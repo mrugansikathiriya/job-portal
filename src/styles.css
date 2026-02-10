@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+/* 👇 VERY IMPORTANT: tell Tailwind where HTML files are */
+@source "../admin/**/*.html";
+@source "../seeker/**/*.html";
