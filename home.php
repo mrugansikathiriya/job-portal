@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CareerCraft | Job Portal</title>
-    <link href="../dist/styles.css" rel="stylesheet">
+    <link href="dist/styles.css" rel="stylesheet">
 
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -29,12 +29,6 @@
             animation: fadeZoom 2s ease forwards;
         }
 
-        /* progress */
-        #scroll-progress-circle {
-            transform: rotate(-90deg);
-            transform-origin: 50% 50%;
-            transition: stroke-dashoffset 0.2s linear;
-        }
 
 
 
@@ -203,107 +197,11 @@
             <div class="absolute h-full w-full animate-pulse bg-[#D7AE27]"></div>
         </div>
     </div>
-    <!-- Scroll Progress Circle with Arrow -->
-    <div id="scroll-progress-container"
-        class="fixed right-6 bottom-8 w-14 h-14 opacity-0 transition-opacity duration-300 z-50 cursor-pointer flex items-center justify-center">
-        <svg class="w-full h-full" viewBox="0 0 100 100">
-            <!-- Background Circle -->
-            <circle cx="50" cy="50" r="45" stroke="#444" stroke-width="8" fill="none" />
-            <!-- Progress Circle -->
-            <circle id="scroll-progress-circle" cx="50" cy="50" r="45" stroke="#D7AE27" stroke-width="8" fill="none"
-                stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283" />
-        </svg>
-        <!-- Arrow Icon (up) -->
-        <span id="scroll-arrow" class="absolute text-[#D7AE27] text-2xl">&#10569;</span>
-    </div>
+ 
+    <?php 
+    include("include/navbar.php");
+    ?>
 
-    <!-- NAVBAR -->
-    <nav class="fixed w-full top-0 z-50 bg-black/50 backdrop-blur-md border-b border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-
-            <!-- Logo -->
-            <div class="flex items-center gap-2 text-xl font-bold text-[#D7AE27]">
-                <img src="image/logo3.jpg" alt="CareerCraft Logo" class="h-10 w-10 object-contain">
-                <span>CareerCraft</span>
-            </div>
-
-            <!-- Desktop Menu -->
-            <div class="flex justify-center">
-                <div class="gap-8 font-medium hidden lg:flex">
-
-                    <!-- Nav Links -->
-                    <a href="home.html"
-                        class="flex items-center h-10 px-3 hover:text-[#D7AE27] hover:underline hover:underline-offset-4">
-                        Home</a>
-                    <a href="#"
-                        class="flex items-center h-10 px-3 hover:text-[#D7AE27] hover:underline hover:underline-offset-4">
-                        Find Jobs</a>
-                    <a href="#"
-                        class="flex items-center h-10 px-3 hover:text-[#D7AE27] hover:underline hover:underline-offset-4">
-                        Find Talent</a>
-                    <a href="#"
-                        class="flex items-center h-10 px-3 hover:text-[#D7AE27] hover:underline hover:underline-offset-4">
-                        Post Job</a>
-                    <a href="#"
-                        class="flex items-center h-10 px-3 hover:text-[#D7AE27] hover:underline hover:underline-offset-4">
-                        Job History</a>
-                </div>
-            </div>
-            <!-- Buttons -->
-            <div class="hidden lg:flex justify-end gap-3">
-                <button
-                    class="px-4 py-2 border border-[#D7AE27] text-[#D7AE27] rounded-lg hover:bg-[#D7AE27] hover:text-black transition">
-                    Login
-                </button>
-
-                <button class="px-4 py-2 bg-[#D7AE27] text-black rounded-lg hover:bg-[#8b6c06] transition"
-                    onclick="location.href='signup.php'">
-                    Sign Up
-                </button>
-            </div>
-
-
-            <!-- Hamburger (Mobile Only) -->
-            <button id="menu-btn" class="lg:hidden text-2xl text-[#D7AE27]" aria-label="Open Menu">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-    </nav>
-
-    <!-- MOBILE MENU -->
-    <div id="mobile-menu"
-        class="fixed top-0 left-0 h-full w-4/5 bg-black/85 backdrop-blur-md transform -translate-x-full transition-transform duration-300 z-50 shadow-xl">
-
-        <div class="flex flex-col h-full justify-between px-4 py-6">
-            <!-- Top: Logo + Close -->
-            <div>
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center space-x-2">
-                        <img src="image/logo3.jpg" alt="Logo" class="h-10 w-10">
-                        <span class="text-[#D7AE27] text-xl font-bold">CareerCraft</span>
-                    </div>
-                    <button id="close-menu" class="text-2xl text-gray-200" aria-label="Close Menu">&#10005;</button>
-                </div>
-
-                <!-- Search Bar -->
-                <div class="relative mb-6">
-                    <i
-                        class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="Search jobs, skills..."
-                        class="w-full pl-10 pr-4 py-3 rounded-full border border-gray-700 bg-gray-900 text-gray-200 placeholder-gray-400
-          focus:outline-none focus:ring-2 focus:ring-[#D7AE27] focus:border-[#D7AE27] shadow-md transition duration-300 hover:shadow-lg hover:border-[#D7AE27]">
-                </div>
-
-                <!-- Links -->
-                <a href="home.html" class="block py-2 text-gray-200 hover:text-[#D7AE27]">Home</a>
-                <a href="#" class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Jobs</a>
-                <a href="#" class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Talent</a>
-                <a href="#" class="block py-2 text-gray-200 hover:text-[#D7AE27]">Post Job</a>
-                <a href="#" class="block py-2 text-gray-200 hover:text-[#D7AE27]">Job History</a>
-            </div>
-
-        </div>
-    </div>
     <!-- Image cursoel -->
     <section class="pt-14 relative" id="home">
         <div class="max-w-7xl mx-auto px-3">
@@ -347,10 +245,10 @@
                             <div class="flex gap-3 justify-center">
                                 <button class="w-32 border border-[#D7AE27] text-[#D7AE27] py-3 rounded-lg
                 transform transition-all duration-300 hover:bg-amber-400 hover:text-black hover:scale-105 hover:shadow-lg
-                active:scale-95 active:shadow-inner">Login</button>
+                active:scale-95 active:shadow-inner"  onclick="location.href='http://localhost/php_program/project/auth/login.php'">Login</button>
                                 <button class="w-32 bg-[#D7AE27] text-black py-3 rounded-lg
                 transform transition-all duration-300 hover:bg-[#B48B1F] hover:text-white hover:scale-105 hover:shadow-lg
-                active:scale-95 active:shadow-inner" onclick="location.href='signup.php'">Sign Up</button>
+                active:scale-95 active:shadow-inner" onclick="location.href='http://localhost/php_program/project/auth/signup.php'">Sign Up</button>
                             </div>
 
                             <!-- Get Started -->
@@ -762,7 +660,7 @@
 
                         <!-- READ MORE BUTTON -->
                         <div class="mt-10">
-                            <a href="about.html" target="_blank"
+                            <a href="about.php" target="_blank"
                                 class="relative inline-block px-8 py-3 font-semibold text-[#0a0a0a] bg-[#D7AE27] rounded-lg overflow-hidden group transition-all duration-500 hover:text-white pulse-button">
                                 <span
                                     class="absolute inset-0 bg-gradient-to-r from-[#FFD966] via-[#D7AE27] to-[#FFD966] opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-lg rounded-lg"></span>
@@ -828,135 +726,11 @@
 
 
     </section>
-    <!-- footer -->
-    <footer class="relative bg-black text-gray-300 pt-20 pb-10 px-6 md:px-20 overflow-hidden">
+  
 
-        <!-- Top Glow -->
-        <div class="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-gray-300/10 to-transparent"></div>
-
-        <!-- MAIN GRID -->
-        <div class="relative max-w-7xl mx-auto grid gap-12 md:grid-cols-[1.6fr_1fr_1fr]">
-
-            <!-- BRAND -->
-            <div class="space-y-6 text-center md:text-left">
-                <div class="flex justify-center md:justify-start items-center gap-3">
-                    <img src="image/logo3.jpg" class="h-12 w-12 rounded-lg shadow-lg">
-                    <h2 class="text-2xl font-bold text-[#D7AE27] tracking-wide">
-                        CareerCraft
-                    </h2>
-                </div>
-
-                <p class="text-gray-400 leading-relaxed max-w-sm mx-auto md:mx-0">
-                    CareerCraft is a modern career-building platform helping students and professionals
-                    grow through technology, innovation, and smart learning solutions.
-                </p>
-
-                <!-- SOCIAL -->
-                <div class="flex justify-center md:justify-start gap-6 pt-2">
-                    <i
-                        class="fa-brands fa-facebook text-xl hover:text-[#D7AE27] transition-all hover:scale-125 hover:drop-shadow-[0_0_8px_#D7AE27] cursor-pointer"></i>
-                    <i
-                        class="fa-brands fa-instagram text-xl hover:text-[#D7AE27] transition-all hover:scale-125 hover:drop-shadow-[0_0_8px_#D7AE27] cursor-pointer"></i>
-                    <i
-                        class="fa-brands fa-x-twitter text-xl hover:text-[#D7AE27] transition-all hover:scale-125 hover:drop-shadow-[0_0_8px_#D7AE27] cursor-pointer"></i>
-                    <i
-                        class="fa-brands fa-linkedin text-xl hover:text-[#D7AE27] transition-all hover:scale-125 hover:drop-shadow-[0_0_8px_#D7AE27] cursor-pointer"></i>
-                </div>
-            </div>
-
-            <!-- QUICK LINKS -->
-            <div class="text-center md:text-left">
-                <h3 class="text-lg font-semibold text-[#D7AE27] mb-5 tracking-wide">
-                    Quick Links
-                </h3>
-                <ul class="space-y-3">
-                    <li>
-                        <a href="#home"
-                            class="relative hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">
-                            Home
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#"
-                            class="relative hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">
-                            Find Jobs
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#"
-                            class="relative hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">
-                            Find Talent
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#"
-                            class="relative hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">
-                            About Us
-                        </a>
-                    </li>
-                    <li>
-                        <a href="about.html#contact"
-                            class="relative hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">
-                            Contact Us
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- LEGAL -->
-            <div class="text-center md:text-left">
-                <h3 class="text-lg font-semibold text-[#D7AE27] mb-5 tracking-wide">
-                    Legal
-                </h3>
-                <ul class="space-y-3">
-                    <li>
-                        <a href="#"
-                            class="hover:text-[#D7AE27] transition  after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">Privacy
-                            Policy</a>
-                    </li>
-                    <li>
-                        <a href="#"
-                            class="hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">Terms
-                            & Conditions</a>
-                    </li>
-                    <li>
-                        <a href="#"
-                            class="hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">Fraud
-                            Alert</a>
-                    </li>
-                </ul>
-                <h3 class="text-lg font-semibold text-[#D7AE27] mb-5 tracking-wide mt-4">
-                    Support
-                </h3>
-                <ul class="space-y-3">
-                    <li>
-                        <a href="#"
-                            class="hover:text-[#D7AE27] transition  after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">
-                            FeedBack</a>
-                    </li>
-                    <li>
-                        <a href="#"
-                            class="hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">FAQs</a>
-                    </li>
-
-                </ul>
-            </div>
-
-        </div>
-
-        <!-- DIVIDER -->
-        <div class="relative max-w-7xl mx-auto mt-14 border-t border-white/10"></div>
-
-        <!-- BOTTOM -->
-        <div class="relative max-w-7xl mx-auto text-center text-sm text-gray-500 mt-6 leading-relaxed">
-            Designed & Developed by <span class="text-[#D7AE27] font-semibold">CareerCraft Team</span><br>
-            © 2025 <span class="text-[#D7AE27] font-semibold">Rabbitcode</span>. All Rights Reserved.
-        </div>
-    </footer>
-
-
-
-
+<?php
+ include("include/footer.php");
+?>
 
 
     <!-- SCRIPT -->
@@ -972,51 +746,7 @@
             }, 2000);
         });
 
-        //=================progress=================
-        const progressContainer = document.getElementById('scroll-progress-container');
-        const progressCircle = document.getElementById('scroll-progress-circle');
-        const arrow = document.getElementById('scroll-arrow');
-        const circumference = 2 * Math.PI * 45; // r=45
-        let scrollTimeout;
-
-        window.addEventListener('scroll', () => {
-            const scrollTop = window.scrollY;
-            const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const scrollPercent = scrollTop / scrollHeight;
-
-            // Update circle progress
-            const dashOffset = circumference * (1 - scrollPercent);
-            progressCircle.style.strokeDashoffset = dashOffset;
-
-            // Show while scrolling
-            progressContainer.style.opacity = 1;
-
-            // Clear previous timeout
-            clearTimeout(scrollTimeout);
-
-            // Hide after 1s of no scrolling
-            scrollTimeout = setTimeout(() => {
-                progressContainer.style.opacity = 0;
-            }, 1000);
-        });
-
-        // Click scroll to top
-        progressContainer.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-        // ================= MOBILE MENU =================
-        const menuBtn = document.getElementById('menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const closeMenu = document.getElementById('close-menu');
-
-        menuBtn.addEventListener('click', () => {
-            mobileMenu.classList.remove('-translate-x-full');
-        });
-
-        closeMenu.addEventListener('click', () => {
-            mobileMenu.classList.add('-translate-x-full');
-        });
+      
 
 
 
@@ -1204,17 +934,15 @@
 
         // Fade-in on scroll
         const faders = document.querySelectorAll('.fade-in-on-scroll');
-        const options = {
-            threshold: 0.2
-        };
+
         const appearOnScroll = new IntersectionObserver(function (entries, observer) {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
-                    observer.unobserve(entry.target);
+                    observer.unobserve(entry.target); // FIXED LINE
                 }
             });
-        }, options);
+        }, { threshold: 0.2 });
 
         faders.forEach(fader => {
             appearOnScroll.observe(fader);
