@@ -81,6 +81,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   ✔ Registration successful
 </div>
 <?php endif; ?>
+
 <div class="w-full max-w-6xl bg-[#0f0f0f] rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-white/10">
 
 <!-- LEFT -->
@@ -164,7 +165,7 @@ class="w-full bg-black border border-white/20 rounded px-4 py-2 mt-2">
 <p id="contactErr" class="text-red-400 text-sm"><?= $contactErr ?></p>
 </div>
 
-<button class="w-full bg-[#D7AE27] text-black py-2 rounded font-bold">
+<button class="w-full bg-[#D7AE27] text-black py-2 rounded font-bold"   onclick="location.href='http://localhost/php_program/project/auth/login.php'">
 Sign Up
 </button>
 
@@ -225,6 +226,7 @@ function togglePassword() {
 }
 
 </script>
+    <?php include("../include/footer.php");?>
 
 </body>
 

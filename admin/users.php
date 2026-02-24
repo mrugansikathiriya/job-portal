@@ -68,13 +68,13 @@ $result = mysqli_query($conn, "SELECT * FROM users ORDER BY uid DESC");
                        <!-- Block / Unblock -->
     <?php if($row['status'] == 'active') { ?>
         <a href="blocked_user.php?uid=<?php echo $row['uid']; ?>"
-           class="bg-blue-500 px-3 py-1 rounded text-sm hover:bg-blue-600 text-white">
-           Block
+           class="bg-green-500 px-3 py-1 rounded text-sm hover:bg-blue-600 text-white">
+           Unblocked
         </a>
     <?php } else { ?>
         <a href="unblocked_user.php?uid=<?php echo $row['uid']; ?>"
-           class="bg-green-500 px-3 py-1 rounded text-sm hover:bg-green-600 text-white">
-           Unblock
+           class="bg-red-500 px-3 py-1 rounded text-sm hover:bg-blue-600 text-white">
+           Blocked
         </a>
     <?php } ?>
                     </td>

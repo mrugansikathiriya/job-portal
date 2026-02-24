@@ -57,21 +57,20 @@
             $websiteErr==""
         ) {
 
-            $sql = "INSERT INTO company 
-            (uid, cname, logo, website, location, description, is_verified, established_at)
-            VALUES (
-            '$uid','$cname','$logoName','$website',
-            '$location','$description','$is_verified','$established_at'
-            )";
+            $sql = "UPDATE company 
+            SET cname='$cname',
+                logo='$logoName',
+                website='$website',
+                location='$location',
+                description='$description',
+                is_verified='$is_verified',
+                established_at='$established_at'
+            WHERE uid='$uid'";
 
          if(mysqli_query($conn,$sql)){
 
     // ✅ UPDATE users table (VERY IMPORTANT)
-    mysqli_query($conn, "
-        UPDATE users 
-        SET is_completed = 1 
-        WHERE uid = '$uid'
-    ");
+    mysqli_query($conn, "UPDATE users SET is_completed = 1 WHERE uid = '$uid'");
 
     // Optional: update session also
     $_SESSION['is_completed'] = 1;

@@ -58,8 +58,11 @@ if ($row["role"] == "admin") {
 
 } else {
 
-    header("Location: jobseeker_dashboard.php");
-
+  if ($row["is_completed"] == 1) {
+        header("Location: http://localhost/php_program/project/home.php");
+    } else {
+        header("Location: http://localhost/php_program/project/seeker/seeker_profile.php");
+    }
 }
 
             exit;

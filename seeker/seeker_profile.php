@@ -24,18 +24,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($sname === "") $snameErr = "Full name required";
     if ($education === "") $educationErr = "Education required";
     if ($skillname === "") $skillErr = "At least one skill required";
-    if ($birthdate === "") $birthDateErr = "Established date is required";
+    if ($birthdate === "") $birthDateErr = "birthdate date is required";
     if ($experience==="") $experienceErr = "Experience is required";
 
 
     if ($snameErr=="" && $educationErr=="" && $skillErr=="" && $birthDateErr=="" && $experienceErr=="") {
 
-        mysqli_query($conn,"
-        INSERT INTO job_seeker
-        (uid, sname, education, experience, skillname, bio,birthdate)
-        VALUES
-        ('$uid','$sname','$education','$experience','$skillname','$bio','$birthdate')
-        ");
+       $sql = "UPDATE job_seeker
+        SET sname='$sname',
+            education='$education',
+            experience='$experience',
+            skillname='$skillname',
+            bio='$bio',
+            birthdate='$birthdate'
+        WHERE uid='$uid'";   // ← close properly
+         if(mysqli_query($conn,$sql)){
 
         mysqli_query($conn,"
         UPDATE users SET is_completed=1 WHERE uid='$uid'
@@ -51,6 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     header("Location:http://localhost/php_program/project/home.php");
         exit;
     }
+}
 }
 ?>
 
@@ -118,7 +122,7 @@ class="w-full bg-black border border-white/20 rounded-md p-3 focus:border-[#D7AE
     </label>
 
     <input type="date"
-           name="birth_date"
+           name="birthdate"
            value="<?= htmlspecialchars($birthdate) ?>"
 class="w-full bg-black border border-white/20 rounded-md p-3 focus:border-[#D7AE27] focus:outline-none">
 
