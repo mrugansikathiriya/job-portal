@@ -11,9 +11,36 @@ $skillname = "";
 $birthdate = "";
 $birthDateErr = "";
 $snameErr = $educationErr =$experienceErr = $skillErr = "";
+$imageName = "";
+$imageErr = "";
+
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+/* IMAGE UPLOAD */
+if(isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0){
 
+    $allowed = ['jpg','jpeg','png','webp'];
+    $fileName = $_FILES['profile_image']['name'];
+    $fileTmp = $_FILES['profile_image']['tmp_name'];
+    $fileSize = $_FILES['profile_image']['size'];
+
+    $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+    if(!in_array($ext, $allowed)){
+        $imageErr = "Only JPG, PNG, WEBP allowed";
+    }
+    elseif($fileSize > 2*1024*1024){
+        $imageErr = "Image must be less than 2MB";
+    }
+    else{
+        $imageName = time() . "_" . uniqid() . "." . $ext;
+        $uploadPath = "../uploads/profile/" . $imageName;
+
+        if(!move_uploaded_file($fileTmp, $uploadPath)){
+            $imageErr = "Image upload failed";
+        }
+    }
+}
     $sname = trim($_POST["sname"] ?? "");
     $education = trim($_POST["education"] ?? "");
     $experience = $_POST["experience"] ?? 0;
@@ -29,15 +56,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
     if ($snameErr=="" && $educationErr=="" && $skillErr=="" && $birthDateErr=="" && $experienceErr=="") {
-
-       $sql = "UPDATE job_seeker
-        SET sname='$sname',
-            education='$education',
-            experience='$experience',
-            skillname='$skillname',
-            bio='$bio',
-            birthdate='$birthdate'
-        WHERE uid='$uid'";   // ← close properly
+$sql = "UPDATE job_seeker
+SET sname='$sname',
+    education='$education',
+    experience='$experience',
+    skillname='$skillname',
+    bio='$bio',
+    birthdate='$birthdate',
+    profile_image='$imageName'
+WHERE uid='$uid'";  // ← close properly
          if(mysqli_query($conn,$sql)){
 
         mysqli_query($conn,"
@@ -96,8 +123,8 @@ p-8 border border-white/10 mt-20 mb-10">
 Job Seeker Profile
 </h2>
 
-<form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
+<form method="POST" enctype="multipart/form-data"
+class="grid grid-cols-1 md:grid-cols-2 gap-6">
 <!-- Full Name -->
 <div>
 <label class="block mb-2">Full Name *</label>
@@ -189,6 +216,8 @@ class="absolute bg-black border border-white/20 w-full mt-1 rounded-md hidden ma
 <p class="text-red-500 text-sm mt-1"><?= $skillErr ?></p>
 </div>
 
+<form method="POST" enctype="multipart/form-data"
+class="grid grid-cols-1 md:grid-cols-2 gap-6">
 <!-- Bio -->
 <div class="md:col-span-2">
 <label class="block mb-2">Bio</label>
@@ -278,6 +307,29 @@ function renderSkills(){
     });
     hiddenInput.value=skills.join(",");
 }
+// image preview
+document.querySelector("input[name='profile_image']")
+.addEventListener("change", function(e){
+
+    const file = e.target.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(event){
+        let preview = document.getElementById("imagePreview");
+        if(!preview){
+            preview = document.createElement("img");
+            preview.id="imagePreview";
+            preview.className="mt-3 h-24 w-24 rounded-full object-cover border border-[#D7AE27]";
+            e.target.parentNode.appendChild(preview);
+        }
+        preview.src = event.target.result;
+    };
+
+    reader.readAsDataURL(file);
+});
+
 
 </script>
     <?php include("../include/footer.php");?>

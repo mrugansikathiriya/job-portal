@@ -22,7 +22,7 @@
             <!-- BRAND -->
             <div class="space-y-6 text-center md:text-left">
                 <div class="flex justify-center md:justify-start items-center gap-3">
-                    <img src="http://localhost/php_program/project/image/logo3.jpg" class="h-12 w-12 rounded-lg shadow-lg">
+                    <img src="../project/image/logo3.jpg" class="h-12 w-12 rounded-lg shadow-lg">
                     <h2 class="text-2xl font-bold text-[#D7AE27] tracking-wide">
                         CareerCraft
                     </h2>
@@ -53,7 +53,7 @@
                 </h3>
                 <ul class="space-y-3">
                     <li>
-                        <a href="http://localhost/php_program/project/home.php"
+                        <a href="../home.php"
                             class="relative hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">
                             Home
                         </a>
@@ -71,7 +71,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="http://localhost/php_program/project/about.php"
+                        <a href="../about.php"
                             class="relative hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">
                             About Us
                         </a>
@@ -97,7 +97,7 @@
                             Policy</a>
                     </li>
                     <li>
-                        <a href="#"
+                        <a href="../project/include/terms.php"
                             class="hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">Terms
                             & Conditions</a>
                     </li>
@@ -117,7 +117,7 @@
                             FeedBack</a>
                     </li>
                     <li>
-                        <a href="#"
+                        <a href="../project/include/faq.php"
                             class="hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">FAQs</a>
                     </li>
 

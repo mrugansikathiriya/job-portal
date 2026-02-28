@@ -5,8 +5,23 @@ require "../array/location.php";
 require "../array/role.php";
 session_start();
 
-$cid = $_SESSION['cid'] ?? 1;
 
+if(!isset($_SESSION['uid'])){
+    header("Location: ../auth/login.php");
+    exit();
+}
+
+$uid = $_SESSION['uid'];
+
+/* Get company id of logged-in user */
+$companyQuery = mysqli_query($conn, "SELECT cid FROM company WHERE uid = $uid");
+
+if(mysqli_num_rows($companyQuery) == 0){
+    die("Company not found. Please complete company profile.");
+}
+
+$companyData = mysqli_fetch_assoc($companyQuery);
+$cid = $companyData['cid'];
 $title = $description = $location = $salary = $salary_type = "";
 $experience_required = $job_type = $work_mode = $deadline = "";
 $skillname = $vacancy = "";
@@ -200,7 +215,6 @@ class="input-field">
     <p id="deadlineErr" class="error"><?= $deadlineErr ?? '' ?></p>
 </div>
 
-<!-- Skill -->
 <!-- Skills -->
 <div class="md:col-span-2 relative">
 <label class="block mb-2">Skills <span class="text-red-500">*</span></label>

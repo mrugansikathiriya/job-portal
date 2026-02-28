@@ -138,7 +138,7 @@ end:
 <link href="../dist/styles.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="icon" href="image/logo3.jpg" type="image/png"></head>
+<link rel="icon" href="http://localhost/php_program/project/image/logo3.jpg" type="image/png"></head>
 
 <body class="min-h-screen flex items-center justify-center bg-black text-white relative overflow-hidden">
 

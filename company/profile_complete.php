@@ -3,8 +3,12 @@
     require "../array/location.php";
     session_start();
 
-    $uid = $_SESSION['uid'] ?? 1;
+if(!isset($_SESSION['uid'])){
+    header("Location: ../auth/login.php");
+    exit();
+}
 
+$uid = $_SESSION['uid'];
     $cname = $website = $location = $description = $established_at = "";
     $is_verified = "";
 
@@ -28,25 +32,41 @@
         if ($website !== "" && !filter_var($website, FILTER_VALIDATE_URL)) {
             $websiteErr = "Invalid website URL";
         }
+if (empty($_FILES["logo"]["name"])) {
+    $logoErr = "Company logo is required";
+}else {
 
-        if (empty($_FILES["logo"]["name"])) {
-            $logoErr = "Company logo is required";
-        } else {
-            $targetDir = "uploads/";
-            if (!is_dir($targetDir)) mkdir($targetDir);
+    $targetDir = "uploads/";
+    if (!is_dir($targetDir)) mkdir($targetDir);
 
-            $logoName = time() . "_" . basename($_FILES["logo"]["name"]);
-            $targetFile = $targetDir . $logoName;
-            $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+$logoName = "company_" . $uid . "_" . time() . ".jpg";
+    $targetFile = $targetDir . $logoName;
 
-            $allowed = ["jpg","jpeg","png"];
+    $check = getimagesize($_FILES["logo"]["tmp_name"]);
 
-            if (!in_array($imageFileType, $allowed)) {
-                $logoErr = "Only JPG, JPEG & PNG allowed";
-            } else {
-                move_uploaded_file($_FILES["logo"]["tmp_name"], $targetFile);
-            }
-        }
+    if ($check === false) {
+        $logoErr = "File is not a valid image";
+    } elseif ($_FILES["logo"]["size"] > 2 * 1024 * 1024) {
+        $logoErr = "Image must be less than 2MB";
+    } else {
+
+        // Resize Image
+        list($width, $height) = getimagesize($_FILES["logo"]["tmp_name"]);
+        $newWidth = 300;
+        $newHeight = 300;
+
+        $src = imagecreatefromstring(file_get_contents($_FILES["logo"]["tmp_name"]));
+        $dst = imagecreatetruecolor($newWidth, $newHeight);
+
+        imagecopyresampled($dst, $src, 0, 0, 0, 0,
+            $newWidth, $newHeight, $width, $height);
+
+        imagejpeg($dst, $targetFile, 80); // 80 = compression quality
+
+        imagedestroy($src);
+        imagedestroy($dst);
+    }
+}
 
         if (
             $cnameErr=="" &&
@@ -173,12 +193,31 @@
         <p id="establishedErr" class="error"><?= $establishedErr ?></p>
     </div>
 
-    <!-- Logo -->
-    <div class="md:col-span-2">
-            <label>Company Logo <span class="text-red-500">*</span></label>
-            <input type="file" id="logo" name="logo" class="input-field">
-            <p id="logoErr" class="error"><?= $logoErr ?></p>
+<!-- Company Logo -->
+<div class="md:col-span-2 mb-4">
+    <label class="block text-white mb-2">
+        Company Logo <span class="text-red-500">*</span>
+    </label>
+
+    <div class="flex items-center gap-6">
+
+        <!-- Preview -->
+        <img id="logoPreview"
+             src="uploads/<?= isset($logoName) ? $logoName : 'download.png'; ?>"
+             class="w-24 h-24 rounded-full object-cover border-2 border-gray-300 shadow">
+
+        <!-- File Input -->
+        <input type="file"
+               name="logo"
+               id="logoInput"
+               accept="image/*"
+               class="text-white">
     </div>
+
+    <p id="logoErr" class="text-red-400 text-sm mt-2">
+        <?= $logoErr ?? "" ?>
+    </p>
+</div>
 
     <!-- Description -->
     <div class="md:col-span-2">
@@ -243,7 +282,6 @@
     const websiteField = document.getElementById("website");
     const websiteErr = document.getElementById("websiteErr");
 
-    const logoField = document.getElementById("logo");
     const logoErr = document.getElementById("logoErr");
 
     const verifiedErr = document.getElementById("verifiedErr");
@@ -289,6 +327,32 @@
     }
     },3000);
 
+const logoInput = document.getElementById("logoInput");
+const preview = document.getElementById("logoPreview");
+const logoErr = document.getElementById("logoErr");
+
+logoInput.addEventListener("change", function () {
+
+    const file = this.files[0];
+
+    if (!file) {
+        logoErr.textContent = "Company logo is required";
+        return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+        logoErr.textContent = "Image must be less than 2MB";
+        return;
+    }
+
+    logoErr.textContent = "";
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        preview.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+});
     </script>
     <?php include("../include/footer.php");?>
 

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -187,6 +188,7 @@
 </head>
 
 
+<?php include("include/navbar.php");?>
 
 <body class="bg-black text-gray-200 font-sans">
 
@@ -198,34 +200,44 @@
         </div>
     </div>
  
-    <?php 
-    include("include/navbar.php");
-    ?>
+   
 
     <!-- Image cursoel -->
-    <section class="pt-14 relative" id="home">
-        <div class="max-w-7xl mx-auto px-3">
+     <div id="carousel" class="relative h-[460px] overflow-hidden rounded-2xl shadow-2xl mt-10">
 
-            <div id="carousel" class="relative h-[460px] overflow-hidden rounded-2xl shadow-2xl">
+    <!-- SLIDES -->
+    <div class="absolute inset-0 slide opacity-100 transition-opacity duration-1000"
+         data-img="image/img2.jpg"
+         data-title="Build Your <span class='text-[#D7AE27]'>Career</span> With Confidence">
+    </div>
 
-                <!-- ================= SLIDES ================= -->
-                <div class="absolute inset-0 slide opacity-100 transition-opacity duration-1000">
-                    <img src="image/img2.jpg" class="w-full h-full object-cover">
+    <div class="absolute inset-0 slide opacity-0 transition-opacity duration-1000"
+         data-img="image/img11.jpg"
+         data-title="Your Dream Job <span class='text-[#D7AE27]'>Starts Here</span>">
+    </div>
 
-                    <!-- Overlay -->
-                    <div class="absolute inset-0 pointer-events-none
-          bg-[radial-gradient(ellipse_85%_65%_at_center,rgba(2,6,23,0.92)_0%,rgba(2,6,23,0.75)_40%,rgba(2,6,23,0.45)_70%,transparent_100%)]
-          flex flex-col justify-center px-6 md:px-12">
+    <div class="absolute inset-0 slide opacity-0 transition-opacity duration-1000"
+         data-img="image/img3.jpg"
+         data-title="Find Work That <span class='text-[#D7AE27]'>Matters</span>">
+    </div>
 
-                        <!-- Heading -->
-                        <div class="max-w-3xl mx-auto text-center space-y-6">
-                            <h1 class="text-3xl md:text-4xl font-bold text-white">
-                                Build Your <span class="text-[#D7AE27]">Career</span> With Confidence
-                            </h1>
-                            <p class="text-gray-300">Find jobs that match your skills</p>
-                        </div>
+    <!-- IMAGE -->
+    <img id="carouselImage" src="image/img2.jpg"
+         class="w-full h-full object-cover">
 
-                        <!-- Search Bar -->
+    <!-- OVERLAY (ONLY ONE TIME) -->
+    <div class="absolute inset-0 pointer-events-none
+        bg-[radial-gradient(ellipse_85%_65%_at_center,rgba(2,6,23,0.92)_0%,rgba(2,6,23,0.75)_40%,rgba(2,6,23,0.45)_70%,transparent_100%)]
+        flex flex-col justify-center px-6 md:px-12">
+
+        <div class="max-w-3xl mx-auto text-center space-y-6">
+            <h1 id="carouselTitle" class="text-3xl md:text-4xl font-bold text-white">
+                Build Your <span class="text-[#D7AE27]">Career</span> With Confidence
+            </h1>
+            <p class="text-gray-300">Find jobs that match your skills</p>
+        </div>
+
+             <!-- Search Bar -->
                         <div class="hidden md:flex relative max-w-3xl mx-auto mt-6 gap-2 pointer-events-auto z-20">
                             <i
                                 class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
@@ -245,10 +257,10 @@
                             <div class="flex gap-3 justify-center">
                                 <button class="w-32 border border-[#D7AE27] text-[#D7AE27] py-3 rounded-lg
                 transform transition-all duration-300 hover:bg-amber-400 hover:text-black hover:scale-105 hover:shadow-lg
-                active:scale-95 active:shadow-inner"  onclick="location.href='http://localhost/php_program/project/auth/login.php'">Login</button>
+                active:scale-95 active:shadow-inner"  onclick="location.href='../project/auth/login.php'">Login</button>
                                 <button class="w-32 bg-[#D7AE27] text-black py-3 rounded-lg
                 transform transition-all duration-300 hover:bg-[#B48B1F] hover:text-white hover:scale-105 hover:shadow-lg
-                active:scale-95 active:shadow-inner" onclick="location.href='http://localhost/php_program/project/auth/signup.php'">Sign Up</button>
+                active:scale-95 active:shadow-inner" onclick="location.href='../project/auth/signup.php'">Sign Up</button>
                             </div>
 
                             <!-- Get Started -->
@@ -259,112 +271,17 @@
                             </div>
 
                         </div>
-                    </div>
-                </div>
+    </div>
 
-                <!-- Slide 2 -->
-                <div class="absolute inset-0 slide opacity-0 transition-opacity duration-1000">
-                    <img src="image/img11.jpg" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 pointer-events-none
-          bg-[radial-gradient(ellipse_85%_65%_at_center,rgba(2,6,23,0.92)_0%,rgba(2,6,23,0.75)_40%,rgba(2,6,23,0.45)_70%,transparent_100%)]
-          flex flex-col justify-center px-6 md:px-12">
+    <!-- CONTROLS -->
+    <button id="prev"
+        class="absolute left-4 top-1/2 -translate-y-1/2 text-3xl text-white/70 hover:text-white transition">&#10096;</button>
 
-                        <div class="max-w-3xl mx-auto text-center space-y-6">
-                            <h1 class="text-3xl md:text-4xl font-bold text-white">
-                                Your Dream Job <span class="text-[#D7AE27]">Starts Here</span>
-                            </h1>
-                            <p class="text-gray-300">Find jobs that match your skills</p>
-                        </div>
+    <button id="next"
+        class="absolute right-4 top-1/2 -translate-y-1/2 text-3xl text-white/70 hover:text-white transition">&#10097;</button>
 
-                        <!-- Search Bar -->
-                        <div class="hidden md:flex relative max-w-3xl mx-auto mt-6 gap-2 pointer-events-auto z-20">
-                            <i
-                                class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" class="job-search w-full pl-12 pr-4 py-3 rounded-full border border-white placeholder-gray-300
-              text-white font-sans focus:border-[#D7AE27] focus:ring-2 focus:ring-[#D7AE27] outline-none transition"
-                                placeholder="Search jobs, skills...">
-                            <button
-                                class="search-btn w-36 bg-[#D7AE27] text-black rounded-full hover:bg-amber-500 hover:text-white transition-all duration-300 transform">
-                                Search
-                            </button>
-                        </div>
-
-                        <!-- Mobile Buttons -->
-                        <div class="md:hidden px-4 py-6 flex flex-col items-center space-y-4 pointer-events-auto z-20">
-                            <div class="flex gap-3 justify-center">
-                                <button class="w-32 border border-[#D7AE27] text-[#D7AE27] py-3 rounded-lg
-                transform transition-all duration-300 hover:bg-amber-400 hover:text-black hover:scale-105 hover:shadow-lg
-                active:scale-95 active:shadow-inner">Login</button>
-                                <button class="w-32 bg-[#D7AE27] text-black py-3 rounded-lg
-                transform transition-all duration-300 hover:bg-[#B48B1F] hover:text-white hover:scale-105 hover:shadow-lg
-                active:scale-95 active:shadow-inner" onclick="location.href='signup.php'">Sign Up</button>
-                            </div>
-                            <div class="flex justify-center">
-                                <button class="w-64 bg-[#FBBF24] text-black py-3 rounded-lg font-semibold
-                transform transition-all duration-300 hover:bg-[#D7AE27] hover:text-white hover:scale-105 hover:shadow-xl
-                active:scale-95 active:shadow-inner">Get Started</button>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- Slide 3 -->
-                <div class="absolute inset-0 slide opacity-0 transition-opacity duration-1000">
-                    <img src="image/img3.jpg" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 pointer-events-none
-          bg-[radial-gradient(ellipse_85%_65%_at_center,rgba(2,6,23,0.92)_0%,rgba(2,6,23,0.75)_40%,rgba(2,6,23,0.45)_70%,transparent_100%)]
-          flex flex-col justify-center px-6 md:px-12">
-
-                        <div class="max-w-3xl mx-auto text-center space-y-6">
-                            <h1 class="text-3xl md:text-4xl font-bold text-white">
-                                Find Work That <span class="text-[#D7AE27]">Matters</span>
-                            </h1>
-                            <p class="text-gray-300">Find jobs that match your skills</p>
-                        </div>
-
-                        <!-- Search Bar -->
-                        <div class="hidden md:flex relative max-w-3xl mx-auto mt-6 gap-2 pointer-events-auto z-20">
-                            <i
-                                class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" class="job-search w-full pl-12 pr-4 py-3 rounded-full border border-white placeholder-gray-300
-              text-white font-sans focus:border-[#D7AE27] focus:ring-2 focus:ring-[#D7AE27] outline-none transition"
-                                placeholder="Search jobs, skills...">
-                            <button
-                                class="search-btn w-36 bg-[#D7AE27] text-black rounded-full hover:bg-amber-500 hover:text-white transition-all duration-300 transform">
-                                Search
-                            </button>
-                        </div>
-
-                        <!-- Mobile Buttons -->
-                        <div class="md:hidden px-4 py-6 flex flex-col items-center space-y-4 pointer-events-auto z-20">
-                            <div class="flex gap-3 justify-center">
-                                <button class="w-32 border border-[#D7AE27] text-[#D7AE27] py-3 rounded-lg
-                transform transition-all duration-300 hover:bg-amber-400 hover:text-black hover:scale-105 hover:shadow-lg
-                active:scale-95 active:shadow-inner">Login</button>
-                                <button class="w-32 bg-[#D7AE27] text-black py-3 rounded-lg
-                transform transition-all duration-300 hover:bg-[#B48B1F] hover:text-white hover:scale-105 hover:shadow-lg
-                active:scale-95 active:shadow-inner" onclick="location.href='signup.php'">Sign Up</button>
-                            </div>
-                            <div class="flex justify-center">
-                                <button class="w-64 bg-[#FBBF24] text-black py-3 rounded-lg font-semibold
-                transform transition-all duration-300 hover:bg-[#D7AE27] hover:text-white hover:scale-105 hover:shadow-xl
-                active:scale-95 active:shadow-inner">Get Started</button>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- CONTROLS -->
-                <button id="prev"
-                    class="absolute left-4 top-1/2 -translate-y-1/2 text-3xl text-white/70 hover:text-white transition">&#10096;</button>
-                <button id="next"
-                    class="absolute right-4 top-1/2 -translate-y-1/2 text-3xl text-white/70 hover:text-white transition">&#10097;</button>
-
-            </div>
-        </div>
-    </section>
+</div>
+ 
 
     <!-- Trusted Companies -->
     <section class="bg-black py-16">
@@ -749,89 +666,37 @@
       
 
 
+const slides = document.querySelectorAll(".slide");
+const img = document.getElementById("carouselImage");
+const title = document.getElementById("carouselTitle");
 
-        //search and slide
-        const slides = document.querySelectorAll(".slide");
-        const next = document.getElementById("next");
-        const prev = document.getElementById("prev");
+let current = 0;
 
-        let index = 0;
+function showSlide(index) {
+    const slide = slides[index];
 
-        function showSlide(i) {
-            slides.forEach((slide, idx) => {
-                slide.classList.toggle("opacity-100", idx === i);
-                slide.classList.toggle("opacity-0", idx !== i);
-            });
-        }
+    img.src = slide.dataset.img;
+    title.innerHTML = slide.dataset.title;
 
-        function nextSlide() {
-            index = (index + 1) % slides.length;
-            showSlide(index);
-        }
+    slides.forEach(s => s.style.opacity = "0");
+    slide.style.opacity = "1";
+}
 
-        function prevSlide() {
-            index = (index - 1 + slides.length) % slides.length;
-            showSlide(index);
-        }
+document.getElementById("next").onclick = () => {
+    current = (current + 1) % slides.length;
+    showSlide(current);
+};
 
-        next.addEventListener("click", nextSlide);
-        prev.addEventListener("click", prevSlide);
+document.getElementById("prev").onclick = () => {
+    current = (current - 1 + slides.length) % slides.length;
+    showSlide(current);
+};
 
-        setInterval(nextSlide, 4000);
-
-        // SEARCH LOGIC
-        function runSearch(value) {
-            if (!value.trim()) return alert("Please enter a search term");
-            alert("Searching for: " + value);
-            // window.location.href = "jobs.php?search=" + encodeURIComponent(value);
-        }
-
-        document.addEventListener("click", e => {
-            const btn = e.target.closest(".search-btn");
-            if (!btn) return;
-            const input = btn.parentElement.querySelector(".job-search");
-            if (input) runSearch(input.value);
-        });
-
-        document.querySelectorAll(".job-search").forEach(input => {
-            input.addEventListener("keydown", e => {
-                if (e.key === "Enter") runSearch(input.value);
-            });
-        });
-        // Select all search inputs (carousel + sticky if you give it class "job-search")
-        const searchInputs = document.querySelectorAll(".job-search");
-
-        // Sync input value across all inputs
-        searchInputs.forEach(input => {
-            input.addEventListener("input", (e) => {
-                const value = e.target.value;
-                searchInputs.forEach(i => {
-                    if (i !== input) i.value = value; // update other inputs
-                });
-            });
-        });
-
-        // Search button logic
-        document.addEventListener("click", (e) => {
-            const btn = e.target.closest(".search-btn");
-            if (!btn) return;
-
-            const input = btn.parentElement.querySelector(".job-search");
-            if (input && input.value.trim() !== "") {
-                // Replace this with your search page
-                window.location.href = "jobs.php?search=" + encodeURIComponent(input.value);
-            }
-        });
-
-        // Enter key triggers search
-        searchInputs.forEach(input => {
-            input.addEventListener("keydown", (e) => {
-                if (e.key === "Enter" && input.value.trim() !== "") {
-                    // Replace this with your search page
-                    window.location.href = "jobs.php?search=" + encodeURIComponent(input.value);
-                }
-            });
-        });
+// Auto slide
+setInterval(() => {
+    current = (current + 1) % slides.length;
+    showSlide(current);
+}, 5000);
         //  company logo
         // List of company logos (can be PNG or JPG)
         const logos = [

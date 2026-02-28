@@ -1,7 +1,14 @@
 <?php
 require "../config/db.php";
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require __DIR__ . '/../phpmailer/src/Exception.php';
+require __DIR__ . '/../phpmailer/src/PHPMailer.php';
+require __DIR__ . '/../phpmailer/src/SMTP.php';
+
 $uname = $email = $password = $contact = $role = "";
-$unameErr = $emailErr = $passwordErr = $contactErr = $roleErr = "";
+$unameErr = $emailErr = $passwordErr = $contactErr = $roleErr =$termsErr = "";
 $success = false;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -18,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($contact == "") $contactErr = "Contact required";
     if ($role == "") $roleErr = "Role required";
 
-    if ($unameErr=="" && $emailErr=="" && $passwordErr=="" && $contactErr=="" && $roleErr=="") {
+    if ($unameErr=="" && $emailErr=="" && $passwordErr=="" && $contactErr=="" && $roleErr=="" && $termsErr =="") {
 
         // check email exists
         $check = mysqli_query($conn, "SELECT uid FROM users WHERE email='$email'");
@@ -44,8 +51,100 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 mysqli_query($conn,
                     "INSERT INTO job_seeker (uid,sname) VALUES ($uid,'$uname')"
                 );
-            }
+                    }
+             
+try {
 
+    $mail = new PHPMailer(true);
+
+    $mail->isSMTP();
+    $mail->Host       = 'smtp.gmail.com';
+    $mail->SMTPAuth   = true;
+    $mail->Username   = 'careercraft535@gmail.com';
+    $mail->Password   = 'twhx zekb bklj ceow'; // change this
+    $mail->SMTPSecure = 'tls';
+    $mail->Port       = 587;
+
+    $mail->setFrom('careercraft535@gmail.com', 'Career Craft');
+    $mail->addAddress($email, $uname);
+
+    $mail->isHTML(true);
+    $mail->Subject = 'Welcome to Career Craft 🎉';
+
+    // ===== ROLE BASED CONTENT =====
+
+    if (strtolower($role) == "company") {
+        $mainMessage = "
+            <p>You can now post jobs, manage applicants, and grow your company with top talent.</p>
+         
+        ";
+    } else {
+        $mainMessage = "
+            <p>You can now explore jobs, apply to companies, and build your career.</p>
+          
+        ";
+    }
+
+    // ===== FULL EMAIL DESIGN =====
+
+    $mail->Body = "
+    <html>
+    <body style='margin:0; padding:0; background:#f4f4f4; font-family:Segoe UI;'>
+
+    <table align='center' width='100%' cellpadding='0' cellspacing='0'>
+    <tr>
+    <td align='center'>
+
+    <table width='600' cellpadding='0' cellspacing='0'
+    style='background:white; margin-top:40px; border-radius:10px; overflow:hidden;'>
+
+    <!-- HEADER -->
+    <tr>
+    <td align='center' style='background:black; padding:30px;'>
+    <h1 style='color:#D7AE27; margin:0;'>Career Craft</h1>
+    <p style='color:white; margin:5px 0 0 0;'>Build Your Future With Us</p>
+    </td>
+    </tr>
+
+    <!-- BODY -->
+    <tr>
+    <td style='padding:40px; color:#333;'>
+
+    <h2>Welcome, $uname 👋</h2>
+
+    $mainMessage
+
+    <p style='margin-top:30px; font-size:14px; color:#777;'>
+    If you did not register this account, please ignore this email.
+    </p>
+
+    </td>
+    </tr>
+
+    <!-- FOOTER -->
+    <tr>
+    <td align='center' style='background:#f9f9f9; padding:20px; font-size:13px; color:#888;'>
+    © ".date("Y")." Career Craft | India
+    </td>
+    </tr>
+
+    </table>
+
+    </td>
+    </tr>
+    </table>
+
+    </body>
+    </html>
+    ";
+
+    $mail->send();
+
+} catch (Exception $e) {
+    error_log("Mailer Error: " . $mail->ErrorInfo);
+}
+
+// ===== END EMAIL =====
             $success = true;
             $uname = $email = $password = $contact = $role = "";
         }
@@ -62,7 +161,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <link href="../dist/styles.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="icon" href="image/logo3.jpg" type="image/png">
+<link rel="icon" href="../image/logo3.jpg" type="image/png">
 
 <style>
 @keyframes float {
@@ -85,7 +184,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <div class="w-full max-w-6xl bg-[#0f0f0f] rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-white/10">
 
 <!-- LEFT -->
- <a href="http://localhost/php_program/project/home.php" class="absolute left-4 top-4 text-yellow-400 text-sm hover:underline">← Back</a>
+ <a href="../home.php" class="absolute left-4 top-4 text-yellow-400 text-sm hover:underline">← Back</a>
 
 <div class="md:w-1/2 bg-black relative flex items-center justify-center overflow-hidden">
   <div class="hidden md:block absolute w-72 h-72 bg-[#D7AE27] rounded-full -top-12 -left-12 animate-float"></div>
@@ -164,8 +263,25 @@ value="<?= htmlspecialchars($contact) ?>"
 class="w-full bg-black border border-white/20 rounded px-4 py-2 mt-2">
 <p id="contactErr" class="text-red-400 text-sm"><?= $contactErr ?></p>
 </div>
+<!-- TERMS & CONDITIONS -->
+<div class="flex items-start gap-2 mt-2">
+    <input type="checkbox" id="terms" name="terms"
+        class="mt-1 accent-yellow-500">
 
-<button class="w-full bg-[#D7AE27] text-black py-2 rounded font-bold"   onclick="location.href='http://localhost/php_program/project/auth/login.php'">
+    <label for="terms" class="text-sm text-white/80">
+        I agree to the 
+        <a href="../include/terms.php" target="_blank"
+           class="text-[#D7AE27] hover:underline">
+           Terms & Conditions
+        </a>
+    </label>
+</div>
+
+<p class="text-red-400 text-sm">
+    <?= isset($termsErr) ? $termsErr : "" ?>
+</p>
+
+<button id="signBtn" class="w-full bg-[#D7AE27] text-black py-2 rounded font-bold mt-2"   onclick="location.href='http://localhost/php_program/project/auth/login.php'">
 Sign Up
 </button>
 
@@ -201,12 +317,18 @@ document.querySelectorAll('[name="role"]').forEach(r =>
   r.onchange = () => roleErr.textContent = ""
 );
 
-setTimeout(() => {
-    const toast = document.getElementById("successToast");
-    toast.style.opacity = "0";
+document.addEventListener("DOMContentLoaded", function() {
 
-    setTimeout(() => toast.remove(), 500); // remove after fade-out
-  }, 3000); // 3 seconds
+    const toast = document.getElementById("successToast");
+
+    if (toast) {
+        setTimeout(() => {
+            toast.style.opacity = "0";
+            setTimeout(() => toast.remove(), 500);
+        }, 3000);
+    }
+
+});
 
 
 function togglePassword() {
@@ -224,9 +346,17 @@ function togglePassword() {
     }
 
 }
+const termsCheckbox = document.getElementById("terms");
+const signBtn = document.getElementById("signBtn");
 
+if (termsCheckbox) {
+    signBtn.disabled = true;
+
+    termsCheckbox.addEventListener("change", function() {
+        signBtn.disabled = !this.checked;
+    });
+}
 </script>
-    <?php include("../include/footer.php");?>
 
 </body>
 
