@@ -22,7 +22,7 @@
             <!-- BRAND -->
             <div class="space-y-6 text-center md:text-left">
                 <div class="flex justify-center md:justify-start items-center gap-3">
-                    <img src="../project/image/logo3.jpg" class="h-12 w-12 rounded-lg shadow-lg">
+                    <img src="http://localhost/php_program/project/image/logo3.jpg" class="h-12 w-12 rounded-lg shadow-lg">
                     <h2 class="text-2xl font-bold text-[#D7AE27] tracking-wide">
                         CareerCraft
                     </h2>

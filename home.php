@@ -1,4 +1,7 @@
+<?php
+session_start(); // <--- top of the file
 
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -188,7 +191,9 @@
 </head>
 
 
-<?php include("include/navbar.php");?>
+<?php
+
+include("include/navbar.php");?>
 
 <body class="bg-black text-gray-200 font-sans">
 
@@ -253,19 +258,11 @@
                         <!-- Mobile Buttons -->
                         <div class="md:hidden px-4 py-6 flex flex-col items-center space-y-4 pointer-events-auto z-20">
 
-                            <!-- Login & Sign Up -->
-                            <div class="flex gap-3 justify-center">
-                                <button class="w-32 border border-[#D7AE27] text-[#D7AE27] py-3 rounded-lg
-                transform transition-all duration-300 hover:bg-amber-400 hover:text-black hover:scale-105 hover:shadow-lg
-                active:scale-95 active:shadow-inner"  onclick="location.href='../project/auth/login.php'">Login</button>
-                                <button class="w-32 bg-[#D7AE27] text-black py-3 rounded-lg
-                transform transition-all duration-300 hover:bg-[#B48B1F] hover:text-white hover:scale-105 hover:shadow-lg
-                active:scale-95 active:shadow-inner" onclick="location.href='../project/auth/signup.php'">Sign Up</button>
-                            </div>
+                    
 
                             <!-- Get Started -->
                             <div class="flex justify-center">
-                                <button class="w-64 bg-[#FBBF24] text-black py-3 rounded-lg font-semibold
+                                <button onclick="location.href='#hire'" class="w-64 bg-[#FBBF24] text-black py-3 rounded-lg font-semibold
                 transform transition-all duration-300 hover:bg-[#D7AE27] hover:text-white hover:scale-105 hover:shadow-xl
                 active:scale-95 active:shadow-inner">Get Started</button>
                             </div>

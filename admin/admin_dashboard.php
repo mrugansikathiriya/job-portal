@@ -148,7 +148,7 @@ $applications = $conn->query("SELECT COUNT(*) as total FROM application")->fetch
 
         <!-- Logout -->
         <div class="mt-10">
-            <a href="logout.php"
+            <a href="http://localhost/php_program/project/auth/logout.php"
                class="bg-[#D7AE27] text-black px-6 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition">
                Logout
             </a>

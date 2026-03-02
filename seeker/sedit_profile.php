@@ -5,13 +5,8 @@ require "../config/db.php";
 require "../array/skill.php";
 require "../authc/csrf.php";
 
-if(!isset($_SESSION['uid'])){
+if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'seeker'){
     header("Location: ../auth/login.php");
-    exit();
-}
-
-if(isset($_SESSION['is_completed']) && $_SESSION['is_completed'] == 1){
-    header("Location: sdashboard.php"); // Seeker dashboard
     exit();
 }
 
@@ -25,7 +20,7 @@ $imageName = "";
 $snameErr = $educationErr = $experienceErr = $skillErr = $birthDateErr = "";
 $imageErr = "";
 
-// Fetch existing data
+/* Fetch existing data */
 $result = mysqli_query($conn,"SELECT * FROM job_seeker WHERE uid='$uid'");
 $existing = mysqli_fetch_assoc($result);
 
@@ -39,7 +34,7 @@ if($existing){
     $imageName = $existing['profile_image'];
 }
 
-// Form submit
+/* FORM SUBMIT */
 if($_SERVER["REQUEST_METHOD"] === "POST"){
 
     if (!validateCSRFToken($_POST['csrf_token'])) {
@@ -53,8 +48,16 @@ if($_SERVER["REQUEST_METHOD"] === "POST"){
     $bio = trim($_POST["bio"] ?? "");
     $birthdate = $_POST["birthdate"] ?? "";
 
-    // Image upload
+    /* Validation */
+    if ($sname === "") $snameErr = "Full name required";
+    if ($education === "") $educationErr = "Education required";
+    if ($experience === "") $experienceErr = "Experience required";
+    if ($skillname === "") $skillErr = "At least one skill required";
+    if ($birthdate === "") $birthDateErr = "Birthdate required";
+
+    /* Image Upload */
     if (!empty($_FILES['profile_image']['name'])) {
+
         $targetDir = __DIR__ . "/uploads/";
         if (!is_dir($targetDir)) mkdir($targetDir, 0755, true);
 
@@ -66,6 +69,7 @@ if($_SERVER["REQUEST_METHOD"] === "POST"){
         } elseif($_FILES['profile_image']['size'] > 2 * 1024 * 1024){
             $imageErr = "Image must be less than 2MB";
         } else {
+
             $imageName = "user_" . $uid . "_" . time() . ".jpg";
             $targetFile = $targetDir . $imageName;
 
@@ -85,37 +89,43 @@ if($_SERVER["REQUEST_METHOD"] === "POST"){
         }
     }
 
-    // Validation
-    if ($sname === "") $snameErr = "Full name required";
-    if ($education === "") $educationErr = "Education required";
-    if ($experience === "") $experienceErr = "Experience required";
-    if ($skillname === "") $skillErr = "At least one skill required";
-    if ($birthdate === "") $birthDateErr = "Birthdate required";
-
     if ($snameErr=="" && $educationErr=="" && $experienceErr=="" && $skillErr=="" && $birthDateErr=="" && $imageErr=="") {
+if($imageName != ""){
 
-      $imageQuery = $imageName != "" ? "profile_image='$imageName'" : "";
+    $sql = "UPDATE job_seeker SET
+                sname='$sname',
+                education='$education',
+                experience='$experience',
+                skillname='$skillname',
+                bio='$bio',
+                birthdate='$birthdate',
+                profile_image='$imageName'
+            WHERE uid='$uid'";
 
-$sql = "UPDATE job_seeker SET
-            sname='$sname',
-            education='$education',
-            experience='$experience',
-            skillname='$skillname',
-            bio='$bio',
-            birthdate='$birthdate'";
+} else {
 
-if($imageQuery != "") $sql .= ", $imageQuery";
+    $sql = "UPDATE job_seeker SET
+                sname='$sname',
+                education='$education',
+                experience='$experience',
+                skillname='$skillname',
+                bio='$bio',
+                birthdate='$birthdate'
+            WHERE uid='$uid'";
+}
 
-$sql .= " WHERE uid='$uid'";
+mysqli_query($conn,$sql);
 
         if(mysqli_query($conn,$sql)){
 
-            mysqli_query($conn,"UPDATE users SET is_completed=1 WHERE uid='$uid'");
-            $_SESSION['is_completed'] = 1;
-            $_SESSION['profile_success'] = "Profile completed successfully!";
-            if($imageName != "") $_SESSION['profile_image'] = $imageName;
+            if($imageName != ""){
+                mysqli_query($conn,"UPDATE users SET p_image='$imageName' WHERE uid='$uid'");
+               $_SESSION['p_image'] = $imageName;
+            }
 
+            $_SESSION['edit_success'] = "Profile updated successfully!";
             regenerateCSRFToken();
+
             header("Location: sdashboard.php");
             exit();
         }
@@ -128,16 +138,14 @@ $sql .= " WHERE uid='$uid'";
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Career Craft | Job Seeker Registration</title>
+<title>Career Craft | Edit Company Profile</title>
+
 <link href="../dist/styles.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="icon" href="../image/logo3.jpg" type="image/png">
+
 <style>
-input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-    cursor: pointer;
-}
 .input-field{
     width:100%;
     background:black;
@@ -152,34 +160,33 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size:14px;
     margin-top:4px;
 }
+
+        /* Make calendar icon white */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+       
 </style>
+
 </head>
-<body class="bg-black px-4 py-6 overflow-x-hidden overflow-y-auto text-white">
 
-<?php include("../include/navbar.php");?>
+<body class="bg-black px-4 py-6 overflow-x-hidden overflow-y-auto">
 
-<a href="../auth/login.php" class="absolute left-4 top-4 mt-20 text-yellow-400 text-sm hover:underline">← Back</a>
+<?php include("../include/navbar.php"); ?>
+<a href="sdashboard.php"
+   class="inline-block mt-20 mb-4 text-yellow-400 text-sm hover:underline">
+   ← Back to Dashboard
+</a>
 
-   <?php if(isset($_SESSION['login_success'])): ?>
-<div id="flashMessage"
-     class="fixed top-15 right-5 bg-green-600 text-white px-6 py-4 rounded-lg shadow-lg z-50 
-            flex items-center justify-between gap-4 min-w-[280px] 
-            transition-opacity duration-500">
 
-    <span><?= $_SESSION['login_success']; ?></span>
+<div class="max-w-5xl mx-auto bg-[#0f0f0f] rounded-2xl shadow-2xl 
+p-6 sm:p-8 border border-white/10 text-white mb-20">
 
-    <!-- Close Button -->
-    <button onclick="closeFlash()"
-            class="text-white text-xl font-bold hover:text-gray-200 leading-none">
-        &times;
-    </button>
-</div>
-<?php unset($_SESSION['login_success']); ?>
-<?php endif; ?>
-<div class="max-w-5xl mx-auto bg-[#0f0f0f] rounded-2xl shadow-2xl p-6 sm:p-8 border border-white/10 mt-20 mb-10">
 <h2 class="text-2xl md:text-3xl font-bold text-[#D7AE27] mb-6 text-center">
-Job Seeker Registration
+Edit Company Profile
 </h2>
+
 
 <form method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-5" novalidate>
 <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
@@ -189,7 +196,9 @@ Job Seeker Registration
 <label class="block mb-2">Profile Image</label>
 <div class="flex items-center gap-6">
 <img id="imagePreview"
-src="<?= !empty($imageName) ? '../uploads/profile/'.$imageName : 'https://ui-avatars.com/api/?name='.urlencode($sname ?? 'User').'&background=D7AE27&color=000'; ?>"
+src="<?= !empty($imageName) 
+        ? 'uploads/'.$imageName 
+        : 'https://ui-avatars.com/api/?name='.urlencode($sname ?? 'User').'&background=D7AE27&color=000'; ?>"
 class="w-24 h-24 rounded-full object-cover border-2 border-gray-300 shadow">
 <input type="file" name="profile_image" id="profileInput" accept="image/*" class="text-white">
 </div>
@@ -252,15 +261,20 @@ class="w-24 h-24 rounded-full object-cover border-2 border-gray-300 shadow">
 <textarea name="bio" id="bio" rows="4" class="input-field resize-none"><?= htmlspecialchars($bio) ?></textarea>
 </div>
 
+
+<!-- Submit -->
 <div class="md:col-span-2 mt-6 flex justify-center">
 <button class="bg-[#D7AE27] text-black px-8 py-2 rounded-md font-semibold hover:bg-yellow-400 transition">
-Register
+Save Changes
 </button>
 </div>
+
 </form>
 </div>
 
+<!-- JAVASCRIPT -->
 <script>
+
 const skillsArray = <?= json_encode($skillsList) ?>;
 const skillInput = document.getElementById("skillInput");
 const skillTags = document.getElementById("skillTags");
@@ -345,26 +359,16 @@ document.addEventListener("click", function (e) {
         suggestionBox.classList.add("hidden");
     }
 });
-
-// Image preview & validation
-const imageInput = document.getElementById("profileInput");
-const imagePreview = document.getElementById("imagePreview");
-const imageErr = document.getElementById("imageErr");
-
-imageInput.addEventListener("change", function(){
+// Logo Preview
+document.getElementById("profileInput").addEventListener("change", function () {
     const file = this.files[0];
-    if(!file) return;
-    const allowed = ["image/jpeg","image/png","image/webp"];
-    if(!allowed.includes(file.type)){
-        imageErr.textContent = "Only JPG, PNG, WEBP allowed";
-    } else if(file.size > 2*1024*1024){
-        imageErr.textContent = "Image must be less than 2MB";
-    } else {
-        imageErr.textContent = "";
-        const reader = new FileReader();
-        reader.onload = e => imagePreview.src = e.target.result;
-        reader.readAsDataURL(file);
-    }
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        document.getElementById("imagePreview").src = e.target.result;
+    };
+    reader.readAsDataURL(file);
 });
 
 // Live validation
@@ -407,23 +411,11 @@ document.querySelector("form").addEventListener("submit", function(e){
     if(!valid) e.preventDefault();
 });
 
-// Initial render
 renderSkills();
 
-function closeFlash() {
-    const flash = document.getElementById("flashMessage");
-    if (flash) {
-        flash.style.opacity = "0";
-        setTimeout(() => flash.remove(), 500);
-    }
-}
-
-// Auto hide after 1 minute (60000 milliseconds)
-setTimeout(function(){
-    closeFlash();
-}, 60000);
 </script>
 
-<?php include("../include/footer.php");?>
+<?php include("../include/footer.php"); ?>
+
 </body>
 </html>

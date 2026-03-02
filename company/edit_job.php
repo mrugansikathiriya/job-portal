@@ -1,281 +1,67 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+session_start();
+
 require "../config/db.php";
 require "../array/skill.php";
 require "../array/location.php";
 require "../array/role.php";
 require "../authc/csrf.php";
 
-
-if(!isset($_SESSION['uid'])){
+if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'company'){
     header("Location: ../auth/login.php");
     exit();
 }
 
 $uid = $_SESSION['uid'];
+$jid = intval($_GET['jid'] ?? 0);
 
-/* Get company id of logged-in user */
-$companyQuery = mysqli_query($conn, "SELECT cid FROM company WHERE uid = $uid");
-
-if(mysqli_num_rows($companyQuery) == 0){
-    die("Company not found. Please complete company profile.");
+// Fetch job and company
+$jobRes = mysqli_query($conn, "SELECT * FROM job JOIN company ON job.cid = company.cid WHERE job.jid='$jid' AND company.uid='$uid'");
+if(mysqli_num_rows($jobRes) == 0){
+    die("Job not found or unauthorized");
 }
+$job = mysqli_fetch_assoc($jobRes);
 
-$companyData = mysqli_fetch_assoc($companyQuery);
-$cid = $companyData['cid'];
-$title = $description = $location = $salary = $salary_type = "";
-$experience_required = $job_type = $work_mode = $deadline = "";
-$skillname = $vacancy = "";
+$errors = [];
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
-$titleErr = $locationErr = $experienceErr = "";
-$jobTypeErr = $workModeErr = $deadlineErr = "";
-$skillErr = $vacancyErr = "";
-
-$success = false;
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
- if (!validateCSRFToken($_POST['csrf_token'])) {
+     if (!validateCSRFToken($_POST['csrf_token'])) {
         die("Invalid CSRF token");
     }
-    $title = trim($_POST["title"] ?? "");
-    $description = trim($_POST["description"] ?? "");
-    $location = trim($_POST["location"] ?? "");
-    $salary = trim($_POST["salary"] ?? "");
-    $salary_type = $_POST["salary_type"] ?? "";
-    $experience_required = $_POST["experience_required"] ?? "";
-    $job_type = $_POST["job_type"] ?? "";
-    $work_mode = $_POST["work_mode"] ?? "";
-    $deadline = $_POST["deadline"] ?? "";
-    $skillname = trim($_POST["skillname"] ?? "");
-    $vacancy = $_POST["vacancy"] ?? "";
-$status = (strtotime($deadline) < strtotime(date("Y-m-d"))) ? "closed" : "open";
-    if ($title === "") $titleErr = "Job title is required";
-    if ($location === "") $locationErr = "Location is required";
-    if ($experience_required === "") $experienceErr = "Experience is required";
-    if ($job_type === "") $jobTypeErr = "Job type is required";
-    if ($work_mode === "") $workModeErr = "Work mode is required";
-    if ($deadline === "") $deadlineErr = "Deadline date is required";
-    if ($skillname === "") $skillErr = "At least one skill is required";
-    if ($vacancy === "") $vacancyErr = "Vacancy is required";
+        $title = trim($_POST['title']);
+    $location = trim($_POST['location']);
+    $experience = trim($_POST['experience_required']);
+    $job_type = trim($_POST['job_type']);
+    $work_mode = trim($_POST['work_mode']);
+    $salary = trim($_POST['salary']);
+    $deadline = $_POST['deadline'];
+    $description = trim($_POST['description']);
 
-    if (
-        $titleErr=="" && $locationErr=="" && $experienceErr=="" &&
-        $jobTypeErr=="" && $workModeErr=="" && $deadlineErr=="" &&
-        $skillErr=="" && $vacancyErr==""
-    ) {
+    if(!$title) $errors[] = "Job title required";
 
-$sql = "INSERT INTO job
-(uid, cid, title, description, location, salary, salary_type,
-experience_required, skillname, job_type, work_mode, deadline,
-status, vacancy, applicant, is_approve)
-VALUES (
-'$uid', '$cid', '$title', '$description', '$location', '$salary',
-'$salary_type', '$experience_required', '$skillname',
-'$job_type', '$work_mode', '$deadline',
-'$status', '$vacancy', 0, 'pending'
-)";
-        if(mysqli_query($conn,$sql)){
-            $_SESSION['post_success'] = "Job posted successfully!";
-            $title = $description = $location = $salary = "";
-            $experience_required = $job_type = $work_mode = $deadline = "";
-            $skillname = $vacancy = "";
+    if(empty($errors)){
+        $stmt = $conn->prepare("UPDATE job SET title=?, location=?, experience_required=?, job_type=?, work_mode=?, salary=?, deadline=?, description=? WHERE jid=?");
+        $stmt->bind_param("ssssssssi",$title,$location,$experience,$job_type,$work_mode,$salary,$deadline,$description,$jid);
+        $stmt->execute();
+        $stmt->close();
+        $_SESSION['jobedit_success'] = "job updated successfully!";
+
             regenerateCSRFToken();
 
-            header("Location: cdashboard.php");
-            exit;
+        header("Location: view_job.php");
+        exit();
     }
-        }
-       
-
 }
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Career Craft | Post job</title>
-
-<link href="../dist/styles.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="icon" href="../image/logo3.jpg" type="image/png">
-     <style>
-            /* Make calendar icon white */
-            input[type="date"]::-webkit-calendar-picker-indicator {
-                filter: invert(1);
-                cursor: pointer;
-            }
-            </style>
-</head>
-
-<body class="bg-black px-4 py-6 overflow-x-hidden overflow-y-auto">
-    <?php include("../include/navbar.php");?>
-<a href="cdashboard.php"
-   class="inline-block mt-20 mb-4 text-yellow-400 text-sm hover:underline">
-   ← Back to Dashboard
-</a>
-
-
-<div class="max-w-5xl mx-auto bg-[#0f0f0f] rounded-2xl shadow-2xl 
-p-6 sm:p-8 border border-white/10 text-white  mb-10">
-
-<h2 class="text-2xl md:text-3xl font-bold text-[#D7AE27] mb-6 text-center">
-Post New Job
-</h2>
-
-<form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-5" novalidate>
-<input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
-
-<!-- Job Title -->
-<div>
-<label>Job Title <span class="text-red-500">*</span></label>
-
-<input 
-    list="jobTitles"
-    id="titleField"
-    name="title"
-    value="<?= htmlspecialchars($title) ?>"
-    class="input-field"
-    placeholder="Search job title..."
->
-
-<datalist id="jobTitles">
-<?php foreach($technical_roles as $role) { ?>
-    <option value="<?= $role ?>">
-<?php } ?>
-</datalist>
-
-<p id="titleErr" class="error"><?= $titleErr ?></p>
-</div>
-<!-- Location -->
-<div>
-<label>Location <span class="text-red-500">*</span></label>
-<select id="locationField" name="location" class="input-field">
-<option value="">Select Location</option>
-<?php foreach($locationList as $loc): ?>
-<option value="<?= $loc ?>" <?= ($location==$loc)?"selected":"" ?>>
-<?= $loc ?>
-</option>
-<?php endforeach; ?>
-</select>
-<p id="locationErr" class="error"><?= $locationErr ?></p>
-</div>
-
-<!-- Experience -->
-<div>
-<label>Experience <span class="text-red-500">*</span></label>
-<select id="experience_required" name="experience_required" class="input-field">
-<option value="">Select Experience</option>
-<option value="0">Fresher</option>
-<option value="1">1 Year</option>
-<option value="2">2 Years</option>
-<option value="3">3+ Years</option>
-</select>
-<p id="experience_requiredErr" class="error"><?= $experienceErr ?></p>
-</div>
-
-<!-- Job Type -->
-<div>
-<label>Job Type <span class="text-red-500">*</span></label>
-<select id="job_type" name="job_type" class="input-field">
-<option value="">Select Job Type</option>
-<option value="full-time">Full Time</option>
-<option value="part-time">Part Time</option>
-<option value="internship">Internship</option>
-<option value="contract">Contract</option>
-</select>
-<p id="job_typeErr" class="error"><?= $jobTypeErr ?></p>
-</div>
-
-<!-- Work Mode -->
-<div>
-<label>Work Mode <span class="text-red-500">*</span></label>
-<select id="work_mode" name="work_mode" class="input-field">
-<option value="">Select Work Mode</option>
-<option value="remote">Remote</option>
-<option value="onsite">Onsite</option>
-<option value="hybrid">Hybrid</option>
-</select>
-<p id="work_modeErr" class="error"><?= $workModeErr ?></p>
-</div>
-
-<!-- Vacancy -->
-<div>
-<label>Vacancy <span class="text-red-500">*</span></label>
-<input type="number" id="vacancy" name="vacancy"
-value="<?= htmlspecialchars($vacancy) ?>"
-class="input-field">
-<p id="vacancyErr" class="error"><?= $vacancyErr ?></p>
-</div>
-
-<!-- Deadline -->
-<div>
-    <label>Deadline Date <span class="text-red-500">*</span></label>
-    <input type="date" 
-           id="deadline" 
-           name="deadline"
-           value="<?= htmlspecialchars($deadline ?? '') ?>"
-           min="<?= date('Y-m-d') ?>" 
-           class="input-field">
-           
-    <p id="deadlineErr" class="error"><?= $deadlineErr ?? '' ?></p>
-</div>
-
-<!-- Skills -->
-<div class="md:col-span-2 relative">
-<label class="block mb-2">Skills <span class="text-red-500">*</span></label>
-
-<input type="text" id="skillInput"
-placeholder="Type skill and press Enter"
-class="input-field">
-
-<div id="suggestions"
-class="absolute bg-black border border-white/20 w-full mt-1 rounded-md hidden max-h-40 overflow-y-auto z-10">
-</div>
-
-<div id="skillTags" class="flex flex-wrap gap-2 mt-3"></div>
-
-<input type="hidden" name="skillname" id="skillHidden"
-value="<?= htmlspecialchars($skillname ?? '') ?>">
-
-<p class="error"><?= $skillErr ?></p>
-</div>
-
-<!-- Salary -->
-<div>
-<label>Salary</label>
-<input name="salary" class="input-field">
-</div>
-
-<div>
-<label>Salary Type</label>
-<select name="salary_type" class="input-field">
-<option value="">Select</option>
-<option value="fixed">Fixed</option>
-<option value="range">Range</option>
-<option value="negotiable">Negotiable</option>
-</select>
-</div>
-
-<!-- Description -->
-<div class="md:col-span-2">
-<label>Description</label>
-<textarea name="description" rows="4"
-class="input-field resize-none"><?= htmlspecialchars($description) ?></textarea>
-</div>
-
-<div class="md:col-span-2 mt-6 flex justify-center">
-<button class="bg-[#D7AE27] text-black px-8 py-2 rounded-md font-semibold hover:bg-yellow-400 transition">
-Post Job
-</button>
-</div>
-
-</form>
-</div>
-
+<title>Career Craft | Edit Job</title>
+   <link href="../dist/styles.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" href="../image/logo3.jpg" type="image/png"></head>
 <style>
 .input-field{
 width:100%;
@@ -291,13 +77,151 @@ color:#f87171;
 font-size:14px;
 margin-top:4px;
 }
+
 </style>
+</head>
+<body class="bg-black text-white min-h-screen">
+<?php include("../include/navbar.php"); ?>
+<a href="cdashboard.php"
+   class="inline-block mt-20 mb-4 text-yellow-400 text-sm hover:underline">
+   ← Back to Dashboard
+</a>
+
+<div class="max-w-5xl mx-auto bg-[#0f0f0f] rounded-2xl shadow-2xl 
+p-6 sm:p-8 border border-white/10 text-white  mb-10">
+
+<h2 class="text-2xl md:text-3xl font-bold text-[#D7AE27] mb-6 text-center">
+Edit Job
+</h2>
+
+<?php if(!empty($errors)) { foreach($errors as $err) echo "<p class='text-red-500'>$err</p>"; } ?>
+
+<form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-5" novalidate>
+
+<input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
+
+<!-- Job Title -->
+<div>
+<label>Job Title <span class="text-red-500">*</span></label>
+
+<input 
+    list="jobTitles"
+    id="titleField"
+    name="title"
+    value="<?= htmlspecialchars($job['title']) ?>"
+    class="input-field"
+    placeholder="Search job title..."
+>
+
+<datalist id="jobTitles">
+<?php foreach($technical_roles as $role) { ?>
+    <option value="<?= $role ?>">
+<?php } ?>
+</datalist>
+
+<p id="titleErr" class="error"></p>
+</div>
 
 
+<!-- Location -->
+<div>
+<label>Location <span class="text-red-500">*</span></label>
+<select id="locationField" name="location" class="input-field">
+<option value="">Select Location</option>
+<?php foreach($locationList as $loc): ?>
+<option value="<?= $loc ?>" <?= ($job['location']==$loc)?"selected":"" ?>>
+<?= $loc ?>
+</option>
+<?php endforeach; ?>
+</select>
+<p id="locationErr" class="error"></p>
+</div>
 
+
+<!-- Experience -->
+<div>
+<label>Experience <span class="text-red-500">*</span></label>
+<select id="experience_required" name="experience_required" class="input-field">
+<option value="">Select Experience</option>
+<option value="0" <?= ($job['experience_required']=="0")?"selected":"" ?>>Fresher</option>
+<option value="1" <?= ($job['experience_required']=="1")?"selected":"" ?>>1 Year</option>
+<option value="2" <?= ($job['experience_required']=="2")?"selected":"" ?>>2 Years</option>
+<option value="3" <?= ($job['experience_required']=="3")?"selected":"" ?>>3+ Years</option>
+</select>
+<p id="experience_requiredErr" class="error"></p>
+</div>
+
+
+<!-- Job Type -->
+<div>
+<label>Job Type <span class="text-red-500">*</span></label>
+<select id="job_type" name="job_type" class="input-field">
+<option value="">Select Job Type</option>
+<option value="full-time" <?= ($job['job_type']=="full-time")?"selected":"" ?>>Full Time</option>
+<option value="part-time" <?= ($job['job_type']=="part-time")?"selected":"" ?>>Part Time</option>
+<option value="internship" <?= ($job['job_type']=="internship")?"selected":"" ?>>Internship</option>
+<option value="contract" <?= ($job['job_type']=="contract")?"selected":"" ?>>Contract</option>
+</select>
+<p id="job_typeErr" class="error"></p>
+</div>
+
+
+<!-- Work Mode -->
+<div>
+<label>Work Mode <span class="text-red-500">*</span></label>
+<select id="work_mode" name="work_mode" class="input-field">
+<option value="">Select Work Mode</option>
+<option value="remote" <?= ($job['work_mode']=="remote")?"selected":"" ?>>Remote</option>
+<option value="onsite" <?= ($job['work_mode']=="onsite")?"selected":"" ?>>Onsite</option>
+<option value="hybrid" <?= ($job['work_mode']=="hybrid")?"selected":"" ?>>Hybrid</option>
+</select>
+<p id="work_modeErr" class="error"></p>
+</div>
+
+
+<!-- Salary -->
+<div>
+<label>Salary</label>
+<input type="text"
+name="salary"
+value="<?= htmlspecialchars($job['salary']) ?>"
+class="input-field">
+</div>
+
+
+<!-- Deadline -->
+<div>
+<label>Deadline Date <span class="text-red-500">*</span></label>
+<input type="date"
+id="deadline"
+name="deadline"
+value="<?= htmlspecialchars($job['deadline']) ?>"
+min="<?= date('Y-m-d') ?>"
+class="input-field">
+<p id="deadlineErr" class="error"></p>
+</div>
+
+
+<!-- Description -->
+<div class="md:col-span-2">
+<label>Description</label>
+<textarea name="description"
+rows="4"
+class="input-field resize-none"><?= htmlspecialchars($job['description']) ?></textarea>
+</div>
+
+
+<!-- Button -->
+<div class="md:col-span-2 mt-6 flex justify-center">
+<button class="bg-[#D7AE27] text-black px-8 py-2 rounded-md font-semibold hover:bg-yellow-400 transition">
+Update Job
+</button>
+</div>
+
+</form>
+</div>
 <script>
-// ================= LIVE VALIDATION =================
-
+    
 const titleField = document.getElementById("titleField");
 const titleErr = document.getElementById("titleErr");
 
@@ -431,9 +355,7 @@ function renderSkills(){
 }
 
 renderSkills();
-</script>
-
-<?php include("../include/footer.php");?>
-
+    </script>
+<?php include("../include/footer.php"); ?>
 </body>
 </html>

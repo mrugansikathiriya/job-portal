@@ -1,46 +1,73 @@
 <?php
-session_start();
-require "../config/db.php";
-
-$successMessage = "";
-// LOGIN ATTEMPT LIMIT
-$max_attempts = 5;
-$lock_time = 300; // 5 minutes
-
-if (!isset($_SESSION['attempts'])) {
-    $_SESSION['attempts'] = 0;
-    $_SESSION['last_attempt'] = 0;
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
 }
+require "../config/db.php";
+require "../authc/csrf.php";
 
-$locked = false;
-$remaining = 0;
+/* =========================
+   REMEMBER ME AUTO LOGIN
+========================= */
+if (!isset($_SESSION['uid']) && isset($_COOKIE['remember_token'])) {
 
-// Check if locked
-if ($_SESSION['attempts'] >= $max_attempts) {
+    $token = mysqli_real_escape_string($conn, $_COOKIE['remember_token']);
 
-    $elapsed = time() - $_SESSION['last_attempt'];
+    $auto = mysqli_query($conn, 
+        "SELECT uid, uname, role, is_completed 
+         FROM users WHERE remember_token='$token'");
 
-    if ($elapsed < $lock_time) {
-        $locked = true;
-        $remaining = $lock_time - $elapsed;
-    } else {
-        // Reset after lock time
-        $_SESSION['attempts'] = 0;
-        $_SESSION['last_attempt'] = 0;
+    if (mysqli_num_rows($auto) == 1) {
+
+        $user = mysqli_fetch_assoc($auto);
+
+        session_regenerate_id(true);
+
+        $_SESSION['uid'] = $user['uid'];
+        $_SESSION['uname'] = $user['uname'];
+        $_SESSION['role'] = $user['role'];
+        $_SESSION['is_completed'] = $user['is_completed'];
+         if ($user["role"] == "admin") {
+                        header("Location: ../admin/admin_dashboard.php");
+                    } 
+            elseif ($user["role"] == "company") {
+
+                        if ($user["is_completed"] == 1)
+                            header("Location: ../company/cdashboard.php");
+                        else
+                            header("Location: ../company/profile_complete.php");
+                    } 
+                    else {
+
+                        if ($user["is_completed"] == 1)
+                            header("Location: ../seeker/sdashboard.php");
+                        else
+                            header("Location: ../seeker/seeker_profile.php");
+                    }
+                   exit;
+
     }
 }
 
+$toastError = "";
+$locked = false;
+$remaining = 0;
+
 $email = $password = $captcha = "";
 $emailErr = $passwordErr = $captchaErr = "";
-$toastError = "";
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && !$locked) {
+/* =========================
+   LOGIN PROCESS
+========================= */
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $email    = trim($_POST["email"]);
+  if (!validateCSRFToken($_POST['csrf_token'])) {
+        die("Invalid CSRF token");
+    }
+
+    $email    = mysqli_real_escape_string($conn, trim($_POST["email"]));
     $password = $_POST["password"];
     $captcha  = trim($_POST["captcha"]);
 
-    // VALIDATION
     if ($email == "")
         $emailErr = "Email required";
     elseif (!filter_var($email, FILTER_VALIDATE_EMAIL))
@@ -53,79 +80,114 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !$locked) {
 
     if ($captcha == "")
         $captchaErr = "Captcha required";
-    elseif ($captcha != $_SESSION["vercode"]) {
+    elseif ($captcha != $_SESSION["vercode"])
         $captchaErr = "Invalid Captcha";
-        $_SESSION['attempts']++;
-        $_SESSION['last_attempt'] = time();
-    }
 
     if ($emailErr=="" && $passwordErr=="" && $captchaErr=="") {
 
-        $stmt = mysqli_prepare($conn, "SELECT * FROM users WHERE email=?");
-        mysqli_stmt_bind_param($stmt, "s", $email);
-        mysqli_stmt_execute($stmt);
-        $res = mysqli_stmt_get_result($stmt);
+        $check = mysqli_query($conn, 
+            "SELECT * FROM users WHERE email='$email'");
 
-        if (mysqli_num_rows($res) == 1) {
+        if (mysqli_num_rows($check) == 1) {
 
-            $row = mysqli_fetch_assoc($res);
+            $row = mysqli_fetch_assoc($check);
 
-            if ($row["status"] != "active") {
-                $toastError = "❌ Your account has been blocked by admin.";
-            } else {
+            /* DATABASE LOCK CHECK */
+            if ($row['failed_attempts'] >= 5) {
 
-                if (password_verify($password, $row["password"])) {
+                $elapsed = time() - $row['last_failed_attempt'];
 
-                    // SUCCESS → RESET ATTEMPTS
-                    $_SESSION['attempts'] = 0;
-                    $_SESSION['last_attempt'] = 0;
+                if ($elapsed < 300) {
+                    $locked = true;
+                    $remaining = 300 - $elapsed;
+                    $toastError = "🚫 Account locked. Try again later.";
+                } else {
+                    mysqli_query($conn,
+                        "UPDATE users 
+                         SET failed_attempts=0, last_failed_attempt=0 
+                         WHERE uid='{$row['uid']}'");
+                }
+            }
+
+            if (!$locked) {
+
+                if ($row["status"] != "active") {
+                    $toastError = "❌ Account blocked by admin.";
+                }
+
+                elseif (password_verify($password, $row["password"])) {
+
+                    /* RESET FAILED ATTEMPTS */
+                    mysqli_query($conn,
+                        "UPDATE users 
+                         SET failed_attempts=0, last_failed_attempt=0 
+                         WHERE uid='{$row['uid']}'");
+
+                    session_regenerate_id(true);
 
                     $_SESSION["uid"]   = $row["uid"];
                     $_SESSION["uname"] = $row["uname"];
                     $_SESSION["role"]  = $row["role"];
+                    $_SESSION["is_completed"] = $row["is_completed"];
+                    $_SESSION['login_success'] = "Login successful! Welcome back.";
 
-                     $successMessage = "✔ Login Successfully";
-                 
-                    // ROLE REDIRECT
+                    /* REMEMBER ME */
+                    if (isset($_POST['remember'])) {
+
+                        $token = bin2hex(random_bytes(32));
+
+                        setcookie("remember_token", $token, 
+                                  time() + (86400*30), "/", "", false, true);
+
+                        mysqli_query($conn,
+                            "UPDATE users 
+                             SET remember_token='$token' 
+                             WHERE uid='{$row['uid']}'");
+                    }
+
+                    /* ROLE REDIRECT */
                     if ($row["role"] == "admin") {
                         header("Location: ../admin/admin_dashboard.php");
-
-                    } elseif ($row["role"] == "company") {
+                    } 
+                    elseif ($row["role"] == "company") {
 
                         if ($row["is_completed"] == 1)
-                            header("Location: ../home.php");
+                            header("Location: ../company/cdashboard.php");
                         else
                             header("Location: ../company/profile_complete.php");
-
-                    } else {
+                    } 
+                    else {
 
                         if ($row["is_completed"] == 1)
-                            header("Location: ../home.php");
+                            header("Location: ../seeker/sdashboard.php");
                         else
                             header("Location: ../seeker/seeker_profile.php");
                     }
                     exit;
 
                 } else {
-                    $_SESSION['attempts']++;
-                    $_SESSION['last_attempt'] = time();
+
+                    $now = time();
+
+                    mysqli_query($conn,
+                        "UPDATE users 
+                         SET failed_attempts = failed_attempts + 1,
+                             last_failed_attempt = '$now'
+                         WHERE uid='{$row['uid']}'");
+
+                    $toastError = "❌ Invalid login credentials.";
                 }
             }
+
         } else {
-            $_SESSION['attempts']++;
-            $_SESSION['last_attempt'] = time();
+            $toastError = "❌ Invalid login credentials.";
         }
-
-        if ($_SESSION['attempts'] >= $max_attempts) {
-            $locked = true;
-            $remaining = $lock_time;
-        }
-
-        if (!$locked)
-            $toastError = "❌ Invalid login. Remaining attempts: " . ($max_attempts - $_SESSION['attempts']);
     }
+        regenerateCSRFToken(); 
+
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -150,16 +212,37 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !$locked) {
 
 <body class="min-h-screen bg-black flex items-center justify-center">
 
-<?php if ($successMessage): ?>
-<p class="text-green-500 text-center font-semibold mt-3">
-    <?= $successMessage ?>
-</p>
+
+<!-- SUCCESS TOAST -->
+<?php if(isset($_GET['registered'])): ?>
+<div id="successToast"
+     class="fixed top-24 right-5 bg-green-600 text-white px-6 py-4 rounded-lg shadow-lg z-50 
+            flex items-center justify-between gap-4 min-w-[300px]
+            transition-opacity duration-500">
+
+    <span>✔ Registration successful. Please login.</span>
+
+    <button onclick="closeToast('successToast')" 
+            class="text-xl font-bold hover:text-gray-200 leading-none">
+        &times;
+    </button>
+</div>
 <?php endif; ?>
+
 
 <!-- ERROR TOAST -->
 <?php if ($toastError): ?>
-<div class="fixed top-5 right-5 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
-<?= $toastError ?>
+<div id="errorToast"
+     class="fixed top-24 right-5 bg-red-600 text-white px-6 py-4 rounded-lg shadow-lg z-50 
+            flex items-center justify-between gap-4 min-w-[300px]
+            transition-opacity duration-500">
+
+    <span><?= $toastError ?></span>
+
+    <button onclick="closeToast('errorToast')" 
+            class="text-xl font-bold hover:text-gray-200 leading-none">
+        &times;
+    </button>
 </div>
 <?php endif; ?>
 
@@ -178,7 +261,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !$locked) {
 <h2 class="text-3xl font-bold text-[#D7AE27] mb-6">Welcome Back</h2>
 
 <form method="POST" novalidate class="space-y-4">
-
+<input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
 <div>
 <label>Email <span class="req">*</span></label>
 <input id="email" name="email"
@@ -207,11 +290,8 @@ class="absolute right-3 top-2.5 cursor-pointer text-white/70">
 
 <img src="captcha.php" id="captchaImage"
 class="border border-white/30 rounded h-12">
-
-<button type="button"
-onclick="refreshCaptcha()"
+<button type="button" id="refreshBtn"
 class="text-yellow-400 text-xl hover:rotate-180 transition duration-300">
-
 <i class="fa-solid fa-rotate-right"></i>
 </button>
 
@@ -229,6 +309,11 @@ class="fixed top-5 right-5 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg 
 Try again in <span id="countdown"><?= $remaining ?></span>
 </div>
 <?php endif; ?>
+<label class="flex items-center gap-2 text-sm">
+    <input type="checkbox" name="remember">
+    Remember Me
+</label>
+
 <button id="loginBtn"
 class="w-full bg-[#D7AE27] text-black py-2 rounded font-bold hover:bg-yellow-500 disabled:opacity-50"
 <?= $locked ? 'disabled' : '' ?>>
@@ -271,73 +356,109 @@ Forgot Password?
 </div>
 
 <script>
-// 👁 Toggle password
-function togglePassword() {
-    const pass = document.getElementById("password");
-    const icon = document.querySelector("#passToggle i");
-    pass.type = pass.type === "password" ? "text" : "password";
-    icon.classList.toggle("fa-eye");
-    icon.classList.toggle("fa-eye-slash");
-}
+document.addEventListener("DOMContentLoaded", function () {
 
-// ✅ LIVE VALIDATION
-email.addEventListener("input", () => {
-    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    emailErr.textContent =
-        email.value === "" ? "Email required" :
-        !pattern.test(email.value) ? "Invalid email" : "";
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+    const emailErr = document.getElementById("emailErr");
+    const passwordErr = document.getElementById("passwordErr");
+
+    // 👁 Toggle password
+    window.togglePassword = function () {
+        const pass = document.getElementById("password");
+        const icon = document.querySelector("#passToggle i");
+        pass.type = pass.type === "password" ? "text" : "password";
+        icon.classList.toggle("fa-eye");
+        icon.classList.toggle("fa-eye-slash");
+    };
+
+    // ✅ LIVE VALIDATION
+    if (email) {
+        email.addEventListener("input", function () {
+            const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+            if (email.value === "") {
+                emailErr.textContent = "Email required";
+            } else if (!pattern.test(email.value)) {
+                emailErr.textContent = "Invalid email";
+            } else {
+                emailErr.textContent = "";
+            }
+        });
+    }
+
+    if (password) {
+        password.addEventListener("input", function () {
+            if (password.value === "") {
+                passwordErr.textContent = "Password required";
+            } else if (password.value.length < 6) {
+                passwordErr.textContent = "Minimum 6 characters";
+            } else {
+                passwordErr.textContent = "";
+            }
+        });
+    }
+
+        const refreshBtn = document.getElementById("refreshBtn");
+
+    if (refreshBtn) {
+        refreshBtn.addEventListener("click", function () {
+            const captchaImg = document.getElementById("captchaImage");
+            captchaImg.src = "captcha.php?rand=" + Date.now();
+        });
+    }
 });
 
-password.addEventListener("input", () => {
-    passwordErr.textContent =
-        password.value === "" ? "Password required" :
-        password.value.length < 6 ? "Minimum 6 characters" : "";
-});
 
-function refreshCaptcha() {
-    document.getElementById("captchaImage").src =
-        "captcha.php?" + Date.now();
+function closeToast(id) {
+    const toast = document.getElementById(id);
+    if (toast) {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 500);
+    }
 }
 
-// ✅ AUTO HIDE SUCCESS TOAST (ALWAYS CHECK)
+// Auto hide success after 60 seconds
 const successToast = document.getElementById("successToast");
 if (successToast) {
-    setTimeout(() => {
-        successToast.remove();
-    }, 3000);
+    setTimeout(() => closeToast("successToast"), 60000);
+}
+
+// Auto hide error after 60 seconds
+const errorToast = document.getElementById("errorToast");
+if (errorToast) {
+    setTimeout(() => closeToast("errorToast"), 60000);
 }
 </script>
 
 <?php if ($locked): ?>
 <script>
-let timeLeft = <?= $remaining ?>;
-const countdown = document.getElementById("countdown");
-const loginBtn = document.getElementById("loginBtn");
+document.addEventListener("DOMContentLoaded", function(){
 
-function formatTime(seconds) {
-    let m = Math.floor(seconds / 60);
-    let s = seconds % 60;
+    let timeLeft = <?= $remaining ?>;
+    const countdown = document.getElementById("countdown");
+    const loginBtn = document.getElementById("loginBtn");
 
-    if (m < 10) m = "0" + m;
-    if (s < 10) s = "0" + s;
-
-    return m + ":" + s;
-}
-
-// Show first time
-countdown.textContent = formatTime(timeLeft);
-
-const timer = setInterval(() => {
-    timeLeft--;
+    function formatTime(seconds) {
+        let m = Math.floor(seconds / 60);
+        let s = seconds % 60;
+        return String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
+    }
 
     countdown.textContent = formatTime(timeLeft);
 
-    if (timeLeft <= 0) {
-        clearInterval(timer);
-        loginBtn.disabled = false;
-        document.getElementById("lockMessage").remove();
-    }
-}, 1000);
+    const timer = setInterval(() => {
+        timeLeft--;
+        countdown.textContent = formatTime(timeLeft);
+
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            loginBtn.disabled = false;
+            document.getElementById("lockMessage").remove();
+        }
+    }, 1000);
+
+});
 </script>
 <?php endif; ?>
 </body>

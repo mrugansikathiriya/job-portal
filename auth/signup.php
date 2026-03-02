@@ -1,5 +1,10 @@
 <?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 require "../config/db.php";
+require "../authc/csrf.php";
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -9,10 +14,11 @@ require __DIR__ . '/../phpmailer/src/SMTP.php';
 
 $uname = $email = $password = $contact = $role = "";
 $unameErr = $emailErr = $passwordErr = $contactErr = $roleErr =$termsErr = "";
-$success = false;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
+ if (!validateCSRFToken($_POST['csrf_token'])) {
+        die("Invalid CSRF token");
+    }
     $uname = trim($_POST["uname"]);
     $email = trim($_POST["email"]);
     $password = $_POST["password"];
@@ -145,11 +151,16 @@ try {
 }
 
 // ===== END EMAIL =====
-            $success = true;
             $uname = $email = $password = $contact = $role = "";
+            regenerateCSRFToken(); // Optional but recommended
+
+            header("Location: login.php?registered=1");
+exit();
         }
     }
+
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -174,12 +185,7 @@ try {
 </style>
 </head>
 
-<body class="min-h-screen bg-black flex items-center justify-center px-4 overflow-x-hidden mt-10 mb-10"><?php if ($success): ?>
-<div id="successToast"
-     class="fixed top-5 right-5 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-500">
-  ✔ Registration successful
-</div>
-<?php endif; ?>
+<body class="min-h-screen bg-black flex items-center justify-center px-4 overflow-x-hidden mt-10 mb-10">
 
 <div class="w-full max-w-6xl bg-[#0f0f0f] rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-white/10">
 
@@ -202,6 +208,7 @@ try {
 <h2 class="text-2xl font-bold text-[#D7AE27] mb-6">Create Account</h2>
 
 <form method="POST" class="space-y-4" novalidate>
+<input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
 
 <div>
 <label>Username <span id="s-uname" class="req">*</span></label>
@@ -281,7 +288,7 @@ class="w-full bg-black border border-white/20 rounded px-4 py-2 mt-2">
     <?= isset($termsErr) ? $termsErr : "" ?>
 </p>
 
-<button id="signBtn" class="w-full bg-[#D7AE27] text-black py-2 rounded font-bold mt-2"   onclick="location.href='http://localhost/php_program/project/auth/login.php'">
+<button id="signBtn" class="w-full bg-[#D7AE27] text-black py-2 rounded font-bold mt-2">
 Sign Up
 </button>
 

@@ -1,21 +1,21 @@
 <?php
 session_start();
-include("connection.php");
+require "../config/db.php";
 
 date_default_timezone_set('Asia/Kolkata');
 
 $uid = $_SESSION['uid'] ?? 0;
 
 $sql = "SELECT job.*, company.cname, company.logo,
-        saved_jobs.jid AS saved_job,
-        TIMESTAMPDIFF(SECOND, job.created_at, NOW()) as seconds_old
+        saved_job.jid AS saved_job,
+        TIMESTAMPDIFF(SECOND, job.posted_at, NOW()) as seconds_old
         FROM job
         JOIN company ON job.cid = company.cid
-        LEFT JOIN saved_jobs 
-            ON job.jid = saved_jobs.jid 
-            AND saved_jobs.uid = '$uid'
+        LEFT JOIN saved_job 
+            ON job.jid = saved_job.jid 
+            AND saved_job.uid = '$uid'
         WHERE job.deadline >= CURDATE()
-        ORDER BY job.created_at DESC";
+        ORDER BY job.posted_at DESC";
 
 $result = mysqli_query($conn, $sql);
 ?>
@@ -23,16 +23,18 @@ $result = mysqli_query($conn, $sql);
 <!DOCTYPE html>
 <html>
 <head>
-<title>Find Jobs</title>
+<title>Career Craft | Find Jobs</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.tailwindcss.com"></script>
-
-<!-- Font Awesome (IMPORTANT) -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="../dist/styles.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" href="../image/logo3.jpg" type="image/png">
 </head>
 
 <body class="bg-[#0f0f0f] text-white min-h-screen">
-<div class="max-w-7xl mx-auto px-6 mt-16">
+    <?php include("../include/navbar.php"); ?>
+
+<div class="max-w-7xl mx-auto px-6 mt-20 mb-10">
 
 <h2 class="text-3xl text-center font-semibold mb-12">Recommended Jobs</h2>
 
@@ -56,8 +58,9 @@ $result = mysqli_query($conn, $sql);
     }
 
     $saved = !empty($row['saved_job']);
-    $logo = !empty($row['logo']) ? "uploads/".$row['logo'] : "https://via.placeholder.com/60";
-?>
+$logo = !empty($row['logo']) 
+        ? "../company/uploads/".$row['logo'] 
+        : "https://via.placeholder.com/70";?>
 
 <!-- Job Card -->
 <div class="bg-[#161616] p-6 rounded-2xl border border-gray-800 hover:border-yellow-400 transition-all duration-300 relative">
@@ -141,4 +144,6 @@ $result = mysqli_query($conn, $sql);
 </div>
 
 </body>
+<?php include("../include/footer.php"); ?>
+
 </html>

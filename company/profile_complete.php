@@ -1,21 +1,42 @@
     <?php
+    session_start();
+
     require "../config/db.php";
     require "../array/location.php";
-    session_start();
+    require "../authc/csrf.php";
+
 
 if(!isset($_SESSION['uid'])){
     header("Location: ../auth/login.php");
     exit();
 }
 
+if(isset($_SESSION['is_completed']) && $_SESSION['is_completed'] == 1){
+    header("Location: cdashboard.php");
+    exit();
+}
+
 $uid = $_SESSION['uid'];
+
     $cname = $website = $location = $description = $established_at = "";
     $is_verified = "";
 
     $cnameErr = $locationErr = $establishedErr = $logoErr = $verifiedErr = $websiteErr = "";
-    $success = false;
+$result = mysqli_query($conn, "SELECT * FROM company WHERE uid='$uid'");
+$existing = mysqli_fetch_assoc($result);
 
+if($existing){
+    $cname = $existing['cname'];
+    $website = $existing['website'];
+    $location = $existing['location'];
+    $description = $existing['description'];
+    $established_at = $existing['established_at'];
+    $is_verified = $existing['is_verified'];
+}
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
+ if (!validateCSRFToken($_POST['csrf_token'])) {
+        die("Invalid CSRF token");
+    }
 
         $cname = trim($_POST["cname"] ?? "");
         $website = trim($_POST["website"] ?? "");
@@ -32,14 +53,15 @@ $uid = $_SESSION['uid'];
         if ($website !== "" && !filter_var($website, FILTER_VALIDATE_URL)) {
             $websiteErr = "Invalid website URL";
         }
-if (empty($_FILES["logo"]["name"])) {
-    $logoErr = "Company logo is required";
-}else {
+$logoName = "";
 
-    $targetDir = "uploads/";
+// If logo uploaded
+if (!empty($_FILES["logo"]["name"])) {
+
+$targetDir = __DIR__ . "/uploads/";
     if (!is_dir($targetDir)) mkdir($targetDir);
 
-$logoName = "company_" . $uid . "_" . time() . ".jpg";
+    $logoName = "company_" . $uid . "_" . time() . ".jpg";
     $targetFile = $targetDir . $logoName;
 
     $check = getimagesize($_FILES["logo"]["tmp_name"]);
@@ -50,23 +72,21 @@ $logoName = "company_" . $uid . "_" . time() . ".jpg";
         $logoErr = "Image must be less than 2MB";
     } else {
 
-        // Resize Image
         list($width, $height) = getimagesize($_FILES["logo"]["tmp_name"]);
-        $newWidth = 300;
-        $newHeight = 300;
 
         $src = imagecreatefromstring(file_get_contents($_FILES["logo"]["tmp_name"]));
-        $dst = imagecreatetruecolor($newWidth, $newHeight);
+        $dst = imagecreatetruecolor(300, 300);
 
         imagecopyresampled($dst, $src, 0, 0, 0, 0,
-            $newWidth, $newHeight, $width, $height);
+            300, 300, $width, $height);
 
-        imagejpeg($dst, $targetFile, 80); // 80 = compression quality
+        imagejpeg($dst, $targetFile, 80);
 
         imagedestroy($src);
         imagedestroy($dst);
     }
 }
+
 
         if (
             $cnameErr=="" &&
@@ -77,32 +97,54 @@ $logoName = "company_" . $uid . "_" . time() . ".jpg";
             $websiteErr==""
         ) {
 
-            $sql = "UPDATE company 
-            SET cname='$cname',
-                logo='$logoName',
-                website='$website',
-                location='$location',
-                description='$description',
-                is_verified='$is_verified',
-                established_at='$established_at'
-            WHERE uid='$uid'";
+        if($logoName != ""){
+    $logoQuery = "logo='$logoName',";
+} else {
+    $logoQuery = "";
+}
+
+$sql = "UPDATE company 
+        SET cname='$cname',
+            $logoQuery
+            website='$website',
+            location='$location',
+            description='$description',
+            is_verified='$is_verified',
+            established_at='$established_at'
+        WHERE uid='$uid'";
 
          if(mysqli_query($conn,$sql)){
 
-    // ✅ UPDATE users table (VERY IMPORTANT)
-    mysqli_query($conn, "UPDATE users SET is_completed = 1 WHERE uid = '$uid'");
+    //  UPDATE users table (VERY IMPORTANT)
+if($logoName != ""){
+    mysqli_query($conn, "UPDATE users 
+                         SET p_image='$logoName', is_completed=1 
+                         WHERE uid='$uid'");
+    $_SESSION['p_image'] = $logoName;
+} else {
+    mysqli_query($conn, "UPDATE users 
+                         SET is_completed=1 
+                         WHERE uid='$uid'");
+}
 
-    // Optional: update session also
-    $_SESSION['is_completed'] = 1;
+// Update session
+$_SESSION['cname'] = $cname;
 
-    $success = true;
+if($logoName != ""){
+    $_SESSION['p_image'] = $logoName;
+}
+
+$_SESSION['is_completed'] = 1;
+$_SESSION['profile_success'] = "Company profile completed successfully!";
 
     // Clear form values
     $cname = $website = $location = $description = $established_at = "";
     $is_verified = "";
 
     // ✅ Redirect to dashboard
-    header("Location:http://localhost/php_program/project/home.php");
+                regenerateCSRFToken(); // Optional but recommended
+
+    header("Location:http://localhost/php_program/project/company/cdashboard.php");
     exit;
 }
         }
@@ -132,14 +174,27 @@ $logoName = "company_" . $uid . "_" . time() . ".jpg";
 
     <body class="bg-black px-4 py-6 overflow-x-hidden overflow-y-auto">
 
-    <?php if($success): ?>
-    <div id="successToast"
-    class="fixed top-5 right-5 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-500">
-    Company Registered Successfully
-    </div>
-    <?php endif; ?>
+
     <?php include("../include/navbar.php");?>
-     <a href="http://localhost/php_program/project/auth/login.php" class="absolute left-4 top-4  mt-20 text-yellow-400 text-sm hover:underline">← Back</a>
+   
+    <a href="http://localhost/php_program/project/auth/login.php" class="absolute left-4 top-4  mt-20 text-yellow-400 text-sm hover:underline">← Back</a>
+
+   <?php if(isset($_SESSION['login_success'])): ?>
+<div id="flashMessage"
+     class="fixed top-15 right-5 bg-green-600 text-white px-6 py-4 rounded-lg shadow-lg z-50 
+            flex items-center justify-between gap-4 min-w-[280px] 
+            transition-opacity duration-500">
+
+    <span><?= $_SESSION['login_success']; ?></span>
+
+    <!-- Close Button -->
+    <button onclick="closeFlash()"
+            class="text-white text-xl font-bold hover:text-gray-200 leading-none">
+        &times;
+    </button>
+</div>
+<?php unset($_SESSION['login_success']); ?>
+<?php endif; ?>
 
     <div class="max-w-5xl mx-auto bg-[#0f0f0f] rounded-2xl shadow-2xl 
     p-6 sm:p-8 border border-white/10 text-white mt-20 mb-10">
@@ -150,10 +205,38 @@ $logoName = "company_" . $uid . "_" . time() . ".jpg";
 
     <form method="POST" enctype="multipart/form-data"
     class="grid grid-cols-1 md:grid-cols-2 gap-5" novalidate>
+    <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
 
+<!-- Company Logo -->
+<div class="md:col-span-2 mb-4">
+    <label class="block text-white mb-2">
+        Company Logo <span class="text-red-500">*</span>
+    </label>
+
+    <div class="flex items-center gap-6">
+
+        <!-- Preview -->
+        <img id="logoPreview"
+     src="<?= !empty($_SESSION['p_image']) 
+            ? 'uploads/'.$_SESSION['p_image'] 
+            : 'https://ui-avatars.com/api/?name='.urlencode($cname ?? 'Company').'&background=D7AE27&color=000'; ?>"
+     class="w-24 h-24 rounded-full object-cover border-2 border-gray-300 shadow">
+
+        <!-- File Input -->
+        <input type="file"
+               name="logo"
+               id="logoInput"
+               accept="image/*"
+               class="text-white">
+    </div>
+
+    <p id="logoErr" class="text-red-400 text-sm mt-2">
+        <?= $logoErr ?? "" ?>
+    </p>
+</div>
     <!-- Company Name -->
     <div>
-        <label>Company Name <span class="text-red-500">*</span></label>
+        <label>Company Name </label>
         <input id="cname" name="cname"
         value="<?= htmlspecialchars($cname) ?>"
         class="input-field">
@@ -193,31 +276,7 @@ $logoName = "company_" . $uid . "_" . time() . ".jpg";
         <p id="establishedErr" class="error"><?= $establishedErr ?></p>
     </div>
 
-<!-- Company Logo -->
-<div class="md:col-span-2 mb-4">
-    <label class="block text-white mb-2">
-        Company Logo <span class="text-red-500">*</span>
-    </label>
 
-    <div class="flex items-center gap-6">
-
-        <!-- Preview -->
-        <img id="logoPreview"
-             src="uploads/<?= isset($logoName) ? $logoName : 'download.png'; ?>"
-             class="w-24 h-24 rounded-full object-cover border-2 border-gray-300 shadow">
-
-        <!-- File Input -->
-        <input type="file"
-               name="logo"
-               id="logoInput"
-               accept="image/*"
-               class="text-white">
-    </div>
-
-    <p id="logoErr" class="text-red-400 text-sm mt-2">
-        <?= $logoErr ?? "" ?>
-    </p>
-</div>
 
     <!-- Description -->
     <div class="md:col-span-2">
@@ -264,79 +323,65 @@ $logoName = "company_" . $uid . "_" . time() . ".jpg";
 
 
     <script>
-    flatpickr("#established_at", {
-        dateFormat: "Y-m-d",
-        maxDate: "today"
-    });
 
     // LIVE VALIDATION
     const cnameField = document.getElementById("cname");
-    const cnameErr = document.getElementById("cnameErr");
+const cnameErr = document.getElementById("cnameErr");
 
-    const locationField = document.getElementById("locationField");
-    const locationErr = document.getElementById("locationErr");
+const locationField = document.getElementById("locationField");
+const locationErr = document.getElementById("locationErr");
 
-    const establishedField = document.getElementById("established_at");
-    const establishedErr = document.getElementById("establishedErr");
+const establishedField = document.getElementById("established_at");
+const establishedErr = document.getElementById("establishedErr");
 
-    const websiteField = document.getElementById("website");
-    const websiteErr = document.getElementById("websiteErr");
-
-    const logoErr = document.getElementById("logoErr");
-
-    const verifiedErr = document.getElementById("verifiedErr");
-
-    cnameField.addEventListener("input", function(){
-        cnameErr.textContent =
-            cnameField.value.trim() !== "" ? "" : "Company name is required";
-    });
-
-    locationField.addEventListener("change", function(){
-        locationErr.textContent =
-            locationField.value !== "" ? "" : "Location is required";
-    });
-
-    establishedField.addEventListener("change", function(){
-        establishedErr.textContent =
-            establishedField.value !== "" ? "" : "Established date is required";
-    });
-
-    websiteField.addEventListener("input", function(){
-        const pattern = /^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-]*)*$/;
-        websiteErr.textContent =
-            websiteField.value.trim() === "" || pattern.test(websiteField.value)
-            ? "" : "Invalid website URL";
-    });
-
-    logoField.addEventListener("change", function(){
-        logoErr.textContent =
-            logoField.files.length > 0 ? "" : "Company logo is required";
-    });
-
-    document.querySelectorAll('input[name="is_verified"]').forEach(radio => {
-        radio.addEventListener("change", function(){
-            verifiedErr.textContent = "";
-        });
-    });
-
-    setTimeout(() => {
-    const toast = document.getElementById("successToast");
-    if(toast){
-        toast.style.opacity = "0";
-        setTimeout(() => toast.remove(), 500);
-    }
-    },3000);
+const websiteField = document.getElementById("website");
+const websiteErr = document.getElementById("websiteErr");
 
 const logoInput = document.getElementById("logoInput");
 const preview = document.getElementById("logoPreview");
 const logoErr = document.getElementById("logoErr");
 
-logoInput.addEventListener("change", function () {
+const verifiedErr = document.getElementById("verifiedErr");
 
+// Company Name
+cnameField.addEventListener("input", function(){
+    cnameErr.textContent =
+        cnameField.value.trim() !== "" ? "" : "Company name is required";
+});
+
+// Location
+locationField.addEventListener("change", function(){
+    locationErr.textContent =
+        locationField.value !== "" ? "" : "Location is required";
+});
+
+// Date
+establishedField.addEventListener("change", function(){
+    establishedErr.textContent =
+        establishedField.value !== "" ? "" : "Established date is required";
+});
+
+// Website
+websiteField.addEventListener("input", function(){
+    const pattern = /^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-]*)*$/;
+    websiteErr.textContent =
+        websiteField.value.trim() === "" || pattern.test(websiteField.value)
+        ? "" : "Invalid website URL";
+});
+
+// Verified radio
+document.querySelectorAll('input[name="is_verified"]').forEach(radio => {
+    radio.addEventListener("change", function(){
+        verifiedErr.textContent = "";
+    });
+});
+
+// Logo Preview + Validation
+logoInput.addEventListener("change", function () {
     const file = this.files[0];
 
     if (!file) {
-        logoErr.textContent = "Company logo is required";
+        logoErr.textContent = "";
         return;
     }
 
@@ -353,6 +398,19 @@ logoInput.addEventListener("change", function () {
     };
     reader.readAsDataURL(file);
 });
+
+function closeFlash() {
+    const flash = document.getElementById("flashMessage");
+    if (flash) {
+        flash.style.opacity = "0";
+        setTimeout(() => flash.remove(), 500);
+    }
+}
+
+// Auto hide after 1 minute (60000 milliseconds)
+setTimeout(function(){
+    closeFlash();
+}, 60000);
     </script>
     <?php include("../include/footer.php");?>
 

@@ -1,13 +1,12 @@
 <?php
 session_start();
-include("connection.php");
+include("../config/db.php");;
 
-if(!isset($_GET['id'])){
-    header("Location: find_jobs.php");
+if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'seeker'){
+    header("Location: ../auth/login.php");
     exit();
 }
 
-$jid = $_GET['id'];
 
 $sql = "SELECT job.*, 
         company.cname, 
@@ -16,8 +15,7 @@ $sql = "SELECT job.*,
         company.location AS company_location,
         company.description AS company_desc
         FROM job
-        JOIN company ON job.cid = company.cid
-        WHERE job.jid = '$jid'";
+        JOIN company ON job.cid = company.cid";
 
 $result = mysqli_query($conn,$sql);
 
@@ -32,25 +30,29 @@ $row = mysqli_fetch_assoc($result);
 $saved = false;
 if(isset($_SESSION['uid'])){
     $uid = $_SESSION['uid'];
-    $check = mysqli_query($conn,"SELECT 1 FROM saved_jobs WHERE uid='$uid' AND jid='$jid'");
+    $check = mysqli_query($conn,"SELECT 1 FROM saved_job WHERE uid='$uid'");
     if(mysqli_num_rows($check) > 0){
         $saved = true;
     }
 }
 
 // Logo fallback
-$logo = !empty($row['logo']) ? "uploads/".$row['logo'] : "https://via.placeholder.com/70";
-
+$logo = !empty($row['logo']) 
+        ? "../company/uploads/".$row['logo'] 
+        : "https://via.placeholder.com/70";
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-<title>Job Details</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<title>Career craft | Find Job</title>
+<link href="../dist/styles.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="icon" href="../image/logo3.jpg" type="image/png">
+
 </head>
 
-<body class="bg-[#0f0f0f] text-white min-h-screen">
+<body class="bg-[#0f0f0f] text-white min-h-screen"> 
 
 <div class="max-w-4xl mx-auto mt-12 bg-[#1a1a1a] p-8 rounded-2xl border border-gray-800">
 
@@ -145,7 +147,7 @@ class="text-yellow-400 underline">
 <?php if(isset($_SESSION['uid'])): ?>
     <a href="apply_job.php?jid=<?= $row['jid']; ?>"
        class="inline-block bg-yellow-400 text-black px-6 py-2 rounded-lg font-medium hover:bg-yellow-500 mt-6">
-        Apply
+        Apply Now
     </a>
 <?php endif; ?>
 
