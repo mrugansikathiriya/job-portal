@@ -1,7 +1,7 @@
 <?php
-session_start();
 require "../config/db.php";
-
+require "admin_auth.php";
+require "../authc/csrf.php";
 // Get seekers whose users are active
 $result = mysqli_query($conn, "
     SELECT job_seeker.*, users.uname, users.email, users.status 
@@ -53,7 +53,6 @@ $result = mysqli_query($conn, "
     <th class="p-3">Skills</th>
     <th class="p-3">Bio</th>
     <th class="p-3">Birthdate</th>
-    <th class="p-3 text-center">Actions</th>
 </tr>
 </thead>
 
@@ -73,13 +72,6 @@ $result = mysqli_query($conn, "
     <td class="p-3"><?php echo $row['bio']; ?></td>
     <td class="p-3"><?php echo $row['birthdate']; ?></td>
 
-    <td class="p-3 text-center">
-        <a href="delete_seeker.php?sid=<?php echo $row['sid']; ?>"
-           onclick="return confirm('Are you sure?')"
-           class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 text-sm">
-           Delete
-        </a>
-    </td>
 
 </tr>
 

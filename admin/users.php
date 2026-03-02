@@ -1,12 +1,7 @@
 <?php
-session_start();
 require "../config/db.php";
-
-// // Check admin login (optional)
-// if(!isset($_SESSION['aid'])){
-//     header("Location: login.php");
-//     exit();
-// }
+require "admin_auth.php";
+require "../authc/csrf.php";
 
 $result = mysqli_query($conn, "SELECT * FROM users ORDER BY uid DESC");
 ?>
@@ -66,17 +61,24 @@ $result = mysqli_query($conn, "SELECT * FROM users ORDER BY uid DESC");
 
                     <td class="p-3">
                        <!-- Block / Unblock -->
+  <form method="POST" action="toggle_user_status.php" class="inline">
+    <input type="hidden" name="uid" value="<?php echo $row['uid']; ?>">
+    <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
+
     <?php if($row['status'] == 'active') { ?>
-        <a href="blocked_user.php?uid=<?php echo $row['uid']; ?>"
-           class="bg-green-500 px-3 py-1 rounded text-sm hover:bg-blue-600 text-white">
-           Unblocked
-        </a>
+        <input type="hidden" name="action" value="block">
+        <button type="submit"
+            class="bg-green-500 px-3 py-1 rounded text-sm hover:bg-blue-600 text-white">
+            Unblocked
+        </button>
     <?php } else { ?>
-        <a href="unblocked_user.php?uid=<?php echo $row['uid']; ?>"
-           class="bg-red-500 px-3 py-1 rounded text-sm hover:bg-blue-600 text-white">
-           Blocked
-        </a>
+        <input type="hidden" name="action" value="unblock">
+        <button type="submit"
+            class="bg-red-500 px-3 py-1 rounded text-sm hover:bg-blue-600 text-white">
+            Blocked
+        </button>
     <?php } ?>
+</form>
                     </td>
 
                     <td class="p-3"><?php echo $row['created_at']; ?></td>
@@ -86,11 +88,18 @@ $result = mysqli_query($conn, "SELECT * FROM users ORDER BY uid DESC");
 
                       
 
-                        <a href="delete_user.php?uid=<?php echo $row['uid']; ?>"
-                           onclick="return confirm('Are you sure?')"
-                           class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 text-sm">
-                           Delete
-                        </a>
+                     <form method="POST" action="delete_user.php" 
+      class="inline"
+      onsubmit="return confirm('Are you sure?')">
+
+    <input type="hidden" name="uid" value="<?php echo $row['uid']; ?>">
+    <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
+
+    <button type="submit"
+        class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 text-sm">
+        Delete
+    </button>
+</form>
 
                     </td>
                 </tr>
@@ -103,7 +112,7 @@ $result = mysqli_query($conn, "SELECT * FROM users ORDER BY uid DESC");
 
     </div>
 
-    <div class="mt-8">
+    <div class="mt-8">  
         <a href="admin_dashboard.php"
            class="bg-[#D7AE27] text-black px-6 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition">
            Back to Dashboard

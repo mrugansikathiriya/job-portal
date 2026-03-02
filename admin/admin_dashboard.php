@@ -1,6 +1,9 @@
 <?php
-session_start();
 require "../config/db.php";
+require "admin_auth.php";
+
+
+
 
 // Fetch counts
 $users = $conn->query("SELECT COUNT(*) as total FROM users")->fetch_assoc()['total'];

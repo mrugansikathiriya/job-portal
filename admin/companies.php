@@ -1,6 +1,6 @@
 <?php
-session_start();
 require "../config/db.php";
+require "admin_auth.php";
 
 // Get companies whose users are active
 $result = mysqli_query($conn, "
@@ -53,7 +53,6 @@ $result = mysqli_query($conn, "
     <th class="p-3">Location</th>
     <th class="p-3">Established</th>
     <th class="p-3">Verified</th>
-    <th class="p-3 text-center">Actions</th>
 </tr>
 </thead>
 
@@ -103,13 +102,6 @@ $result = mysqli_query($conn, "
         <?php } ?>
     </td>
 
-    <td class="p-3 text-center">
-        <a href="delete_company.php?cid=<?php echo $row['cid']; ?>"
-           onclick="return confirm('Are you sure?')"
-           class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 text-sm">
-           Delete
-        </a>
-    </td>
 
 </tr>
 

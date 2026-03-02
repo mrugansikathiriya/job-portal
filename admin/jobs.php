@@ -1,7 +1,7 @@
 <?php
-session_start();
 require "../config/db.php";
-
+require "admin_auth.php";
+require "../authc/csrf.php";
 $status = $_GET['status'] ?? '';
 
 $query = "
@@ -138,22 +138,31 @@ $result = mysqli_query($conn, $query);
 
     <td class="p-3"><?= $row['posted_at']; ?></td>
 
-   
-  <td class="p-3">
+<td class="p-3">
 
 <?php if($row['is_approve'] == 'pending') { ?>
 
     <div class="flex flex-col items-center gap-2">
 
-        <a href="approve_job.php?jid=<?= $row['jid']; ?>"
-           class="w-24 text-center bg-yellow-500 px-3 py-1 rounded text-black text-sm hover:bg-yellow-600 transition">
-           Approve
-        </a>
+        <!-- Approve Button -->
+        <form method="POST" action="approve_job.php" class="w-full">
+            <input type="hidden" name="jid" value="<?= $row['jid']; ?>">
+            <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
+            <button type="submit"
+                class="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition">
+                Approve
+            </button>
+        </form>
 
-        <a href="reject_job.php?jid=<?= $row['jid']; ?>"
-           class="w-24 text-center bg-red-500 px-3 py-1 rounded text-white text-sm hover:bg-red-600 transition">
-           Reject
-        </a>
+        <!-- Reject Button -->
+        <form method="POST" action="reject_job.php" class="w-full">
+            <input type="hidden" name="jid" value="<?= $row['jid']; ?>">
+            <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
+            <button type="submit"
+                class="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition">
+                Reject
+            </button>
+        </form>
 
     </div>
 
@@ -174,11 +183,17 @@ $result = mysqli_query($conn, $query);
 </td>
 
 <td class="p-3 text-center">
-    <a href="delete_job.php?jid=<?= $row['jid']; ?>"
-       onclick="return confirm('Are you sure?')"
-       class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 text-sm">
-       Delete
-    </a>
+ <form method="POST" action="delete_job.php"
+      onsubmit="return confirm('Are you sure you want to delete this job?');">
+
+    <input type="hidden" name="jid" value="<?= $row['jid']; ?>">
+    <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
+
+    <button type="submit"
+        class="bg-gray-800 hover:bg-red-700 text-red-500 hover:text-white px-3 py-1 rounded text-sm transition">
+        Delete
+    </button>
+</form>
 </td>
 </tr>
 
