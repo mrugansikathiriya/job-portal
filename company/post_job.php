@@ -9,7 +9,7 @@ require "../array/role.php";
 require "../authc/csrf.php";
 
 
-if(!isset($_SESSION['uid'])){
+if(!isset($_SESSION['uid']) || $_SESSION['role']!='company'){
     header("Location: ../auth/login.php");
     exit();
 }

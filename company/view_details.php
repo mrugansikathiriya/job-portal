@@ -37,6 +37,8 @@ $logo = !empty($jdata['logo']) ? "../company/uploads/".$jdata['logo'] : "https:/
 <link href="../dist/styles.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" href="../image/logo3.jpg" type="image/png">
+
 </head>
 
 <body class="bg-black text-white min-h-screen px-4 py-6">
@@ -45,7 +47,7 @@ $logo = !empty($jdata['logo']) ? "../company/uploads/".$jdata['logo'] : "https:/
 
 <a href="cdashboard.php"
    class="inline-block mt-20 mb-4 text-yellow-400 text-sm hover:underline">
-   ← Back to Dashboard
+   ← Back
 </a>
 
 

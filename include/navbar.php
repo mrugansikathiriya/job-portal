@@ -49,13 +49,30 @@ if (session_status() == PHP_SESSION_NONE) {
             </div>
 
             <!-- Desktop Menu -->
-            <div class="hidden lg:flex items-center gap-8 font-medium">
-                <a href="http://localhost/php_program/project/home.php" class="hover:text-[#D7AE27] hover:underline">Home</a>
-                <a href="#" class="hover:text-[#D7AE27] hover:underline">Find Jobs</a>
-                <a href="#" class="hover:text-[#D7AE27] hover:underline">Find Talent</a>
-                <a href="http://localhost/php_program/project/company/post_job.php" class="hover:text-[#D7AE27] hover:underline">Post Job</a>
-                <a href="#" class="hover:text-[#D7AE27] hover:underline">Job History</a>
-            </div>
+          <div class="hidden lg:flex items-center gap-8 font-medium">
+
+    <a href="http://localhost/php_program/project/home.php" class="hover:text-[#D7AE27] hover:underline">Home</a>
+
+    <?php if(!isset($_SESSION['uid'])): ?>
+        <!-- Guest: show all links -->
+        <a href="http://localhost/php_program/project/seeker/find_job.php" class="hover:text-[#D7AE27] hover:underline">Find Jobs</a>
+        <a href="#" class="hover:text-[#D7AE27] hover:underline">Find Talent</a>
+        <a href="http://localhost/php_program/project/company/post_job.php" class="hover:text-[#D7AE27] hover:underline">Post Job</a>
+        <a href="#" class="hover:text-[#D7AE27] hover:underline">Job History</a>
+    
+    <?php elseif($_SESSION['role'] == 'seeker'): ?>
+        <!-- Seeker -->
+        <a href="http://localhost/php_program/project/seeker/find_job.php" class="hover:text-[#D7AE27] hover:underline">Find Jobs</a>
+        <a href="#" class="hover:text-[#D7AE27] hover:underline">Job History</a>
+    
+    <?php elseif($_SESSION['role'] == 'company'): ?>
+        <!-- Company -->
+        <a href="#" class="hover:text-[#D7AE27] hover:underline">Find Talent</a>
+        <a href="http://localhost/php_program/project/company/post_job.php" class="hover:text-[#D7AE27] hover:underline">Post Job</a>
+        <a href="#" class="hover:text-[#D7AE27] hover:underline">Job History</a>
+    <?php endif; ?>
+
+</div>
 
             <!-- Buttons / Profile Image -->
             <div class="hidden lg:flex justify-end gap-3 items-center relative">
@@ -101,27 +118,27 @@ if (session_status() == PHP_SESSION_NONE) {
                    class="block px-4 py-2 text-white hover:bg-gray-800">Edit Profile</a>
             <?php endif; ?>
 
-            <a href="../auth/logout.php"
+    <a href="http://localhost/php_program/project/auth/logout.php"
                class="block px-4 py-2 text-red-400 hover:bg-gray-800">Logout</a>
         </div>
 
-    </div>
+     </div>
 
-    <?php else: ?>
+        <?php else: ?>
 
-    <!-- If Not Logged In -->
-    <button class="px-4 py-2 border border-[#D7AE27] text-[#D7AE27] rounded-lg hover:bg-[#D7AE27] hover:text-black transition"
-        onclick="location.href='http://localhost/php_program/project/auth/login.php'">
-        Login
-    </button>
+        <!-- If Not Logged In -->
+        <button class="px-4 py-2 border border-[#D7AE27] text-[#D7AE27] rounded-lg hover:bg-[#D7AE27] hover:text-black transition"
+            onclick="location.href='http://localhost/php_program/project/auth/login.php'">
+            Login
+        </button>
 
-    <button class="px-4 py-2 bg-[#D7AE27] text-black rounded-lg hover:bg-[#8b6c06] transition"
-        onclick="location.href='http://localhost/php_program/project/auth/signup.php'">
-        Sign Up
-    </button>
+        <button class="px-4 py-2 bg-[#D7AE27] text-black rounded-lg hover:bg-[#8b6c06] transition"
+            onclick="location.href='http://localhost/php_program/project/auth/signup.php'">
+            Sign Up
+        </button>
 
-    <?php endif; ?>
-</div>
+        <?php endif; ?>
+        </div>
 
             <!-- Hamburger (Mobile Only) -->
             <button id="menu-btn" class="lg:hidden text-2xl text-[#D7AE27]" aria-label="Open Menu">
@@ -151,11 +168,44 @@ if (session_status() == PHP_SESSION_NONE) {
                 </div>
 
                 <!-- Links -->
-                <a href="http://localhost/php_program/project/home.php" class="block py-2 text-gray-200 hover:text-[#D7AE27]">Home</a>
-                <a href="#" class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Jobs</a>
-                <a href="#" class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Talent</a>
-                <a href="http://localhost/php_program/project/company/post_job.php" class="block py-2 text-gray-200 hover:text-[#D7AE27]">Post Job</a>
-                <a href="#" class="block py-2 text-gray-200 hover:text-[#D7AE27]">Job History</a>
+<a href="http://localhost/php_program/project/home.php" 
+class="block py-2 text-gray-200 hover:text-[#D7AE27]">Home</a>
+
+<?php if(!isset($_SESSION['uid'])): ?>
+    <!-- Guest: show all links -->
+    <a href="http://localhost/php_program/project/seeker/find_job.php"
+       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Jobs</a>
+
+    <a href="#"
+       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Talent</a>
+
+    <a href="http://localhost/php_program/project/company/post_job.php"
+       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Post Job</a>
+
+    <a href="#"
+       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Job History</a>
+
+<?php elseif($_SESSION['role'] == 'seeker'): ?>
+    <!-- Seeker -->
+    <a href="http://localhost/php_program/project/seeker/find_job.php"
+       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Jobs</a>
+
+   
+
+    <a href="http://localhost/php_program/project/seeker/job_history.php"
+       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Job History</a>
+
+<?php elseif($_SESSION['role'] == 'company'): ?>
+    <!-- Company -->
+    <a href="#"
+       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Talent</a>
+
+    <a href="http://localhost/php_program/project/company/post_job.php"
+       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Post Job</a>
+
+    <a href="http://localhost/php_program/project/company/job_history.php"
+       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Job History</a>
+<?php endif; ?>
 
                 <!-- Mobile Login / Profile -->
                <!-- Bottom Section -->
@@ -206,7 +256,7 @@ if (session_status() == PHP_SESSION_NONE) {
            class="block py-2 text-gray-200 hover:text-[#D7AE27]">Edit Profile</a>
     <?php endif; ?>
 
-    <a href="../auth/logout.php"
+    <a href="http://localhost/php_program/project/auth/logout.php"
        class="block py-2 text-red-400 hover:text-red-500">Logout</a>
 
 <?php else: ?>

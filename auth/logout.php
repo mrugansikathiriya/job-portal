@@ -1,7 +1,5 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+session_start();
 
 require "../config/db.php";
 
@@ -12,13 +10,13 @@ if (isset($_SESSION['uid'])) {
 
     $uid = $_SESSION['uid'];
 
-    // Remove token from database
-    mysqli_query($conn, 
-        "UPDATE users SET remember_token=NULL WHERE uid='$uid'");
+    mysqli_query($conn,
+        "UPDATE users SET remember_token=NULL WHERE uid='$uid'"
+    );
 }
 
 /* =========================
-   DELETE COOKIE
+   DELETE REMEMBER COOKIE
 ========================= */
 if (isset($_COOKIE['remember_token'])) {
     setcookie("remember_token", "", time() - 3600, "/", "", false, true);
@@ -27,27 +25,28 @@ if (isset($_COOKIE['remember_token'])) {
 /* =========================
    DESTROY SESSION
 ========================= */
-$_SESSION = array();
+$_SESSION = [];
 
 if (ini_get("session.use_cookies")) {
+
     $params = session_get_cookie_params();
-    setcookie(session_name(), '', time() - 42000,
-        $params["path"], $params["domain"],
-        $params["secure"], $params["httponly"]
+
+    setcookie(
+        session_name(),
+        "",
+        time() - 42000,
+        $params["path"],
+        $params["domain"],
+        $params["secure"],
+        $params["httponly"]
     );
 }
 
 session_destroy();
 
 /* =========================
-   REGENERATE ID (extra safety)
-========================= */
-session_start();
-session_regenerate_id(true);
-session_destroy();
-
-/* =========================
-   REDIRECT
+   REDIRECT TO LOGIN
 ========================= */
 header("Location: login.php");
-exit;
+exit();
+?>

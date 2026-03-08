@@ -1,16 +1,53 @@
 <?php
 session_start();
-include("connection.php");
+require "../config/db.php";
+require "../authc/csrf.php";
 
-if(!isset($_SESSION['aid'])){
-    exit("Invalid access");
+/* CSRF Validation */
+if(!validateCSRFToken($_POST['csrf_token'])){
+    die("Invalid CSRF Token");
 }
 
-$aid = intval($_SESSION['aid']);
+/* Check application id */
+if(!isset($_SESSION['aid'])){
+    die("Application ID missing");
+}
+
+$aid = $_SESSION['aid'];
 $score = intval($_POST['score']);
 
-mysqli_query($conn,
-"UPDATE application SET score=$score WHERE aid=$aid");
+/* Update score and attempt */
+$query = "
+UPDATE application
+SET score='$score',
+attempt = attempt + 1
+WHERE aid='$aid'
+";
 
-echo "Test Submitted Successfully!";
+$result = mysqli_query($conn,$query);
+
+if($result){
+
+    /* If failed */
+    if($score == 0){
+
+        $_SESSION['fail_msg'] = "Application not submitted. You failed the test. Please attempt again.";
+
+        echo "fail";
+
+    }
+    /* If passed */
+    else{
+
+        $_SESSION['success_msg'] = "Application submitted successfully!";
+
+        echo "success";
+
+    }
+
+}else{
+
+    echo "Error: ".mysqli_error($conn);
+
+}
 ?>

@@ -1,13 +1,18 @@
 <?php
 session_start();
-include("../config/db.php");;
+include("../config/db.php");
+require "../authc/csrf.php";
 
-if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'seeker'){
+if(!isset($_SESSION['uid']) ){
     header("Location: ../auth/login.php");
     exit();
 }
+if(!isset($_GET['jid'])){
+    header("Location: find_job.php");
+    exit();
+}
 
-
+$jid = intval($_GET['jid']);
 $sql = "SELECT job.*, 
         company.cname, 
         company.logo, 
@@ -15,7 +20,8 @@ $sql = "SELECT job.*,
         company.location AS company_location,
         company.description AS company_desc
         FROM job
-        JOIN company ON job.cid = company.cid";
+        JOIN company ON job.cid = company.cid
+        WHERE job.jid=$jid";
 
 $result = mysqli_query($conn,$sql);
 
@@ -30,10 +36,33 @@ $row = mysqli_fetch_assoc($result);
 $saved = false;
 if(isset($_SESSION['uid'])){
     $uid = $_SESSION['uid'];
-    $check = mysqli_query($conn,"SELECT 1 FROM saved_job WHERE uid='$uid'");
+  $check = mysqli_query($conn,
+"SELECT 1 FROM saved_job 
+ WHERE uid='$uid' AND jid='".$row['jid']."'");
     if(mysqli_num_rows($check) > 0){
         $saved = true;
     }
+}
+// Check if already applied
+$applied = false;
+$pendingTest = false;
+$aid = 0;
+
+$applyCheck = mysqli_query($conn,
+"SELECT aid, score FROM application 
+ WHERE uid='$uid' AND jid='".$row['jid']."' 
+ LIMIT 1");
+
+if(mysqli_num_rows($applyCheck) > 0){
+
+    $appData = mysqli_fetch_assoc($applyCheck);
+    $aid = $appData['aid'];
+
+    if($appData['score'] == 0){
+        $pendingTest = true; // Test not attempted
+    }
+
+    $applied = true; // Block second apply
 }
 
 // Logo fallback
@@ -44,7 +73,7 @@ $logo = !empty($row['logo'])
 <!DOCTYPE html>
 <html>
 <head>
-<title>Career craft | Find Job</title>
+<title>Career craft | Job details</title>
 <link href="../dist/styles.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -52,9 +81,13 @@ $logo = !empty($row['logo'])
 
 </head>
 
-<body class="bg-[#0f0f0f] text-white min-h-screen"> 
-
-<div class="max-w-4xl mx-auto mt-12 bg-[#1a1a1a] p-8 rounded-2xl border border-gray-800">
+<body class="bg-black text-white min-h-screen"> 
+    <?php include("../include/navbar.php"); ?>
+<a href="sdashboard.php"
+   class="inline-block mt-20 text-yellow-400 text-sm hover:underline  ml-10">
+   ← Back
+</a>
+<div class="max-w-4xl mx-auto bg-[#1a1a1a] p-8 rounded-2xl border border-gray-800 mt-5 mb-10">
 
 <!-- Top Section -->
 <div class="flex justify-between items-start">
@@ -64,16 +97,26 @@ $logo = !empty($row['logo'])
 class="w-16 h-16 rounded-lg bg-white p-1">
 
 <div>
-<h2 class="text-2xl font-semibold"><?php echo $row['title']; ?></h2>
+<h2 class="text-2xl font-semibold"><?php echo htmlspecialchars($row['title']); ?></h2>
 <p class="text-gray-400"><?php echo $row['cname']; ?></p>
 </div>
 </div>
-
 <?php if(isset($_SESSION['uid'])) { ?>
-<a href="<?php echo $saved ? 'unsave_job.php' : 'save_job.php'; ?>?jid=<?php echo $row['jid']; ?>"
+
+<form method="POST" action="<?php echo $saved ? 'unsave_job.php' : 'save_job.php'; ?>" class="inline">
+
+<input type="hidden" name="jid" value="<?php echo $row['jid']; ?>">
+<input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
+
+<button type="submit"
 class="text-2xl <?php echo $saved ? 'text-yellow-400' : 'text-gray-400 hover:text-yellow-400'; ?>">
+
 <i class="<?php echo $saved ? 'fa-solid' : 'fa-regular'; ?> fa-bookmark"></i>
-</a>
+
+</button>
+
+</form>
+
 <?php } ?>
 
 </div>
@@ -104,7 +147,7 @@ class="text-2xl <?php echo $saved ? 'text-yellow-400' : 'text-gray-400 hover:tex
 </p>
 
 <!-- Toggle Button -->
-<button onclick="toggleCompany()"
+<button onclick="toggleCompany(this)"
 class="mb-6 bg-gray-800 border border-yellow-400 text-yellow-400 px-5 py-2 rounded-lg hover:bg-yellow-400 hover:text-black transition">
 View Company Details
 </button>
@@ -145,18 +188,36 @@ class="text-yellow-400 underline">
 
 <!-- Apply Button -->
 <?php if(isset($_SESSION['uid'])): ?>
-    <a href="apply_job.php?jid=<?= $row['jid']; ?>"
-       class="inline-block bg-yellow-400 text-black px-6 py-2 rounded-lg font-medium hover:bg-yellow-500 mt-6">
-        Apply Now
-    </a>
+
+<?php if($pendingTest): ?>
+
+<a href="test.php?aid=<?= $aid ?>"
+class="inline-block bg-yellow-400 text-black px-6 py-2 rounded-lg font-medium hover:bg-yellow-500 mt-6">
+Continue Aptitude Test
+</a>
+
+<?php elseif(!$applied): ?>
+
+<a href="apply_job.php?jid=<?= $row['jid']; ?>"
+class="inline-block bg-yellow-400 text-black px-6 py-2 rounded-lg font-medium hover:bg-yellow-500 mt-6">
+Apply Now
+</a>
+
+<?php else: ?>
+
+<button class="inline-block bg-gray-600 text-white px-6 py-2 rounded-lg mt-6 cursor-not-allowed">
+Application Submitted
+</button>
+
+<?php endif; ?>
+
 <?php endif; ?>
 
 </div>
 
 <script>
-function toggleCompany() {
+function toggleCompany(btn) {
     var section = document.getElementById("companySection");
-    var btn = event.target;
 
     if(section.classList.contains("hidden")) {
         section.classList.remove("hidden");
@@ -169,4 +230,6 @@ function toggleCompany() {
 </script>
 
 </body>
+<?php include("../include/footer.php"); ?>
+
 </html>

@@ -1,10 +1,11 @@
 <?php
 session_start();
 require "../config/db.php";
+require "../authc/csrf.php";
 
 /* Check login */
-if(!isset($_SESSION['uid'])){
-    header("Location: login.php");
+if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'seeker'){
+    header("Location: ../auth/login.php");
     exit();
 }
 
@@ -39,30 +40,36 @@ $user = mysqli_fetch_assoc($result);
 /* ===============================
    REAPPLY LOGIC (unchanged)
 =================================*/
+/* ===============================
+   PREVENT DUPLICATE APPLICATION
+=================================*/
+
 $check = mysqli_query($conn,
 "SELECT aid, score FROM application 
  WHERE jid=$jid AND sid=".$user['sid']." 
- ORDER BY aid DESC LIMIT 1");
+ LIMIT 1");
 
 if(mysqli_num_rows($check) > 0){
 
     $appData = mysqli_fetch_assoc($check);
 
-    if($appData['score'] >= 5){
-        die("You already passed this job test. You cannot apply again.");
-    }
-
-    if($appData['score'] < 5){
+    // Test not completed
+    if($appData['score'] == 0){
         header("Location: test.php?aid=".$appData['aid']);
         exit();
     }
+
+    // Test completed OR failed
+    die("You have already applied for this job.");
 }
 
 /* ===============================
    FORM SUBMIT
 =================================*/
 if($_SERVER["REQUEST_METHOD"] == "POST"){
-
+  if (!validateCSRFToken($_POST['csrf_token'])) {
+        die("Invalid CSRF token");
+    }
     if(empty($_FILES['resume']['name'])){
         $resumeErr = "Resume is required.";
     } else {
@@ -88,10 +95,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         move_uploaded_file($fileTmp,"uploads/".$newName);
 
         /* INSERT STRUCTURE SAME STYLE AS YOUR JOB INSERT */
-        $sql = "INSERT INTO application
-                (jid,sid,resume,score,status)
-                VALUES
-                ('$jid','".$user['sid']."','$newName',0,'pending')";
+    $sql = "INSERT INTO application
+        (uid,jid,sid,resume,status,score)
+        VALUES
+        ('$uid','$jid','".$user['sid']."','$newName','pending',0)";
 
         if(mysqli_query($conn,$sql)){
 
@@ -99,6 +106,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
             mysqli_query($conn,
             "UPDATE job SET applicant = applicant + 1 WHERE jid=$jid");
+            regenerateCSRFToken();
 
             header("Location: test.php?aid=".$aid);
             exit();
@@ -112,50 +120,106 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <!DOCTYPE html>
 <html>
 <head>
-<title>Apply Job</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>Career Craft | Apply Job</title>
+<link href="../dist/styles.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" href="../image/logo3.jpg" type="image/png">
 </head>
 
-<body class="bg-[#0f0f0f] text-white min-h-screen flex items-center justify-center">
+<body class="bg-black text-white min-h-screen">
 
-<div class="w-full max-w-2xl bg-[#1a1a1a] p-8 rounded-2xl border border-gray-800">
+<?php include("../include/navbar.php"); ?>
 
-<h2 class="text-2xl font-semibold text-yellow-400 mb-6 text-center">
+<div class="max-w-6xl mx-auto px-4 py-10 mt-18">
+
+<!-- Back Button -->
+<div class="mb-6">
+<a href="job_details.php"
+class="inline-flex items-center text-[#D7AE27] hover:text-yellow-400 font-medium transition">
+<i class="fa-solid fa-arrow-left mr-2"></i>
+Back
+</a>
+</div>
+
+<!-- Apply Job Card -->
+<div class="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-xl p-8">
+
+<h2 class="text-3xl font-bold text-[#D7AE27] mb-8 text-center">
 Apply for Job
 </h2>
 
 <?php if($formError): ?>
-<p class="text-red-400 mb-4"><?= $formError ?></p>
+<p class="text-red-400 mb-6 text-center"><?= $formError ?></p>
 <?php endif; ?>
 
-<form method="POST" enctype="multipart/form-data" id="applyForm" class="space-y-5">
+<form method="POST" enctype="multipart/form-data" id="applyForm" class="space-y-6">
+
+<input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
 
 <!-- Name -->
-<input type="text" value="<?= htmlspecialchars($user['sname']) ?>" readonly
-class="w-full p-3 bg-gray-800 rounded border border-gray-700">
+<div>
+<label class="block mb-2 text-sm font-semibold text-[#D7AE27]">
+Full Name
+</label>
+
+<input type="text"
+value="<?= htmlspecialchars($user['sname']) ?>" readonly
+class="w-full p-3 bg-[#1a1a1a] rounded-lg border border-gray-700 
+focus:outline-none focus:border-[#D7AE27]">
+</div>
 
 <!-- Email -->
-<input type="email" value="<?= htmlspecialchars($user['email']) ?>" readonly
-class="w-full p-3 bg-gray-800 rounded border border-gray-700">
+<div>
+<label class="block mb-2 text-sm font-semibold text-[#D7AE27]">
+Email Address
+</label>
+
+<input type="email"
+value="<?= htmlspecialchars($user['email']) ?>" readonly
+class="w-full p-3 bg-[#1a1a1a] rounded-lg border border-gray-700 
+focus:outline-none focus:border-[#D7AE27]">
+</div>
 
 <!-- Contact -->
-<input type="text" value="<?= htmlspecialchars($user['contact']) ?>" readonly
-class="w-full p-3 bg-gray-800 rounded border border-gray-700">
+<div>
+<label class="block mb-2 text-sm font-semibold text-[#D7AE27]">
+Contact Number
+</label>
 
-<!-- Resume -->
+<input type="text"
+value="<?= htmlspecialchars($user['contact']) ?>" readonly
+class="w-full p-3 bg-[#1a1a1a] rounded-lg border border-gray-700 
+focus:outline-none focus:border-[#D7AE27]">
+</div>
+
+<!-- Resume Upload -->
+<div>
+<label class="block mb-2 text-sm font-semibold text-[#D7AE27]">
+Upload Resume (PDF / DOC / DOCX)
+</label>
+
 <input type="file" name="resume" id="resumeField"
-class="w-full p-3 bg-gray-800 rounded border border-gray-700">
+class="w-full p-3 bg-[#1a1a1a] rounded-lg border border-gray-700 text-gray-300
+file:bg-[#D7AE27] file:text-black file:px-4 file:py-2 file:border-0 file:rounded-lg
+hover:file:bg-yellow-500 transition">
 
-<p id="resumeErr" class="text-red-400 text-sm">
+<p id="resumeErr" class="text-red-400 text-sm mt-2">
 <?= $resumeErr ?>
 </p>
+</div>
 
-<button type="submit" id="submitBtn"
-class="w-full bg-yellow-400 text-black py-3 rounded-lg font-semibold hover:bg-yellow-500">
+<!-- Submit Button -->
+<button type="submit"
+class="w-full bg-[#D7AE27] text-black py-3 rounded-xl font-bold text-lg
+hover:bg-yellow-500 transition duration-300 transform hover:scale-[1.03]">
 Continue to Aptitude Test
 </button>
 
 </form>
+
+</div>
+
 </div>
 
 <script>
@@ -195,4 +259,6 @@ resumeField.addEventListener("change", function(){
 </script>
 
 </body>
+<?php include("../include/footer.php"); ?>
+
 </html>

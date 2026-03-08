@@ -28,7 +28,7 @@ $result = mysqli_query($conn, $sql);
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Company Dashboard | Jobs Posted</title>
+    <title>Career Craft | Jobs Posted</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="../dist/styles.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
@@ -39,7 +39,10 @@ $result = mysqli_query($conn, $sql);
 
 <body class="bg-[#0f0f0f] text-white min-h-screen">
 <?php include("../include/navbar.php"); ?>
-
+<a href="cdashboard.php"
+   class="inline-block mt-20 text-yellow-400 text-sm hover:underline">
+   ← Back
+</a>
 <?php if(isset($_SESSION['jobedit_success'])): ?>
 <div id="flashMessage"
      class="fixed top-20 right-5 bg-green-600 text-white px-6 py-4 rounded-lg shadow-lg z-50 

@@ -129,7 +129,7 @@ $result = mysqli_query($conn, $query);
     <td class="p-3"><?= $row['applicant']; ?></td>
 
     <td class="p-3">
-        <?php if($row['status'] == 'active') { ?>
+        <?php if($row['status'] == 'open') { ?>
             <span class="bg-green-500 px-3 py-1 rounded text-sm">Active</span>
         <?php } else { ?>
             <span class="bg-red-500 px-3 py-1 rounded text-sm">Closed</span>

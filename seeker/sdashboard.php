@@ -1,6 +1,8 @@
 <?php
 session_start();
 include("../config/db.php");
+require "../authc/csrf.php";
+$csrf_token = generateCSRFToken();
 
 if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'seeker'){
     header("Location: ../auth/login.php");
@@ -82,6 +84,41 @@ $sdata_count = mysqli_fetch_assoc($saved_count);
 </div>
 <?php unset($_SESSION['edit_success']); ?>
 <?php endif; ?>
+
+<?php if(isset($_SESSION['success_msg'])): ?>
+<div id="flashMessage"
+     class="fixed top-15 right-5 bg-green-600 text-white px-6 py-4 rounded-lg shadow-lg z-50 
+            flex items-center justify-between gap-4 min-w-[280px] 
+            transition-opacity duration-500">
+
+    <span><?= $_SESSION['success_msg']; ?></span>
+
+    <!-- Close Button -->
+    <button onclick="closeFlash()"
+            class="text-white text-xl font-bold hover:text-gray-200 leading-none">
+        &times;
+    </button>
+</div>
+<?php unset($_SESSION['success_msg']); ?>
+<?php endif; ?>
+
+<?php if(isset($_SESSION['fail_msg'])): ?>
+<div id="flashMessage"
+     class="fixed top-15 right-5 bg-red-600 text-white px-6 py-4 rounded-lg shadow-lg z-50 
+            flex items-center justify-between gap-4 min-w-[280px] 
+            transition-opacity duration-500">
+
+    <span><?= $_SESSION['fail_msg']; ?></span>
+
+    <!-- Close Button -->
+    <button onclick="closeFlash()"
+            class="text-white text-xl font-bold hover:text-gray-200 leading-none">
+        &times;
+    </button>
+</div>
+<?php unset($_SESSION['fail_msg']); ?>
+<?php endif; ?>
+
 <div class="max-w-7xl mx-auto px-4 py-10 mt-20">
 
     <!-- Seeker Info Card -->
@@ -114,13 +151,15 @@ $sdata_count = mysqli_fetch_assoc($saved_count);
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
         <!-- Total Applications -->
+         <a href="find_job.php?applied=1" class="block">
         <div class="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition duration-300">
             <h3 class="text-5xl font-bold text-[#D7AE27]"><?= $adata['total']; ?></h3>
             <p class="text-white/70 mt-3">Total Jobs Applied</p>
         </div>
 
         <!-- Total Saved Jobs -->
-        <div class="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition duration-300">
+<a href="find_job.php?saved=1" class="block">        
+    <div class="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition duration-300">
             <h3 class="text-5xl font-bold text-[#D7AE27]"><?= $sdata_count['total']; ?></h3>
             <p class="text-white/70 mt-3">Saved Jobs</p>
         </div>
@@ -151,4 +190,6 @@ setTimeout(closeFlash, 60000);
 </script>
 
 </body>
+<?php include("../include/footer.php"); ?>
+
 </html>

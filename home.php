@@ -517,7 +517,7 @@ include("include/navbar.php");?>
                             <div class="w-20 h-[2px] bg-[#D7AE27] mb-8"></div>
 
                             <!-- SMALLER EXPLORE JOBS BUTTON -->
-                            <a href="jobs.php" class="relative inline-flex items-center justify-center px-6 py-3 rounded-lg
+                            <a href="http://localhost/php_program/project/seeker/find_job.php" class="relative inline-flex items-center justify-center px-6 py-3 rounded-lg
                   bg-gradient-to-r from-[#D7AE27] to-[#FFD700] text-black font-semibold text-base
                   tracking-wide shadow-[0_2px_10px_rgba(215,174,23,0.4)]
                   hover:scale-105 hover:shadow-[0_4px_20px_rgba(215,174,23,0.6)]
@@ -640,6 +640,81 @@ include("include/navbar.php");?>
 
 
     </section>
+
+      <section id="feedback_section">
+            
+            <?php
+                require "config/db.php";
+
+        $sql = "SELECT feedback.*, users.p_image, users.role
+        FROM feedback
+        JOIN users ON feedback.uid = users.uid
+        ORDER BY feedback.fid DESC";
+
+            $result = $conn->query($sql);
+            ?>
+
+            <!-- FEEDBACK SECTION -->
+
+            <div class="max-w-6xl mx-auto mt-6 px-6 mb-16">
+
+            <h2 class="text-3xl font-bold text-yellow-400 mb-8 text-center">
+            User Feedback
+            </h2>
+
+            <div class="grid md:grid-cols-3 gap-6">
+
+            <?php while($row=$result->fetch_assoc()) { ?>
+
+            <div class="bg-gradient-to-b from-[#0a0a0a] to-[#0a0a0a]  p-6 rounded-xl shadow-lg hover:scale-105 transition">
+
+        <?php
+            if(!empty($row['p_image'])){
+
+                if($row['role'] == 'company'){
+                    $imagePath = "http://localhost/php_program/project/company/uploads/" . $row['p_image'];
+                }else{
+                    $imagePath = "http://localhost/php_program/project/seeker/uploads/" . $row['p_image'];
+                }
+            ?>
+    
+        <img src="<?= $imagePath ?>" 
+        class="w-12 h-12 rounded-full mb-3 object-cover border-2 border-[#D7AE27]">
+
+        <?php } else { ?>
+
+        <img src="https://ui-avatars.com/api/?name=<?= urlencode($row['name']) ?>&background=D7AE27&color=000"
+        class="w-12 h-12 rounded-full mb-3 border-2 border-[#D7AE27]">
+
+        <?php } ?>
+
+            <h3 class="text-lg font-semibold">
+            <?php echo $row['name']; ?>
+            </h3>
+
+
+            <p class="text-yellow-400 mb-2">
+            <?php echo str_repeat("⭐️",$row['rating']); ?>
+            </p>
+
+            <p class="text-gray-400 text-sm">
+            <?php echo $row['message']; ?>
+            </p>
+
+            </div>
+
+            <?php } ?>
+
+            </div>
+            </div>
+            <div class="flex justify-center mt-6 mb-6">
+            <a href="http://localhost/php_program/project/include/feedback.php"
+            class="bg-yellow-400 text-black px-6 py-2 rounded hover:bg-yellow-500">
+            Give Feedback
+            </a>
+            </div>
+    </section>
+              
   
 
 <?php

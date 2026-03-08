@@ -22,9 +22,7 @@ $cdata = mysqli_fetch_assoc($company);
 $job_count = mysqli_query($conn, "SELECT COUNT(*) as total FROM job WHERE uid='$uid'");
 $jdata = mysqli_fetch_assoc($job_count);
 
-// Count applicants
-$app_count = mysqli_query($conn, "SELECT COUNT(*) as total FROM application WHERE uid='$uid'");
-$adata = mysqli_fetch_assoc($app_count);
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -154,12 +152,16 @@ $adata = mysqli_fetch_assoc($app_count);
 </a>
 
         <!-- Total Applicants -->
+               <a href="total_applicant.php" class="block">
+
         <div class="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition duration-300">
             <h3 class="text-5xl font-bold text-[#D7AE27]">
-                <?= $adata['total']; ?>
+                                  <i class="fa-solid fa-users"></i>
+
             </h3>
             <p class="text-white/70 mt-3">Total Applicants</p>
         </div>
+        </a>
 
         <!-- Post Job -->
         <div class="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-xl p-8 flex items-center justify-center hover:shadow-2xl transition duration-300">
@@ -188,4 +190,5 @@ setTimeout(function(){
     closeFlash();
 }, 60000);
 </script>
+<?php include("../include/footer.php"); ?>
 </html>

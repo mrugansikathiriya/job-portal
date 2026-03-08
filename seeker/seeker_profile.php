@@ -5,11 +5,10 @@ require "../config/db.php";
 require "../array/skill.php";
 require "../authc/csrf.php";
 
-if(!isset($_SESSION['uid'])){
+if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'seeker'){
     header("Location: ../auth/login.php");
     exit();
 }
-
 if(isset($_SESSION['is_completed']) && $_SESSION['is_completed'] == 1){
     header("Location: sdashboard.php"); // Seeker dashboard
     exit();
