@@ -1,3 +1,15 @@
+<?php
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Check if user is logged in
+$contact_link = isset($_SESSION['uid']) 
+    ? "http://localhost/php_program/project/include/contact.php" 
+    : "http://localhost/php_program/project/auth/login.php";
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -53,33 +65,22 @@
                 </h3>
                 <ul class="space-y-3">
                     <li>
-                        <a href="../home.php"
+                        <a href="http://localhost/php_program/project/home.php"
                             class="relative hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">
                             Home
                         </a>
                     </li>
+                   
                     <li>
-                        <a href="#"
-                            class="relative hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">
-                            Find Jobs
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#"
-                            class="relative hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">
-                            Find Talent
-                        </a>
-                    </li>
-                    <li>
-                        <a href="../about.php"
+                        <a href="http://localhost/php_program/project/about.php"
                             class="relative hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">
                             About Us
                         </a>
                     </li>
                     <li>
-                        <a href="about.html#contact"
-                            class="relative hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">
-                            Contact Us
+                       <a href="<?= $contact_link ?>"
+                        class="relative hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">
+                        Contact Us
                         </a>
                     </li>
                 </ul>
@@ -97,7 +98,7 @@
                             Policy</a>
                     </li>
                     <li>
-                        <a href="../project/include/terms.php"
+                        <a href="http://localhost/php_program/project/include/terms.php"
                             class="hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">Terms
                             & Conditions</a>
                     </li>
@@ -112,12 +113,12 @@
                 </h3>
                 <ul class="space-y-3">
                     <li>
-                        <a href="#"
+                        <a href="http://localhost/php_program/project/include/feedback.php"
                             class="hover:text-[#D7AE27] transition  after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">
                             FeedBack</a>
                     </li>
                     <li>
-                        <a href="../project/include/faq.php"
+                        <a href="http://localhost/php_program/project/include/faq.php"
                             class="hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">FAQs</a>
                     </li>
 

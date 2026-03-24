@@ -1,53 +1,104 @@
-    <?php
-    session_start();
-    require "../config/db.php";
-    require "../authc/csrf.php";
+<?php
+session_start();
+require "../config/db.php";
+require "../authc/csrf.php";
 
-    date_default_timezone_set('Asia/Kolkata');
+date_default_timezone_set('Asia/Kolkata');
 
-    $uid = $_SESSION['uid'] ?? 0;
+$uid = $_SESSION['uid'] ?? 0;
+
+/* ================= FILTER LOGIC ================= */
+
+$where = "WHERE job.deadline >= NOW()";
+
+// Title
+if(!empty($_GET['title'])){
+    $title = mysqli_real_escape_string($conn, $_GET['title']);
+    $where .= " AND job.title LIKE '%$title%'";
+}
+
+// Location
+if(!empty($_GET['location'])){
+    $location = mysqli_real_escape_string($conn, $_GET['location']);
+    $where .= " AND job.location LIKE '%$location%'";
+}
+
+// Experience
+if(!empty($_GET['experience'])){
+    $exp = mysqli_real_escape_string($conn, $_GET['experience']);
+    $where .= " AND job.experience_required = '$exp'";
+}
+
+// Job Type
+if(!empty($_GET['job_type'])){
+    $jobType = mysqli_real_escape_string($conn, $_GET['job_type']);
+    $where .= " AND job.job_type = '$jobType'";
+}
+
+// Salary
+if(!empty($_GET['min_salary'])){
+    $salary = (int)$_GET['min_salary'];
+    $where .= " AND job.salary >= $salary";
+}
+
+/* ================= SORTING ================= */
+
+$order = "ORDER BY job.posted_at DESC";
+
+if(!empty($_GET['sort'])){
+    if($_GET['sort'] == "low"){
+        $order = "ORDER BY job.salary ASC";
+    }
+    elseif($_GET['sort'] == "high"){
+        $order = "ORDER BY job.salary DESC";
+    }
+    elseif($_GET['sort'] == "recent"){
+        $order = "ORDER BY job.posted_at DESC";
+    }
+}
+
+/* ================= QUERY ================= */
 
 if(isset($_GET['saved'])){
 
-$sql = "SELECT job.*, company.cname, company.logo,
-        1 AS saved,
-        TIMESTAMPDIFF(SECOND, job.posted_at, NOW()) as seconds_old
-        FROM saved_job
-        JOIN job ON saved_job.jid = job.jid
-        JOIN company ON job.cid = company.cid
-        WHERE saved_job.uid='$uid'";
+    $sql = "SELECT job.*, company.cname, company.logo,
+            1 AS saved,
+            TIMESTAMPDIFF(SECOND, job.posted_at, NOW()) as seconds_old
+            FROM saved_job
+            JOIN job ON saved_job.jid = job.jid
+            JOIN company ON job.cid = company.cid
+            WHERE saved_job.uid='$uid'";
 
 }
 elseif(isset($_GET['applied'])){
 
-$sql = "SELECT job.*, company.cname, company.logo,
-        1 AS applied,
-        TIMESTAMPDIFF(SECOND, job.posted_at, NOW()) as seconds_old
-        FROM application
-        JOIN job ON application.jid = job.jid
-        JOIN company ON job.cid = company.cid
-        WHERE application.uid='$uid'
-        ORDER BY application.aid DESC";
+    $sql = "SELECT job.*, company.cname, company.logo,
+            1 AS applied,
+            TIMESTAMPDIFF(SECOND, job.posted_at, NOW()) as seconds_old
+            FROM application
+            JOIN job ON application.jid = job.jid
+            JOIN company ON job.cid = company.cid
+            WHERE application.uid='$uid'
+            ORDER BY application.aid DESC";
 
 }
 else{
 
-$sql = "SELECT job.*, company.cname, company.logo,
-        EXISTS(
-            SELECT 1 FROM saved_job 
-            WHERE saved_job.jid = job.jid 
-            AND saved_job.uid = '$uid'
-        ) AS saved,
-        TIMESTAMPDIFF(SECOND, job.posted_at, NOW()) as seconds_old
-        FROM job
-        JOIN company ON job.cid = company.cid
-        WHERE job.deadline >= NOW()
-        ORDER BY job.posted_at DESC";
-
+    $sql = "SELECT job.*, company.cname, company.logo,
+            EXISTS(
+                SELECT 1 FROM saved_job 
+                WHERE saved_job.jid = job.jid 
+                AND saved_job.uid = '$uid'
+            ) AS saved,
+            TIMESTAMPDIFF(SECOND, job.posted_at, NOW()) as seconds_old
+            FROM job
+            JOIN company ON job.cid = company.cid
+            $where
+            $order";
 }
 
-    $result = mysqli_query($conn, $sql);
-    ?>
+$result = mysqli_query($conn, $sql);
+?>
 
     <!DOCTYPE html>
     <html>
@@ -68,7 +119,66 @@ $sql = "SELECT job.*, company.cname, company.logo,
     </a>
 
     <div class="max-w-7xl mx-auto px-6 mt-5 mb-10">
+<form method="GET" class="mb-10">
+<!-- FILTER BAR -->
+<div class="bg-[#161616] p-4 rounded-2xl border border-gray-800 mb-8">
 
+<div class="flex flex-wrap items-center gap-4">
+
+    <!-- Job Title -->
+    <input type="text" id="title" placeholder="🔍 Job Title"
+    class="filter bg-black border border-gray-700 rounded-full px-4 py-2 text-white text-sm">
+
+    <!-- Location -->
+    <input type="text" id="location" placeholder="📍 Location"
+    class="filter bg-black border border-gray-700 rounded-full px-4 py-2 text-white text-sm">
+
+    <!-- Experience -->
+    <select id="experience"
+    class="filter bg-black border border-gray-700 rounded-full px-4 py-2 text-white text-sm">
+        <option value="">💼 Experience</option>
+        <option value="Fresher">Fresher</option>
+        <option value="Intermediate">Intermediate</option>
+        <option value="Expert">Expert</option>
+    </select>
+
+    <!-- Job Type -->
+    <select id="job_type"
+    class="filter bg-black border border-gray-700 rounded-full px-4 py-2 text-white text-sm">
+        <option value="">🧑‍💻 Job Type</option>
+        <option value="Full Time">Full Time</option>
+        <option value="Part Time">Part Time</option>
+        <option value="Remote">Remote</option>
+    </select>
+
+    <!-- Salary Slider -->
+    <div class="flex flex-col text-sm">
+        <label class="text-gray-400">💰 Salary</label>
+        <input type="range" id="salary" min="0" max="50" value="0"
+        class="filter w-40 accent-yellow-400">
+        <span class="text-yellow-400 text-xs">₹ <span id="salaryValue">0</span> LPA+</span>
+    </div>
+
+    <!-- Sort -->
+    <select id="sort"
+    class="filter bg-black border border-gray-700 rounded-full px-4 py-2 text-white text-sm">
+        <option value="recent">Most Recent</option>
+        <option value="low">Salary: Low → High</option>
+        <option value="high">Salary: High → Low</option>
+    </select>
+
+    <!-- CLEAR FILTER -->
+    <button id="clearFilters"
+    class="bg-red-500 text-white px-4 py-2 rounded-full text-sm hover:bg-red-600">
+        Clear
+    </button>
+
+</div>
+</div>
+
+<!-- JOB LIST -->
+<div id="jobContainer" class="grid md:grid-cols-2 lg:grid-cols-3 gap-10"></div>
+</form>
 <h2 class="text-3xl text-center font-semibold mb-12">
 
 <?php

@@ -1,5 +1,14 @@
 <?php
 // terms.php - Terms & Conditions Page
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Check if user is logged in
+$contact_link = isset($_SESSION['uid']) 
+    ? "http://localhost/php_program/project/include/contact.php" 
+    : "http://localhost/php_program/project/auth/login.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -154,6 +163,12 @@
                    class="text-[#D7AE27] hover:underline">
                     careercraft535@gmail.com
                 </a>
+            </p>
+              <p class="text-gray-300 leading-relaxed">
+                Click here to 
+                <a href= "<?= $contact_link ?>"
+                   class="text-[#D7AE27] underline">contact us
+               </a>
             </p>
         </div>
 

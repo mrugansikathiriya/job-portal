@@ -56,20 +56,20 @@ if (session_status() == PHP_SESSION_NONE) {
     <?php if(!isset($_SESSION['uid'])): ?>
         <!-- Guest: show all links -->
         <a href="http://localhost/php_program/project/seeker/find_job.php" class="hover:text-[#D7AE27] hover:underline">Find Jobs</a>
-        <a href="#" class="hover:text-[#D7AE27] hover:underline">Find Talent</a>
+        <a href="http://localhost/php_program/project/company/find_talent.php" class="hover:text-[#D7AE27] hover:underline">Find Talent</a>
         <a href="http://localhost/php_program/project/company/post_job.php" class="hover:text-[#D7AE27] hover:underline">Post Job</a>
-        <a href="#" class="hover:text-[#D7AE27] hover:underline">Job History</a>
+        <a href="http://localhost/php_program/project/seeker/job_history.php" class="hover:text-[#D7AE27] hover:underline">Job History</a>
     
     <?php elseif($_SESSION['role'] == 'seeker'): ?>
         <!-- Seeker -->
         <a href="http://localhost/php_program/project/seeker/find_job.php" class="hover:text-[#D7AE27] hover:underline">Find Jobs</a>
-        <a href="#" class="hover:text-[#D7AE27] hover:underline">Job History</a>
+        <a href="http://localhost/php_program/project/seeker/job_history.php" class="hover:text-[#D7AE27] hover:underline">Job History</a>
     
     <?php elseif($_SESSION['role'] == 'company'): ?>
         <!-- Company -->
-        <a href="#" class="hover:text-[#D7AE27] hover:underline">Find Talent</a>
+            <a href="http://localhost/php_program/project/company/find_talent.php" class="hover:text-[#D7AE27] hover:underline">Find Talent</a>
         <a href="http://localhost/php_program/project/company/post_job.php" class="hover:text-[#D7AE27] hover:underline">Post Job</a>
-        <a href="#" class="hover:text-[#D7AE27] hover:underline">Job History</a>
+        <a href="job_history.php" class="hover:text-[#D7AE27] hover:underline">Job History</a>
     <?php endif; ?>
 
 </div>
@@ -176,7 +176,7 @@ class="block py-2 text-gray-200 hover:text-[#D7AE27]">Home</a>
     <a href="http://localhost/php_program/project/seeker/find_job.php"
        class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Jobs</a>
 
-    <a href="#"
+    <a href="http://localhost/php_program/project/company/find_talent.php"
        class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Talent</a>
 
     <a href="http://localhost/php_program/project/company/post_job.php"
@@ -197,7 +197,7 @@ class="block py-2 text-gray-200 hover:text-[#D7AE27]">Home</a>
 
 <?php elseif($_SESSION['role'] == 'company'): ?>
     <!-- Company -->
-    <a href="#"
+    <a href="http://localhost/php_program/project/company/find_talent.php"
        class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Talent</a>
 
     <a href="http://localhost/php_program/project/company/post_job.php"

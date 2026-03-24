@@ -37,7 +37,7 @@ $result = mysqli_query($conn, $sql);
 
 </head>
 
-<body class="bg-[#0f0f0f] text-white min-h-screen">
+<body class="bg-black text-white min-h-screen">
 <?php include("../include/navbar.php"); ?>
 <a href="cdashboard.php"
    class="inline-block mt-20 text-yellow-400 text-sm hover:underline">
@@ -58,7 +58,7 @@ $result = mysqli_query($conn, $sql);
 </div>
 <?php unset($_SESSION['jobedit_success']); ?>
 <?php endif; ?>
-<div class="max-w-7xl mx-auto px-6 mt-20 mb-10">
+<div class="max-w-7xl mx-auto px-6 mt-10 mb-10">
 
 <h2 class="text-3xl text-center font-semibold mb-12">My Posted Jobs</h2>
 
@@ -69,7 +69,7 @@ $result = mysqli_query($conn, $sql);
 
 <?php while($row = mysqli_fetch_assoc($result)): ?>
 
-<div class="bg-[#161616] p-6 rounded-2xl border border-gray-800 hover:border-yellow-400 transition-all duration-300 relative">
+<div class="bg-[#161616] p-6  rounded-2xl border border-gray-800 hover:border-yellow-400 transition-all duration-300 relative">
 
     <!-- Job Info -->
     <h3 class="text-lg font-semibold mb-2"><?= htmlspecialchars($row['title']); ?></h3>
