@@ -39,6 +39,35 @@ $sql = "SELECT job.*, company.cname, company.logo,
         ORDER BY application.aid DESC";
 
 }
+
+/* ✅ NEW: INTERVIEW FILTER */
+elseif($filter == 'interview'){
+
+$sql = "SELECT job.*, company.cname, company.logo,
+        1 AS applied,
+        TIMESTAMPDIFF(SECOND, job.posted_at, NOW()) as seconds_old
+        FROM application
+        JOIN job ON application.jid = job.jid
+        JOIN company ON job.cid = company.cid
+        WHERE application.uid='$uid'
+        AND application.status='interview_scheduled'
+        ORDER BY application.aid DESC";
+
+}
+
+/* ✅ NEW: OFFERED FILTER */
+elseif($filter == 'offered'){
+$sql = "SELECT job.*, company.cname, company.logo,
+        job_offers.status AS offer_status,
+        TIMESTAMPDIFF(SECOND, job.posted_at, NOW()) as seconds_old
+        FROM job_offers
+        INNER JOIN job ON job_offers.jid = job.jid
+        INNER JOIN company ON job.cid = company.cid
+        WHERE job_offers.sid='$uid'
+        ORDER BY job_offers.oid DESC";
+
+}
+
 else{
 
 $sql = "SELECT job.*, company.cname, company.logo,
@@ -65,7 +94,6 @@ $result = mysqli_query($conn, $sql);
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="icon" href="../image/logo3.jpg" type="image/png">
-
 </head>
 
 <body class="bg-black text-white min-h-screen">
@@ -87,6 +115,12 @@ if($filter == 'saved'){
 }
 elseif($filter == 'applied'){
     echo "Applied Jobs";
+}
+elseif($filter == 'interview'){
+    echo "Interview Jobs";
+}
+elseif($filter == 'offered'){
+    echo "Offered Jobs";
 }
 else{
     echo "All Jobs";
@@ -112,6 +146,17 @@ class="px-5 py-2 rounded-full border <?php echo ($filter=='saved') ? 'bg-yellow-
 Saved Jobs
 </a>
 
+<!-- ✅ NEW BUTTONS -->
+<a href="?filter=interview"
+class="px-5 py-2 rounded-full border <?php echo ($filter=='interview') ? 'bg-yellow-400 text-black' : 'border-gray-600'; ?>">
+Interview Jobs
+</a>
+
+<a href="?filter=offered"
+class="px-5 py-2 rounded-full border <?php echo ($filter=='offered') ? 'bg-yellow-400 text-black' : 'border-gray-600'; ?>">
+Offered Jobs
+</a>
+
 </div>
 
 <!-- JOB GRID -->
@@ -119,7 +164,6 @@ Saved Jobs
 
 <?php while($row = mysqli_fetch_assoc($result)) { 
 
-    // ✅ TIME
     $seconds = $row['seconds_old'];
 
     if ($seconds < 60) $posted = "Just now";
@@ -127,23 +171,17 @@ Saved Jobs
     elseif ($seconds < 86400) $posted = floor($seconds/3600)." hr ago";
     else $posted = floor($seconds/86400)." days ago";
 
-    // ✅ SAVED
     $saved = !empty($row['saved']);
 
-    // ✅ LOGO
     $logo = !empty($row['logo']) 
         ? "../company/uploads/".$row['logo'] 
         : "https://via.placeholder.com/70";
 
-    // ✅ EXPIRED CHECK (IMPORTANT FIX)
     $expired = strtotime($row['deadline']) < time();
 ?>
 
 <!-- CARD -->
 <div class="bg-[#161616] p-6 rounded-2xl border border-gray-800 hover:border-yellow-400 transition relative">
-
-
-
 
 <!-- Company -->
 <div class="flex items-center gap-4 mb-5">
@@ -162,8 +200,12 @@ class="w-14 h-14 rounded-xl object-cover bg-white p-1">
 </div>
 </div>
 
-<!-- STATUS BADGE -->
-<?php if($expired) { ?>
+<!-- STATUS -->
+<?php if(isset($row['offer_status'])){ ?>
+<span class="text-yellow-400 text-xs font-semibold">
+Offer: <?php echo ucfirst($row['offer_status']); ?>
+</span>
+<?php } elseif($expired) { ?>
 <span class="text-red-400 text-xs font-semibold">Closed</span>
 <?php } else { ?>
 <span class="text-green-400 text-xs font-semibold">Open</span>

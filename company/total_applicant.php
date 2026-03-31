@@ -82,7 +82,7 @@ View Applicants
 </td>
 
 <td>
-<a href="view_applicant.php?jid=<?php echo $job['jid']; ?>"
+<a href="view_applicant.php?jid=<?php echo $job['jid']; ?>&filter=all"
 class="text-[#D7AE27] underline text-sm">
 View Applicants
 </a>

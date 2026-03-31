@@ -1,27 +1,37 @@
 <?php
 session_start();
     require "../config/db.php";
+    require "../authc/csrf.php";
 
-    // only company login
-    if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'company'){
-        header("Location: ../auth/login.php");
-        exit();
-    }
-    $uid = $_SESSION['uid'];
+    $csrf_token = generateCSRFToken();
+ 
+$uid = $_SESSION['uid'] ?? 0;
 
-    // fetch seekers + job
-    $sql = "SELECT 
-        js.sid,
-        js.sname,
-        js.education,
-        js.experience,
-        js.skillname,
-        js.bio,
-        js.profile_image,
-        u.created_at
-    FROM job_seeker js
-    JOIN users u ON js.uid = u.uid
-    ORDER BY u.created_at DESC";
+// get company id
+$cid_query = mysqli_query($conn, "SELECT cid FROM company WHERE uid='$uid'");
+$cid_row = mysqli_fetch_assoc($cid_query);
+$cid = $cid_row['cid'] ?? 0;
+
+// fetch seekers + saved status
+$sql = "SELECT 
+    js.sid,
+    js.sname,
+    js.education,
+    js.experience,
+    js.skillname,
+    js.bio,
+    js.profile_image,
+    u.created_at,
+
+    EXISTS(
+        SELECT 1 FROM saved_candidate 
+        WHERE saved_candidate.sid = js.sid 
+        AND saved_candidate.cid = '$cid'
+    ) AS saved
+
+FROM job_seeker js
+JOIN users u ON js.uid = u.uid
+ORDER BY u.created_at DESC";
 
     $result = mysqli_query($conn, $sql);
 ?>
@@ -49,7 +59,7 @@ session_start();
             Find
             <span class="relative inline-block text-white">
                 Talent
-                <span class="absolute left-0 top-full mt-14 w-full h-1 bg-[#D7AE27] rounded-sm"></span>
+                <span class="absolute left-0 top-full mt-6 w-full h-1 bg-[#D7AE27] rounded-sm"></span>
             </span>
         </h2>
 
@@ -65,63 +75,77 @@ session_start();
     ?>
 
     <!-- CARD -->
-    <div class="bg-[#1a1a1a] rounded-2xl p-6 border border-gray-700 
-                shadow-md hover:shadow-yellow-500/20 
-                transition duration-300 hover:-translate-y-1">
+    <!-- CARD -->
+<?php $saved = !empty($row['saved']); ?>
 
-        <!-- TOP -->
-        <div class="flex items-center gap-4">
+    <div class="bg-[#161616] p-6 rounded-2xl border border-gray-800 hover:border-yellow-400 transition-all duration-300 relative">
 
-            <img src="<?= $img ?>" 
-                class="w-16 h-16 rounded-xl object-cover bg-white p-1">
 
-            <div>
-                <h3 class="text-lg font-semibold"><?= $row['sname'] ?></h3>
-                <p class="text-gray-400 text-sm"><?= $row['education'] ?></p>
-                <p class="text-gray-500 text-xs mt-1">Joined: <?= $date ?></p>
-            </div>
+    <!-- SAVE ICON (NOW INSIDE CARD ✅) -->
+<form method="POST" action="toggle_save_candidate.php" class="absolute top-4 right-4">
+    <input type="hidden" name="sid" value="<?= $row['sid'] ?>">
+    <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+    <button type="submit" class="text-xl bg-transparent border-0">
+        <i class="<?= $saved 
+            ? 'fa-solid fa-bookmark text-yellow-400'
+            : 'fa-regular fa-bookmark text-white hover:text-yellow-400' ?>">
+        </i>
+    </button>
+</form>  
 
+    <!-- TOP -->
+    <div class="flex items-center gap-4">
+
+        <img src="<?= $img ?>" 
+            class="w-16 h-16 rounded-xl object-cover bg-white p-1">
+
+        <div>
+            <h3 class="text-lg font-semibold"><?= $row['sname'] ?></h3>
+            <p class="text-gray-400 text-sm"><?= $row['education'] ?></p>
+            <p class="text-gray-500 text-xs mt-1">Joined: <?= $date ?></p>
         </div>
-
-        <!-- TAGS -->
-        <div class="flex flex-wrap gap-2 mt-4 text-xs">
-
-            <span class="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full">
-                <?= $row['experience'] ?>
-            </span>
-
-            <span class="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full">
-                <?= $row['skillname'] ?>
-            </span>
-
-        </div>
-
-        <!-- BIO -->
-        <p class="text-gray-400 text-sm mt-4 leading-relaxed">
-            <?= !empty($row['bio']) ? substr($row['bio'], 0, 80)."..." : "No description available" ?>
-        </p>
-
-        <!-- STATUS -->
-        <div class="flex justify-between items-center mt-5">
-
-            <span class="text-green-400 text-sm font-medium">
-                ● Available for Hiring
-            </span>
-
-            <span class="text-gray-500 text-xs">
-                Active
-            </span>
-
-        </div>
-
-        <!-- BUTTON -->
-        <a href="seeker_details.php?sid=<?= $row['sid'] ?>" 
-        class="block mt-5 bg-[#D7AE27]  text-black text-center py-2 rounded-xl 
-                font-semibold hover:bg-yellow-500 transition">
-            View Profile
-        </a>
 
     </div>
+
+    <!-- TAGS -->
+    <div class="flex flex-wrap gap-2 mt-4 text-xs">
+
+        <span class="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full">
+            <?= $row['experience'] ?>
+        </span>
+
+        <span class="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full">
+            <?= $row['skillname'] ?>
+        </span>
+
+    </div>
+
+    <!-- BIO -->
+    <p class="text-gray-400 text-sm mt-4 leading-relaxed">
+        <?= !empty($row['bio']) ? substr($row['bio'], 0, 80)."..." : "No description available" ?>
+    </p>
+
+    <!-- STATUS -->
+    <div class="flex justify-between items-center mt-5">
+
+        <span class="text-green-400 text-sm font-medium">
+            ● Available for Hiring
+        </span>
+
+        <span class="text-gray-500 text-xs">
+            Active
+        </span>
+
+    </div>
+
+    <!-- BUTTON -->
+    <a href="seeker_details.php?sid=<?= $row['sid'] ?>" 
+    class="block mt-5 bg-[#D7AE27] text-black text-center py-2 rounded-xl 
+            font-semibold hover:bg-yellow-500 transition">
+        View Profile
+    </a>
+
+</div>
 
     <?php } ?>
 

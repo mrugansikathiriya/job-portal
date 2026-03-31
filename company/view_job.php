@@ -92,11 +92,7 @@ $result = mysqli_query($conn, $sql);
            View
         </a>
 
-        <!-- Edit Button -->
-        <a href="edit_job.php?id=<?= $row['jid']; ?>" 
-           class="flex-1 text-center bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition">
-           Edit
-        </a>
+    
 
       <form method="POST" action="delete_job.php" class="flex-1"
       onsubmit="return confirm('Are you sure you want to delete this job?');">

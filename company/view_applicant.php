@@ -27,36 +27,34 @@ require "../config/db.php";
     }
 
     /* ================= FILTER ================= */
-    $filter = $_GET['filter'] ?? 'all';
+  /* ================= FILTER ================= */
+$filter = $_GET['filter'] ?? 'all';
 
-    if($filter == 'selected'){  
-        $sql = "SELECT application.*, job_seeker.sname, job_seeker.profile_image,
-                users.email, users.contact
-                FROM application
-                JOIN job_seeker ON job_seeker.sid = application.sid
-                JOIN users ON users.uid = job_seeker.uid
-                WHERE application.jid='$jid' AND LOWER(application.status)='selected'
-                ORDER BY application.aid DESC";
-    }
-    elseif($filter == 'interview'){  
-        $sql = "SELECT application.*, job_seeker.sname, job_seeker.profile_image,
-                users.email, users.contact
-                FROM application
-                JOIN job_seeker ON job_seeker.sid = application.sid
-                JOIN users ON users.uid = job_seeker.uid
-                WHERE application.jid='$jid' AND application.interview_date IS NOT NULL
-                ORDER BY application.aid DESC";
-    }
-    else{  
-        $sql = "SELECT application.*, job_seeker.sname, job_seeker.profile_image,
-                users.email, users.contact
-                FROM application
-                JOIN job_seeker ON job_seeker.sid = application.sid
-                JOIN users ON users.uid = job_seeker.uid
-                WHERE application.jid='$jid'
-                ORDER BY application.aid DESC";
-    }
 
+$baseQuery = "SELECT application.*, job_seeker.sname, job_seeker.profile_image,
+              users.email, users.contact
+              FROM application
+              JOIN job_seeker ON job_seeker.sid = application.sid
+              JOIN users ON users.uid = job_seeker.uid
+              WHERE application.jid='$jid'";
+
+if($filter == 'selected'){  
+    $sql = $baseQuery . " AND LOWER(application.status)='selected' AND application.interview_date IS NULL";
+}
+elseif($filter == 'rejected'){  
+    $sql = $baseQuery . " AND LOWER(application.status)='rejected'";
+}
+elseif($filter == 'pending'){  
+    $sql = $baseQuery . " AND LOWER(application.status)='pending'";
+}
+elseif($filter == 'shortlisted'){  
+    $sql = $baseQuery . " AND application.interview_date IS NOT NULL";
+}
+else{  
+    $sql = $baseQuery;
+}
+
+$sql .= " ORDER BY application.aid DESC";
     $result = mysqli_query($conn, $sql);
     if(!$result){ die(mysqli_error($conn)); }
     ?>
@@ -86,22 +84,35 @@ require "../config/db.php";
         </h2>
 
         <!-- FILTER BUTTONS -->
-        <div class="flex justify-center gap-4 mb-6 flex-wrap">
+                
+            <div class="flex justify-center gap-4 mb-6 flex-wrap">
+
             <a href="view_applicant.php?jid=<?= $jid ?>&filter=all"
-            class="px-6 py-2 rounded-lg text-sm transition <?= ($filter=='all')?'bg-yellow-400 text-black':'border border-yellow-400 text-[#D7AE27] hover:bg-yellow-400 hover:text-black'; ?>">
-            All Applicants
+            class="px-6 py-2 rounded-lg text-sm <?= ($filter=='all')?'bg-yellow-400 text-black':'border border-yellow-400 text-[#D7AE27]'; ?>">
+            All
+            </a>
+
+            <a href="view_applicant.php?jid=<?= $jid ?>&filter=pending"
+            class="px-6 py-2 rounded-lg text-sm <?= ($filter=='pending')?'bg-yellow-400 text-black':'border border-yellow-400 text-[#D7AE27]'; ?>">
+            Pending
             </a>
 
             <a href="view_applicant.php?jid=<?= $jid ?>&filter=selected"
-            class="px-6 py-2 rounded-lg text-sm transition <?= ($filter=='selected')?'bg-yellow-400 text-black':'border border-yellow-400 text-[#D7AE27] hover:bg-yellow-400 hover:text-black'; ?>">
-            Selected Applicants
+            class="px-6 py-2 rounded-lg text-sm <?= ($filter=='selected')?'bg-yellow-400 text-black':'border border-yellow-400 text-[#D7AE27]'; ?>">
+            Accepted
             </a>
 
-            <a href="view_applicant.php?jid=<?= $jid ?>&filter=interview"
-            class="px-6 py-2 rounded-lg text-sm transition <?= ($filter=='interview')?'bg-yellow-400 text-black':'border border-yellow-400 text-[#D7AE27] hover:bg-yellow-400 hover:text-black'; ?>">
-            Short-listed Applicants
+            <a href="view_applicant.php?jid=<?= $jid ?>&filter=shortlisted"
+            class="px-6 py-2 rounded-lg text-sm <?= ($filter=='shortlisted')?'bg-yellow-400 text-black':'border border-yellow-400 text-[#D7AE27]'; ?>">
+            Interview Scheduled
             </a>
-        </div>
+
+            <a href="view_applicant.php?jid=<?= $jid ?>&filter=rejected"
+            class="px-6 py-2 rounded-lg text-sm <?= ($filter=='rejected')?'bg-yellow-400 text-black':'border border-yellow-400 text-[#D7AE27]'; ?>">
+            Rejected
+            </a>
+
+</div> 
 
         <!-- MAIN CARD -->
         <div class="bg-[#1a1a1a] rounded-xl border border-gray-800 p-6">
@@ -139,15 +150,39 @@ require "../config/db.php";
 
             </div>
 
-            <!-- STATUS BADGE -->
-            <?php
-            $status = strtolower($row['status']);
-            $badgeClass = $status=='selected' ? 'bg-green-500/20 text-green-400' : ($status=='rejected'?'bg-red-500/20 text-red-400':'bg-yellow-500/20 text-yellow-400');
-            $badgeText = !empty($row['interview_date']) ? 'Interview Scheduled' : ucfirst($status=='pending'?'Pending':$status);
-            ?>
-            <span class="px-3 py-1 rounded-full text-xs font-semibold <?= $badgeClass ?>">
-                <?= $badgeText ?>
-            </span>
+
+
+<?php
+$status = strtolower($row['status']);
+
+/* ✅ WORKFLOW LOGIC */
+if (!empty($row['interview_date'])) {
+    $status = 'shortlisted';
+}
+
+/* ✅ BADGE UI */
+if ($status == 'selected') {
+    $badgeClass = 'bg-green-500/20 text-green-400';
+    $badgeText = 'Selected';
+}
+elseif ($status == 'rejected') {
+    $badgeClass = 'bg-red-500/20 text-red-400';
+    $badgeText = 'Rejected';
+}
+elseif ($status == 'shortlisted') {
+    $badgeClass = 'bg-blue-500/20 text-blue-400';
+    $badgeText = 'Interview Scheduled';
+}
+else {
+    $badgeClass = 'bg-yellow-500/20 text-yellow-400';
+    $badgeText = 'Pending';
+}
+?>
+
+<!-- ✅ PRINT BADGE -->
+<span class="<?= $badgeClass ?> px-3 py-1 rounded-full text-xs font-semibold">
+    <?= $badgeText ?>
+</span>
         </div>
 
         <!-- Info Tags -->

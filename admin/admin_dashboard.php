@@ -58,6 +58,11 @@ $applications = $conn->query("SELECT COUNT(*) as total FROM application")->fetch
                 <i class="fa fa-briefcase"></i> Jobs</a></li>
             <li><a href="applications.php" class="flex gap-3 hover:text-[#D7AE27]">
                 <i class="fa fa-file-alt"></i> Applications</a></li>
+                <li>
+                <a href="fraud_reports.php" class="flex gap-3 hover:text-[#D7AE27]">
+                    <i class="fa fa-exclamation-triangle"></i> Fraud Reports
+                </a>
+            </li>
         </ul>
     </div>
 

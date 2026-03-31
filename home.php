@@ -759,78 +759,107 @@ include("include/navbar.php");?>
 
     </section>
 
-      <section id="feedback_section">
-            
-            <?php
-                require "config/db.php";
-
-        $sql = "SELECT feedback.*, users.p_image, users.role
-        FROM feedback
-        JOIN users ON feedback.uid = users.uid
-        ORDER BY feedback.fid DESC";
-
-            $result = $conn->query($sql);
-            ?>
-
-            <!-- FEEDBACK SECTION -->
-
-            <div class="max-w-6xl mx-auto mt-6 px-6 mb-16">
-
-            <h2 class="text-3xl font-bold text-yellow-400 mb-8 text-center">
-            User Feedback
-            </h2>
-
-            <div class="grid md:grid-cols-3 gap-6">
-
-            <?php while($row=$result->fetch_assoc()) { ?>
-
-            <div class="bg-gradient-to-b from-[#0a0a0a] to-[#0a0a0a]  p-6 rounded-xl shadow-lg hover:scale-105 transition">
+    <section id="feedback_section">
 
         <?php
-            if(!empty($row['p_image'])){
+        require "config/db.php";
 
-                if($row['role'] == 'company'){
-                    $imagePath = "http://localhost/php_program/project/company/uploads/" . $row['p_image'];
-                }else{
-                    $imagePath = "http://localhost/php_program/project/seeker/uploads/" . $row['p_image'];
-                }
+        // check toggle
+        $show_all = isset($_GET['all']) && $_GET['all'] == 1;
+
+        // fetch feedback
+        $sql = "SELECT feedback.*, users.p_image, users.role
+                FROM feedback
+                JOIN users ON feedback.uid = users.uid
+                ORDER BY feedback.fid DESC";
+
+        $result = $conn->query($sql);
+
+        // count total
+        $total = $result->num_rows;
+        $count = 0;
+        ?>
+
+        <div class="max-w-6xl mx-auto mt-6 px-6 mb-16">
+
+            <!-- TITLE CENTER -->
+            <div class="flex justify-center">
+                <h2 class="text-2xl md:text-3xl font-semibold text-[#D7AE27] mb-6 text-center">
+                    <span class="text-white">What</span> User 
+                    <span class="text-white">says about us?</span>
+                </h2>
+            </div>
+
+            <!-- GRID -->
+            <div class="grid md:grid-cols-3 gap-6">
+
+            <?php while($row = $result->fetch_assoc()) { 
+
+                // limit to 4 if not expanded
+                if(!$show_all && $count >= 4) break;
+                $count++;
             ?>
-    
-        <img src="<?= $imagePath ?>" 
-        class="w-12 h-12 rounded-full mb-3 object-cover border-2 border-[#D7AE27]">
 
-        <?php } else { ?>
+            <div class="bg-gradient-to-b from-[#0a0a0a] to-[#0a0a0a] p-6 rounded-xl shadow-lg hover:scale-105 transition">
 
-        <img src="https://ui-avatars.com/api/?name=<?= urlencode($row['name']) ?>&background=D7AE27&color=000"
-        class="w-12 h-12 rounded-full mb-3 border-2 border-[#D7AE27]">
+                <?php
+                if(!empty($row['p_image'])){
+                    if($row['role'] == 'company'){
+                        $imagePath = "http://localhost/php_program/project/company/uploads/" . $row['p_image'];
+                    } else {
+                        $imagePath = "http://localhost/php_program/project/seeker/uploads/" . $row['p_image'];
+                    }
+                ?>
+                    <img src="<?= $imagePath ?>" 
+                        class="w-12 h-12 rounded-full mb-3 object-cover border-2 border-[#D7AE27]">
+                <?php } else { ?>
+                    <img src="https://ui-avatars.com/api/?name=<?= urlencode($row['name']) ?>&background=D7AE27&color=000"
+                        class="w-12 h-12 rounded-full mb-3 border-2 border-[#D7AE27]">
+                <?php } ?>
 
-        <?php } ?>
+                <h3 class="text-lg font-semibold"><?= $row['name']; ?></h3>
 
-            <h3 class="text-lg font-semibold">
-            <?php echo $row['name']; ?>
-            </h3>
+                <p class="text-yellow-400 mb-2">
+                    <?= str_repeat("⭐️", $row['rating']); ?>
+                </p>
 
-
-            <p class="text-yellow-400 mb-2">
-            <?php echo str_repeat("⭐️",$row['rating']); ?>
-            </p>
-
-            <p class="text-gray-400 text-sm">
-            <?php echo $row['message']; ?>
-            </p>
+                <p class="text-gray-400 text-sm">
+                    <?= $row['message']; ?>
+                </p>
 
             </div>
 
             <?php } ?>
 
             </div>
-            </div>
-            <div class="flex justify-center mt-6 mb-6">
+
+            <!-- VIEW MORE / LESS -->
+            <?php if($total > 4): ?>
+                <div class="flex justify-center mt-6">
+                    <?php if(!$show_all): ?>
+                        <a href="?all=1#feedback_section"
+                        class="text-yellow-400 hover:underline font-semibold">
+                        View More ↓
+                        </a>
+                    <?php else: ?>
+                        <a href="?all=0#feedback_section"
+                        class="text-yellow-400 hover:underline font-semibold">
+                        Show Less ↑
+                        </a>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+
+        </div>
+
+        <!-- GIVE FEEDBACK BUTTON -->
+        <div class="flex justify-center mt-6 mb-6">
             <a href="http://localhost/php_program/project/include/feedback.php"
             class="bg-yellow-400 text-black px-6 py-2 rounded hover:bg-yellow-500">
             Give Feedback
             </a>
-            </div>
+        </div>
+
     </section>
               
   

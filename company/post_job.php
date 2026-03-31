@@ -153,14 +153,22 @@ Post New Job
 <!-- Location -->
 <div>
 <label>Location <span class="text-red-500">*</span></label>
-<select id="locationField" name="location" class="input-field">
-<option value="">Select Location</option>
+
+<input 
+    list="locations"
+    id="locationField"
+    name="location"
+    value="<?= htmlspecialchars($location) ?>"
+    class="input-field"
+    placeholder="Type or select location..."
+>
+
+<datalist id="locations">
 <?php foreach($locationList as $loc): ?>
-<option value="<?= $loc ?>" <?= ($location==$loc)?"selected":"" ?>>
-<?= $loc ?>
-</option>
+    <option value="<?= $loc ?>">
 <?php endforeach; ?>
-</select>
+</datalist>
+
 <p id="locationErr" class="error"><?= $locationErr ?></p>
 </div>
 

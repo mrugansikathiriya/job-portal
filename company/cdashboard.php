@@ -164,12 +164,14 @@ $jdata = mysqli_fetch_assoc($job_count);
         </a>
 
         <!-- Post Job -->
-        <div class="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-xl p-8 flex items-center justify-center hover:shadow-2xl transition duration-300">
-            <a href="http://localhost/php_program/project/company/post_job.php"
-               class="bg-[#D7AE27] text-black px-8 py-3 rounded-xl font-bold hover:scale-105 transition duration-300">
-               + Post New Job
-            </a>
-        </div>
+ <a href="job_offers.php" class="block">
+    <div class="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition duration-300">
+        <h3 class="text-5xl font-bold text-[#D7AE27]">
+            <i class="fa-solid fa-envelope-open-text"></i>
+        </h3>
+        <p class="text-white/70 mt-3">Job Offers provided to candidate</p>
+    </div>
+        </a>
 
     </div>
 

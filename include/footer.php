@@ -10,18 +10,7 @@ $contact_link = isset($_SESSION['uid'])
     : "http://localhost/php_program/project/auth/login.php";
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>CareerCraft | Job Portal</title>
-    <link href="../dist/styles.css" rel="stylesheet">
 
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="icon" href="image/logo3.jpg" type="image/png"></head>
-<body>
      <!-- footer -->
     <footer class="relative bg-black text-gray-300 pt-20 pb-10 px-6 md:px-20 overflow-hidden">
 
@@ -93,7 +82,7 @@ $contact_link = isset($_SESSION['uid'])
                 </h3>
                 <ul class="space-y-3">
                     <li>
-                        <a href="#"
+                        <a href="http://localhost/php_program/project/include/privacy.php"
                             class="hover:text-[#D7AE27] transition  after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">Privacy
                             Policy</a>
                     </li>
@@ -103,7 +92,7 @@ $contact_link = isset($_SESSION['uid'])
                             & Conditions</a>
                     </li>
                     <li>
-                        <a href="#"
+                        <a href="http://localhost/php_program/project/fraud/fraud_alert.php"
                             class="hover:text-[#D7AE27] transition after:block after:h-[2px] after:w-0 after:bg-[#D7AE27] after:transition-all hover:after:w-full">Fraud
                             Alert</a>
                     </li>
@@ -136,5 +125,5 @@ $contact_link = isset($_SESSION['uid'])
             © 2025 <span class="text-[#D7AE27] font-semibold">Rabbitcode</span>. All Rights Reserved.
         </div>
     </footer>
-</body>
-</html>
+
+    

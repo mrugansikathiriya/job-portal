@@ -13,6 +13,7 @@ if(!isset($_GET['jid'])){
 }
 
 $jid = intval($_GET['jid']);
+
 $sql = "SELECT job.*, 
         company.cname, 
         company.logo, 
@@ -32,18 +33,17 @@ if(mysqli_num_rows($result) == 0){
 
 $row = mysqli_fetch_assoc($result);
 
-// Check saved
 $saved = false;
-if(isset($_SESSION['uid'])){
-    $uid = $_SESSION['uid'];
-  $check = mysqli_query($conn,
+$uid = $_SESSION['uid'];
+
+$check = mysqli_query($conn,
 "SELECT 1 FROM saved_job 
  WHERE uid='$uid' AND jid='".$row['jid']."'");
-    if(mysqli_num_rows($check) > 0){
-        $saved = true;
-    }
+
+if(mysqli_num_rows($check) > 0){
+    $saved = true;
 }
-// Check if already applied
+
 $applied = false;
 $pendingTest = false;
 $aid = 0;
@@ -54,22 +54,27 @@ $applyCheck = mysqli_query($conn,
  LIMIT 1");
 
 if(mysqli_num_rows($applyCheck) > 0){
-
     $appData = mysqli_fetch_assoc($applyCheck);
     $aid = $appData['aid'];
 
     if($appData['score'] == 0){
-        $pendingTest = true; // Test not attempted
+        $pendingTest = true;
     }
 
-    $applied = true; // Block second apply
+    $applied = true;
 }
 
-// Logo fallback
 $logo = !empty($row['logo']) 
-        ? "../company/uploads/".$row['logo'] 
-        : "https://via.placeholder.com/70";
+? "../company/uploads/".$row['logo'] 
+: "https://via.placeholder.com/70";
+
+$list_sql = "SELECT job.*, company.cname, company.logo
+FROM job
+JOIN company ON job.cid = company.cid";
+
+$list_result = mysqli_query($conn,$list_sql);
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -77,159 +82,153 @@ $logo = !empty($row['logo'])
 <link href="../dist/styles.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="icon" href="../image/logo3.jpg" type="image/png">
+    <link rel="icon" href="../image/logo3.jpg" type="image/png">
 
 </head>
 
-<body class="bg-black text-white min-h-screen"> 
-    <?php include("../include/navbar.php"); ?>
+<body class="bg-black text-white min-h-screen">
+
+<?php include("../include/navbar.php"); ?>
+
 <a href="sdashboard.php"
-   class="inline-block mt-20 text-yellow-400 text-sm hover:underline  ml-10">
-   ← Back
+class="inline-block mt-20 text-yellow-400 text-sm hover:underline ml-10">
+← Back
 </a>
-<div class="max-w-4xl mx-auto bg-[#1a1a1a] p-8 rounded-2xl border border-gray-800 mt-5 mb-10">
 
-<!-- Top Section -->
-<div class="flex justify-between items-start">
+<!-- ✅ MAIN FULL WIDTH FLEX -->
+<div class="w-full mt-5 mb-10 grid grid-cols-1 lg:grid-cols-10 gap-6 px-6">
+            <!-- ================= LEFT (70%) ================= -->
+    <div class="lg:col-span-7">
+           <!-- ❌ IMPORTANT: removed max-w-4xl mx-auto -->
+        <div class="w-full bg-[#1a1a1a] p-8 rounded-2xl border border-gray-800">
 
-<div class="flex items-center gap-4">
-<img src="<?php echo $logo; ?>"
-class="w-16 h-16 rounded-lg bg-white p-1">
+            <div class="flex justify-between items-start">
 
-<div>
-<h2 class="text-2xl font-semibold"><?php echo htmlspecialchars($row['title']); ?></h2>
-<p class="text-gray-400"><?php echo $row['cname']; ?></p>
-</div>
-</div>
-<?php if(isset($_SESSION['uid'])) { ?>
+                <div class="flex items-center gap-4">
+                    <img src="<?php echo $logo; ?>" class="w-16 h-16 rounded-lg bg-white p-1">
 
-<form method="POST" action="<?php echo $saved ? 'unsave_job.php' : 'save_job.php'; ?>" class="inline">
+                    <div>
+                        <h2 class="text-2xl font-semibold"><?php echo htmlspecialchars($row['title']); ?></h2>
+                        <p class="text-gray-400"><?php echo $row['cname']; ?></p>
+                    </div>
+                </div>
 
-<input type="hidden" name="jid" value="<?php echo $row['jid']; ?>">
-<input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
+                <form method="POST" action="<?php echo $saved ? 'unsave_job.php' : 'save_job.php'; ?>">
+                    <input type="hidden" name="jid" value="<?php echo $row['jid']; ?>">
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
+                    <button class="text-2xl <?php echo $saved ? 'text-yellow-400' : 'text-gray-400'; ?>">
+                        <i class="<?php echo $saved ? 'fa-solid' : 'fa-regular'; ?> fa-bookmark"></i>
+                    </button>
+                </form>
 
-<button type="submit"
-class="text-2xl <?php echo $saved ? 'text-yellow-400' : 'text-gray-400 hover:text-yellow-400'; ?>">
+            </div>
 
-<i class="<?php echo $saved ? 'fa-solid' : 'fa-regular'; ?> fa-bookmark"></i>
+            <div class="mt-8 space-y-3 text-gray-300">
+                <p><b>Location:</b> <?php echo $row['location']; ?></p>
+                <p><b>Experience:</b> <?php echo $row['experience_required']; ?></p>
+                <p><b>Job Type:</b> <?php echo $row['job_type']; ?></p>
+                <p><b>Work Mode:</b> <?php echo $row['work_mode']; ?></p>
+                <p><b>Salary:</b> ₹ <?php echo $row['salary']; ?></p>
 
-</button>
-
-</form>
-
-<?php } ?>
-
-</div>
-
-<!-- Job Details -->
-<div class="mt-8 space-y-3 text-gray-300">
-
-<p><b>Location:</b> <?php echo $row['location']; ?></p>
-<p><b>Experience:</b> <?php echo $row['experience_required']; ?></p>
-<p><b>Job Type:</b> <?php echo $row['job_type']; ?></p>
-<p><b>Work Mode:</b> <?php echo $row['work_mode']; ?></p>
-<p><b>Salary:</b> ₹ <?php echo $row['salary']; ?></p>
-
-<p class="text-red-400">
-<b>Deadline:</b> <?php echo date("d M Y", strtotime($row['deadline'])); ?>
-</p>
-
+                <p class="text-red-400">
+                <b>Deadline:</b> <?php echo date("d M Y", strtotime($row['deadline'])); ?>
+                </p>
 <p><b>Total Applicants:</b> <?php echo $row['applicant']; ?></p>
+            </div>
 
-</div>
+            <hr class="my-8 border-gray-700">
 
-<hr class="my-8 border-gray-700">
+            <h3 class="text-xl font-semibold mb-3">Job Description</h3>
+            <p class="text-gray-400 mb-6">
+            <?php echo nl2br($row['description']); ?>
+            </p>
 
-<!-- Job Description -->
-<h3 class="text-xl font-semibold mb-3">Job Description</h3>
-<p class="text-gray-400 mb-6">
-<?php echo nl2br($row['description']); ?>
-</p>
+            <button onclick="toggleCompany(this)"
+            class="bg-gray-800 border border-yellow-400 text-yellow-400 px-5 py-2 rounded-lg">
+            View Company Details
+            </button>
 
-<!-- Toggle Button -->
-<button onclick="toggleCompany(this)"
-class="mb-6 bg-gray-800 border border-yellow-400 text-yellow-400 px-5 py-2 rounded-lg hover:bg-yellow-400 hover:text-black transition">
-View Company Details
-</button>
+            <div id="companySection" class="hidden mt-4">
+                <p><b>Name:</b> <?php echo $row['cname']; ?></p>
+                <p><b>Location:</b> <?php echo $row['company_location']; ?></p>
 
-<!-- Company Section (Hidden) -->
-<div id="companySection" class="hidden">
+                <?php if(!empty($row['website'])){ ?>
+                <p><b>Website:</b> 
+                <a href="<?php echo $row['website']; ?>" target="_blank" class="text-yellow-400 underline">
+                Visit</a></p>
+                <?php } ?>
 
-<hr class="my-6 border-gray-700">
+                <p class="text-gray-400 mt-3">
+                <?php echo nl2br($row['company_desc']); ?>
+                </p>
+            </div>
 
-<h3 class="text-xl font-semibold mb-4">Company Details</h3>
+            <?php if($pendingTest){ ?>
+            <a href="test.php?aid=<?=$aid?>" class="block mt-6 bg-yellow-400 text-black text-center py-2 rounded-lg">Continue Test</a>
 
-<p class="text-gray-300 mb-2">
-<b>Company Name:</b> <?php echo $row['cname']; ?>
-</p>
+            <?php } elseif(!$applied){ ?>
+            <a href="apply_job.php?jid=<?=$row['jid']?>" class="block mt-6 bg-yellow-400 text-black text-center py-2 rounded-lg">Apply Now</a>
 
-<p class="text-gray-300 mb-2">
-<b>Company Location:</b> <?php echo $row['company_location']; ?>
-</p>
+            <?php } else { ?>
+            <button class="mt-6 w-full bg-gray-600 py-2 rounded-lg">Application Submitted</button>
+            <?php } ?>
 
-<?php if(!empty($row['website'])) { ?>
-<p class="text-gray-300 mb-2">
-<b>Website:</b> 
-<a href="<?php echo $row['website']; ?>" target="_blank"
-class="text-yellow-400 underline">
-<?php echo $row['website']; ?>
-</a>
-</p>
-<?php } ?>
+        </div>
+    </div>
 
-<div class="mt-4">
-<h4 class="text-lg font-semibold mb-2">About Company</h4>
-<p class="text-gray-400">
-<?php echo nl2br($row['company_desc']); ?>
-</p>
-</div>
+    <!-- ================= RIGHT (30%) ================= -->
+    <div class="lg:col-span-3 h-[calc(100vh-100px)] overflow-y-auto sticky top-20">
+            <?php while($job = mysqli_fetch_assoc($list_result)){ 
 
-</div>
+        $logo2 = !empty($job['logo']) 
+        ? "../company/uploads/".$job['logo'] 
+        : "https://via.placeholder.com/70";
+        ?>
 
-<!-- Apply Button -->
-<?php if(isset($_SESSION['uid'])): ?>
+        <a href="?jid=<?php echo $job['jid']; ?>">
 
-<?php if($pendingTest): ?>
+        <div class="bg-[#161616] p-5 rounded-xl border mb-4
+        <?php echo ($job['jid']==$jid)?'border-yellow-400 bg-[#222]':'border-gray-800'; ?>">
 
-<a href="test.php?aid=<?= $aid ?>"
-class="inline-block bg-yellow-400 text-black px-6 py-2 rounded-lg font-medium hover:bg-yellow-500 mt-6">
-Continue Aptitude Test
-</a>
+            <div class="flex items-center gap-3 mb-3">
+                <img src="<?php echo $logo2; ?>" class="w-12 h-12 rounded bg-white p-1">
 
-<?php elseif(!$applied): ?>
+                <div>
+                    <h3 class="text-sm font-semibold"><?php echo $job['title']; ?></h3>
+                    <p class="text-gray-400 text-xs"><?php echo $job['cname']; ?></p>
+                </div>
+            </div>
 
-<a href="apply_job.php?jid=<?= $row['jid']; ?>"
-class="inline-block bg-yellow-400 text-black px-6 py-2 rounded-lg font-medium hover:bg-yellow-500 mt-6">
-Apply Now
-</a>
+            <p class="text-gray-400 text-xs mb-2">
+            <?php echo substr($job['description'],0,60); ?>...
+            </p>
 
-<?php else: ?>
+            <div class="text-xs text-yellow-400">
+            ₹ <?php echo $job['salary']; ?> LPA
+            </div>
 
-<button class="inline-block bg-gray-600 text-white px-6 py-2 rounded-lg mt-6 cursor-not-allowed">
-Application Submitted
-</button>
+        </div>
+        </a>
 
-<?php endif; ?>
+        <?php } ?>
 
-<?php endif; ?>
+    </div>
 
 </div>
 
 <script>
-function toggleCompany(btn) {
-    var section = document.getElementById("companySection");
+function toggleCompany(btn){
+let sec = document.getElementById("companySection");
 
-    if(section.classList.contains("hidden")) {
-        section.classList.remove("hidden");
-        btn.innerText = "Hide Company Details";
-    } else {
-        section.classList.add("hidden");
-        btn.innerText = "View Company Details";
-    }
+if(sec.classList.contains("hidden")){
+sec.classList.remove("hidden");
+btn.innerText="Hide Company Details";
+}else{
+sec.classList.add("hidden");
+btn.innerText="View Company Details";
+}
 }
 </script>
 
 </body>
-<?php include("../include/footer.php"); ?>
-
 </html>

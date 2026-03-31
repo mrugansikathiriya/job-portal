@@ -69,7 +69,8 @@ if (session_status() == PHP_SESSION_NONE) {
         <!-- Company -->
             <a href="http://localhost/php_program/project/company/find_talent.php" class="hover:text-[#D7AE27] hover:underline">Find Talent</a>
         <a href="http://localhost/php_program/project/company/post_job.php" class="hover:text-[#D7AE27] hover:underline">Post Job</a>
-        <a href="job_history.php" class="hover:text-[#D7AE27] hover:underline">Job History</a>
+           <a href="http://localhost/php_program/project/company/candidate_history.php"
+ class="hover:text-[#D7AE27] hover:underline">Candidate History</a>
     <?php endif; ?>
 
 </div>
@@ -182,8 +183,8 @@ class="block py-2 text-gray-200 hover:text-[#D7AE27]">Home</a>
     <a href="http://localhost/php_program/project/company/post_job.php"
        class="block py-2 text-gray-200 hover:text-[#D7AE27]">Post Job</a>
 
-    <a href="#"
-       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Job History</a>
+    <a href="http://localhost/php_program/project/company/candidate_history.php"
+       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Candidate History</a>
 
 <?php elseif($_SESSION['role'] == 'seeker'): ?>
     <!-- Seeker -->

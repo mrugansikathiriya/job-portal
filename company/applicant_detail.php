@@ -38,6 +38,15 @@ if(mysqli_num_rows($result) == 0){
     die("Unauthorized access or applicant not found");
 }
 $data = mysqli_fetch_assoc($result);
+// ---------------- STATUS DISPLAY ----------------
+$display_status = $data['status'];
+
+if($data['status'] == 'selected' && empty($data['interview_date'])){
+    $display_status = "Shortlisted";
+}
+elseif(!empty($data['interview_date'])){
+    $display_status = "Interview Scheduled";
+}
 
 // ---------------- PHPMailer Function ----------------
 function sendSeekerEmail($seeker_email, $seeker_name, $subject, $message, $company_name, $company_email){
@@ -46,12 +55,12 @@ function sendSeekerEmail($seeker_email, $seeker_name, $subject, $message, $compa
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = $company_email;  // Company email used for sending
-        $mail->Password = 'YOUR_COMPANY_EMAIL_APP_PASSWORD';  // App password
+        $mail->Username = 'careercraft535@gmail.com';
+        $mail->Password = 'twhx zekb bklj ceow'; // App password
         $mail->SMTPSecure = 'tls';
         $mail->Port = 587;
 
-        $mail->setFrom($company_email, $company_name.' HR');
+        $mail->setFrom('careercraft535@gmail.com', $company_name.' HR');
         $mail->addAddress($seeker_email, $seeker_name);
         $mail->addReplyTo($company_email, $company_name.' HR');
 
@@ -115,18 +124,61 @@ if(isset($_POST['schedule'])){
     $date = mysqli_real_escape_string($conn,$_POST['date']);
     $time = mysqli_real_escape_string($conn,$_POST['time']);
 
+    $today = date("Y-m-d");
+    $current_time = date("H:i");
+
     if(empty($date) || empty($time)){
         $msg = "❌ Please select both date and time.";
-    } else {
-        mysqli_query($conn,"UPDATE application SET interview_date='$date', interview_time='$time' WHERE aid='$aid'");
-        regenerateCSRFToken();
+    }
+    elseif($date < $today){
+        $msg = "❌ Cannot select past date.";
+    }
+    else {
 
-        $subject = "Interview Scheduled for {$data['job_title']}";
-        $message_body = "Your interview for <b>{$data['job_title']}</b> is scheduled on <b>$date</b> at <b>$time</b>. Please be on time.";
-        $msg = sendSeekerEmail($data['seeker_email'], $data['sname'], $subject, $message_body, $data['cname'], $data['company_email']);
+        $existing_date = $data['interview_date'];
+        $existing_time = $data['interview_time'];
 
-        header("Location: applicant_detail.php?aid=".$aid);
-        exit();
+        // ❌ Block update
+        if(!empty($existing_date) && $existing_date < $today){
+            $msg = "❌ Interview date expired.";
+        }
+        elseif(!empty($existing_date) && $existing_date == $today && $existing_time < $current_time){
+            $msg = "❌ Interview time already passed.";
+        }
+        else {
+
+    $isReschedule = !empty($data['interview_date']);
+
+mysqli_query($conn,"UPDATE application 
+SET interview_date='$date', 
+    interview_time='$time',
+    status='interview_scheduled'
+WHERE aid='$aid'");
+
+            regenerateCSRFToken();
+
+if($isReschedule){
+    $subject = "Interview Rescheduled for {$data['job_title']}";
+    $message_body = "Your interview has been <b>rescheduled</b>.<br><br>
+                     New Date: <b>$date</b><br>
+                     Time: <b>$time</b>";
+} else {
+    $subject = "Interview Scheduled for {$data['job_title']}";
+    $message_body = "Your interview for <b>{$data['job_title']}</b> is scheduled on <b>$date</b> at <b>$time</b>.";
+}
+
+            $msg = sendSeekerEmail(
+                $data['seeker_email'],
+                $data['sname'],
+                $subject,
+                $message_body,
+                $data['cname'],
+                $data['company_email']
+            );
+
+            header("Location: applicant_detail.php?aid=".$aid);
+            exit();
+        }
     }
 }
 ?>
@@ -140,6 +192,19 @@ if(isset($_POST['schedule'])){
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="icon" href="../image/logo3.jpg" type="image/png">
+
+ <style>
+            /* Make calendar icon white */
+            input[type="date"]::-webkit-calendar-picker-indicator {
+                filter: invert(1);
+                cursor: pointer;
+            }
+             input[type="time"]::-webkit-calendar-picker-indicator {
+                filter: invert(1);
+                cursor: pointer;
+            }
+            </style>
+
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col">
 
@@ -179,8 +244,15 @@ if(isset($_POST['schedule'])){
             <div class="col-span-1 md:col-span-2"><span class="text-yellow-400 font-semibold">Bio</span><p><?= htmlspecialchars($data['bio']); ?></p></div>
             <div><span class="text-yellow-400 font-semibold">Score</span><p><?= htmlspecialchars($data['score']); ?></p></div>
             <div><span class="text-yellow-400 font-semibold">Current Status</span>
-                <p class="<?php if($data['status']=='selected'){ echo 'text-green-400'; } elseif($data['status']=='rejected'){ echo 'text-red-400'; } else{ echo 'text-yellow-400'; } ?>"><?= htmlspecialchars($data['status']); ?></p>
-            </div>
+            <p class="<?php 
+                if($display_status == 'Interview Scheduled'){ echo 'text-green-400'; }
+                elseif($data['status']=='selected'){ echo 'text-green-400'; }
+                elseif($data['status']=='rejected'){ echo 'text-red-400'; }
+                else{ echo 'text-yellow-400'; } 
+            ?>">
+                <?= htmlspecialchars($display_status); ?>
+            </p>
+           </div>
         </div>
 
         <!-- Resume -->
@@ -203,33 +275,87 @@ if(isset($_POST['schedule'])){
                     Reject
                 </button>
             </form>
-        <?php elseif($data['status'] == 'selected'): ?>
-            <!-- Schedule Interview -->
-            <div class="bg-gray-800/70 border-l-4 border-yellow-400 rounded-xl p-6 mt-6 shadow-md">
-                <p class="text-yellow-400 font-bold flex items-center gap-2"><i class="fa-solid fa-calendar-check"></i> Schedule Interview</p>
-                <?php if(!empty($data['interview_date']) && !empty($data['interview_time'])): ?>
-                    <p>Date: <span class="text-white"><?= htmlspecialchars($data['interview_date']); ?></span></p>
-                    <p>Time: <span class="text-white"><?= htmlspecialchars($data['interview_time']); ?></span></p>
-                <?php else: ?>
-                    <p class="text-gray-300">No interview scheduled yet.</p>
-                <?php endif; ?>
+        <?php elseif($data['status'] == 'selected' || $data['status'] == 'interview_scheduled'): ?>
 
-                <form method="POST" class="mt-4 flex flex-col gap-3">
-                    <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
-                    <div class="flex gap-2">
-                        <input type="date" name="date" required class="flex-1 p-3 rounded bg-black border border-gray-600">
-                        <input type="time" name="time" required class="flex-1 p-3 rounded bg-black border border-gray-600">
-                    </div>
-                    <?php if($msg): ?>
-                        <p class="text-sm text-green-400"><?= $msg ?></p>
-                    <?php endif; ?>
-                    <button type="submit" name="schedule" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black py-3 rounded-2xl font-semibold transition-all">
-                        Save Schedule
-                    </button>
-                </form>
+<div class="bg-gray-800/70 border-l-4 border-yellow-400 rounded-xl p-6 mt-6 shadow-md">
+    <p class="text-yellow-400 font-bold flex items-center gap-2">
+        <i class="fa-solid fa-calendar-check"></i> Interview
+    </p>
+
+    <?php if(!empty($data['interview_date']) && !empty($data['interview_time'])): ?>
+
+        <!-- ✅ SHOW DETAILS -->
+        <p class="text-green-400 mt-2 font-semibold">✅ Interview Scheduled</p>
+        <p>Date: <span class="text-white"><?= htmlspecialchars($data['interview_date']); ?></span></p>
+        <p>Time: <span class="text-white"><?= htmlspecialchars($data['interview_time']); ?></span></p>
+
+        <?php
+        $today = date("Y-m-d");
+        $current_time = date("H:i");
+
+        $canReschedule = false;
+
+        if($data['interview_date'] > $today){
+            $canReschedule = true;
+        } elseif($data['interview_date'] == $today && $data['interview_time'] > $current_time){
+            $canReschedule = true;
+        }
+        ?>
+
+        <?php if($canReschedule): ?>
+
+        <!-- ✅ RESCHEDULE FORM -->
+        <form method="POST" class="mt-4 flex flex-col gap-3">
+            <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+
+            <div class="flex gap-2">
+                <input type="date" name="date" required 
+                min="<?= date('Y-m-d') ?>"
+                class="flex-1 p-3 rounded bg-black border border-gray-600">
+
+                <input type="time" name="time" required 
+                class="flex-1 p-3 rounded bg-black border border-gray-600">
             </div>
+
+            <button type="submit" name="schedule"
+                class="w-full bg-yellow-500 hover:bg-yellow-600 text-black py-3 rounded-2xl font-semibold">
+                Reschedule Interview
+            </button>
+        </form>
+
+        <?php else: ?>
+            <p class="text-red-400 mt-2">⛔ Cannot reschedule (time passed)</p>
         <?php endif; ?>
 
+    <?php else: ?>
+
+        <!-- ✅ FIRST TIME SCHEDULE -->
+        <form method="POST" class="mt-4 flex flex-col gap-3">
+            <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+
+            <div class="flex gap-2">
+                <input type="date" name="date" required 
+                min="<?= date('Y-m-d') ?>"
+                class="flex-1 p-3 rounded bg-black border border-gray-600">
+
+                <input type="time" name="time" required 
+                class="flex-1 p-3 rounded bg-black border border-gray-600">
+            </div>
+
+            <?php if($msg): ?>
+                <p class="text-sm text-red-400"><?= $msg ?></p>
+            <?php endif; ?>
+
+            <button type="submit" name="schedule"
+                class="w-full bg-yellow-500 hover:bg-yellow-600 text-black py-3 rounded-2xl font-semibold">
+                Schedule Interview
+            </button>
+        </form>
+
+    <?php endif; ?>
+</div>
+
+<?php endif; ?>
     </div>
 </div>
 

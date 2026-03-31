@@ -29,7 +29,7 @@ $contact_link = isset($_SESSION['uid'])
 
 <!-- Back Button -->
 <div class="max-w-6xl mx-auto px-6 pt-6">
-    <a href="../home.php" 
+    <a href="http://localhost/php_program/project/home.php" 
        class="inline-block text-[#D7AE27] font-semibold hover:underline transition duration-300">
        ← Back to Home
     </a>
