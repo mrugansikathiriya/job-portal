@@ -2,6 +2,7 @@
 session_start();
 require "../config/db.php";
 require "../authc/csrf.php";
+require "../auth/session_check.php";
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
 

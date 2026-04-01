@@ -3,6 +3,7 @@ session_start();
 require "../config/db.php";
 require "../array/location.php";
 require "../authc/csrf.php";
+require "../auth/session_check.php";
 
 if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'company'){
     header("Location: ../auth/login.php");
@@ -37,12 +38,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         die("Invalid CSRF token");
     }
 
-    $cname = trim($_POST["cname"] ?? "");
-    $website = trim($_POST["website"] ?? "");
-    $location = trim($_POST["location"] ?? "");
-    $description = trim($_POST["description"] ?? "");
-    $established_at = $_POST["established_at"] ?? "";
-    $is_verified = $_POST["is_verified"] ?? "";
+   $cname = mysqli_real_escape_string($conn, trim($_POST["cname"] ?? ""));
+$website = mysqli_real_escape_string($conn, trim($_POST["website"] ?? ""));
+$location = mysqli_real_escape_string($conn, trim($_POST["location"] ?? ""));
+$description = mysqli_real_escape_string($conn, trim($_POST["description"] ?? ""));
+$established_at = mysqli_real_escape_string($conn, $_POST["established_at"] ?? "");
+$is_verified = mysqli_real_escape_string($conn, $_POST["is_verified"] ?? "");
 
     if ($cname === "") $cnameErr = "Company name is required";
     if ($location === "") $locationErr = "Location is required";

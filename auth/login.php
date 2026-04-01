@@ -4,7 +4,7 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 require "../config/db.php";
 require "../authc/csrf.php";
-
+require "../auth/session_check.php";
 /* =========================
    REMEMBER ME AUTO LOGIN
 ========================= */
@@ -14,7 +14,8 @@ if (!isset($_SESSION['uid']) && isset($_COOKIE['remember_token'])) {
 
     $auto = mysqli_query($conn, 
         "SELECT uid, uname, role, is_completed 
-         FROM users WHERE remember_token='$token'");
+            FROM users 
+            WHERE remember_token='$token' AND status='active'");
 
     if (mysqli_num_rows($auto) == 1) {
 

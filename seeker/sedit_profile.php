@@ -4,6 +4,7 @@ session_start();
 require "../config/db.php";
 require "../array/skill.php";
 require "../authc/csrf.php";
+require "../auth/session_check.php";
 
 if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'seeker'){
     header("Location: ../auth/login.php");
@@ -41,12 +42,12 @@ if($_SERVER["REQUEST_METHOD"] === "POST"){
         die("Invalid CSRF token");
     }
 
-    $sname = trim($_POST["sname"] ?? "");
-    $education = trim($_POST["education"] ?? "");
-    $experience = $_POST["experience"] ?? "";
-    $skillname = trim($_POST["skillname"] ?? "");
-    $bio = trim($_POST["bio"] ?? "");
-    $birthdate = $_POST["birthdate"] ?? "";
+  $sname = mysqli_real_escape_string($conn, trim($_POST["sname"] ?? ""));
+$education = mysqli_real_escape_string($conn, trim($_POST["education"] ?? ""));
+$experience = mysqli_real_escape_string($conn, $_POST["experience"] ?? "");
+$skillname = mysqli_real_escape_string($conn, trim($_POST["skillname"] ?? ""));
+$bio = mysqli_real_escape_string($conn, trim($_POST["bio"] ?? ""));
+$birthdate = mysqli_real_escape_string($conn, $_POST["birthdate"] ?? "");
 
     /* Validation */
     if ($sname === "") $snameErr = "Full name required";

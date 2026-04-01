@@ -1,6 +1,7 @@
 <?php
     session_start();
 require "../config/db.php";
+require "../auth/session_check.php";
 
     if(!isset($_SESSION['uid'])){
         header("Location: login.php");

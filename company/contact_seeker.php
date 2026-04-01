@@ -2,6 +2,7 @@
 session_start();
 require "../config/db.php";
 require "../authc/csrf.php";
+require "../auth/session_check.php";
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -68,8 +69,12 @@ $res3 = $stmt3->get_result();
 $cid = $res3->fetch_assoc()['cid'];
 
 // ================= JOBS =================
-$jobs = mysqli_query($conn, "SELECT jid, title FROM job WHERE cid='$cid'");
-
+$jobs = mysqli_query($conn, "
+    SELECT jid, title, status 
+    FROM job 
+    WHERE cid='$cid'
+    ORDER BY posted_at DESC
+");
 // ================= CSRF =================
 $csrf_token = generateCSRFToken();
 
@@ -194,9 +199,12 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send'])){
             <!-- JOB DROPDOWN -->
             <select name="jid" class="w-full p-2 bg-black border border-gray-600 rounded focus:outline-none focus:border-yellow-400">
                 <option value="">-- Select Job (Optional) --</option>
-                <?php while($job = mysqli_fetch_assoc($jobs)) { ?>
-                    <option value="<?= $job['jid'] ?>"><?= htmlspecialchars($job['title']) ?></option>
-                <?php } ?>
+                            <?php while($job = mysqli_fetch_assoc($jobs)) { ?>
+            <option value="<?= $job['jid'] ?>" 
+            <?= $job['status']=='closed' ? 'disabled' : '' ?>>
+            <?= htmlspecialchars($job['title']) ?> 
+            <?= $job['status']=='closed' ? '(Closed)' : '' ?>
+            </option>                <?php } ?>
             </select>
             <input type="text" name="subject" placeholder="Subject" class="w-full p-2 bg-black border border-gray-600 rounded focus:outline-none focus:border-yellow-400" required>
             <textarea name="message" placeholder="Write your message..." class="w-full p-2 bg-black border border-gray-600 rounded h-28 focus:outline-none focus:border-yellow-400" required></textarea>

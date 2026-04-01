@@ -1,6 +1,5 @@
 <?php
-session_start(); // <--- top of the file
-
+session_start(); 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -243,17 +242,29 @@ include("include/navbar.php");?>
         </div>
 
              <!-- Search Bar -->
-                        <div class="hidden md:flex relative max-w-3xl mx-auto mt-6 gap-2 pointer-events-auto z-20">
-                            <i
-                                class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" class="job-search w-full pl-12 pr-4 py-3 rounded-full border border-white placeholder-gray-300
-              text-white font-sans focus:border-[#D7AE27] focus:ring-2 focus:ring-[#D7AE27] outline-none transition"
-                                placeholder="Search jobs, skills...">
-                            <button
-                                class="search-btn w-36 bg-[#D7AE27] text-black rounded-full hover:bg-amber-500 hover:text-white transition-all duration-300 transform">
-                                Search
-                            </button>
+            <div class="hidden md:flex relative max-w-3xl mx-auto mt-6 gap-2 pointer-events-auto z-20">
+                                        <!-- <i
+                                                class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i> -->
+                    <form onsubmit="return handleSearch()"
+                            class="hidden md:flex items-center max-w-3xl mx-auto mt-6">
+
+                        <div class="relative flex-1">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+
+                        <input type="text" id="searchInput"
+                        class="w-full pl-12 pr-4 py-3 rounded-xl border border-white bg-transparent text-white 
+                        placeholder-gray-300 focus:border-[#D7AE27] focus:ring-2 focus:ring-[#D7AE27] outline-none"
+                        placeholder="Search jobs....">
                         </div>
+
+                    <button type="submit"
+                    class="ml-5 px-6 py-3 bg-[#D7AE27] text-black rounded-xl font-semibold 
+                    hover:bg-yellow-500 transition">
+                        Search
+                    </button>
+
+                </form>
+            </div>
 
                         <!-- Mobile Buttons -->
                         <div class="md:hidden px-4 py-6 flex flex-col items-center space-y-4 pointer-events-auto z-20">
@@ -1031,9 +1042,27 @@ setInterval(() => {
         faders.forEach(fader => {
             appearOnScroll.observe(fader);
         });
+       const userRole = "<?= $_SESSION['role'] ?>";
 
+        // searching
+        function handleSearch() {
+            let input = document.getElementById("searchInput").value.trim();
 
+            if(input === ""){
+                alert("Please enter something");
+                return false;
+            }
 
+            if(userRole === "company"){
+                // 👉 Company user → view jobs
+                window.location.href = "company/view_job.php?title=" + encodeURIComponent(input);
+            } else {
+                // 👉 Seeker user → find jobs
+                window.location.href = "seeker/find_job.php?title=" + encodeURIComponent(input);
+            }
+
+            return false;
+        }
     </script>
 
 </body>

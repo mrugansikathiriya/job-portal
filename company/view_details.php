@@ -2,6 +2,8 @@
 session_start();
 require "../config/db.php";
 require "../authc/csrf.php";
+require "../auth/session_check.php";
+
 if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'company'){
     header("Location: ../auth/login.php");
     exit();
@@ -64,10 +66,20 @@ p-6 sm:p-8 border border-white/10 text-white mb-20 justify-center">
 
     <!-- Buttons -->
     <div class="flex gap-4 mb-8">
-        <a href="edit_job.php?jid=<?= $jdata['jid'] ?>" 
-           class="bg-yellow-400 text-black px-5 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition">
-           Edit Job
-        </a>
+      <?php if($jdata['status'] != 'closed'){ ?>
+
+<a href="edit_job.php?jid=<?= $jdata['jid'] ?>" 
+   class="bg-yellow-400 text-black px-5 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition">
+   Edit Job
+</a>
+
+<?php } else { ?>
+
+<button class="bg-gray-600 text-white px-5 py-2 rounded-lg cursor-not-allowed">
+   Job Closed
+</button>
+
+<?php } ?>
     <form method="POST" action="delete_job.php"
       onsubmit="return confirm('Are you sure you want to delete this job?');">
 

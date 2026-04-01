@@ -2,6 +2,7 @@
 session_start();
 require "../config/db.php";
 require "../authc/csrf.php";
+require "../auth/session_check.php";
 
 if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'company'){
     header("Location: ../auth/login.php");
@@ -15,14 +16,29 @@ $companyRes = mysqli_query($conn, "SELECT cid FROM company WHERE uid='$uid'");
 $companyData = mysqli_fetch_assoc($companyRes);
 $cid = $companyData['cid'] ?? 0;
 
+$where = "WHERE cid='$cid'";
+
+if(!empty($_GET['title'])){
+    $search = mysqli_real_escape_string($conn, $_GET['title']);
+
+    $where .= " AND (
+        title LIKE '%$search%' 
+        OR description LIKE '%$search%' 
+        OR location LIKE '%$search%'
+    )";
+}
+
+$sql = "SELECT * FROM job 
+        $where
+        ORDER BY posted_at DESC";
+
+$result = mysqli_query($conn, $sql);
 if(!$cid){
     echo "Company not found!";
     exit();
 }
 
-// Fetch all jobs posted by this company
-$sql = "SELECT * FROM job WHERE cid='$cid' ORDER BY posted_at DESC";
-$result = mysqli_query($conn, $sql);
+
 ?>
 
 <!DOCTYPE html>

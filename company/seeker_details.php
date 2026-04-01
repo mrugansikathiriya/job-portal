@@ -2,6 +2,7 @@
 session_start();
 require "../config/db.php";
 require "../authc/csrf.php";
+require "../auth/session_check.php";
 
 // only company login
 if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'company'){
@@ -101,7 +102,7 @@ $img = !empty($seeker['profile_image'])
            Job_Seeker
             <span class="relative inline-block text-white">
                 Profile
-                <span class="absolute left-0 top-full mt-14 w-full h-1 bg-[#D7AE27] rounded-sm"></span>
+                <span class="absolute left-0 top-full mt-5 w-full h-1 bg-[#D7AE27] rounded-sm"></span>
             </span>
         </h2>
 
@@ -182,7 +183,7 @@ $img = !empty($seeker['profile_image'])
     <h4 class="text-lg font-semibold"><?= htmlspecialchars($row['title']) ?></h4>
     <p class="text-gray-400 text-sm mt-1">🏢 <?= htmlspecialchars($row['cname']) ?></p>
     <p class="text-gray-400 text-sm mt-1">📍 <?= htmlspecialchars($row['location']) ?></p>
-    <p class="text-gray-300 mt-2">💰 ₹ <?= htmlspecialchars($row['salary']) ?></p>
+    <p class="text-gray-300 mt-2">💰 ₹ <?= htmlspecialchars($row['salary']) ?> LPA</p>
     <p class="text-gray-400 text-sm mt-2">Applied on: <?= date("d M Y", strtotime($row['applied_at'])) ?></p>
     <span class="<?= $status_color ?> text-black px-3 py-1 rounded-full text-xs mt-3 inline-block">
         <?= ucfirst($row['status']) ?>

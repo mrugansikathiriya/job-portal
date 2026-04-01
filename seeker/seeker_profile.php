@@ -4,6 +4,7 @@ session_start();
 require "../config/db.php";
 require "../array/skill.php";
 require "../authc/csrf.php";
+require "../auth/session_check.php";
 
 if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'seeker'){
     header("Location: ../auth/login.php");

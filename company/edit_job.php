@@ -6,6 +6,7 @@ require "../array/skill.php";
 require "../array/location.php";
 require "../array/role.php";
 require "../authc/csrf.php";
+require "../auth/session_check.php";
 
 if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'company'){
     header("Location: ../auth/login.php");

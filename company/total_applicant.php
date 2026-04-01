@@ -1,6 +1,7 @@
 <?php
 session_start();
 require "../config/db.php";
+require "../auth/session_check.php";
 
 require "../authc/csrf.php";
 if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'company'){

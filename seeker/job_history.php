@@ -2,6 +2,7 @@
 session_start();
 require "../config/db.php";
 require "../authc/csrf.php";
+require "../auth/session_check.php";
 
 date_default_timezone_set('Asia/Kolkata');
 
@@ -11,7 +12,10 @@ if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'seeker'){
     exit();
 }
 $uid = $_SESSION['uid'] ?? 0;
-
+// 🔥 Convert uid → sid
+$seekerRes = mysqli_query($conn, "SELECT sid FROM job_seeker WHERE uid='$uid'");
+$seekerData = mysqli_fetch_assoc($seekerRes);
+$sid = $seekerData['sid'] ?? 0;
 // ✅ FILTER
 $filter = $_GET['filter'] ?? 'all';
 
@@ -63,9 +67,8 @@ $sql = "SELECT job.*, company.cname, company.logo,
         FROM job_offers
         INNER JOIN job ON job_offers.jid = job.jid
         INNER JOIN company ON job.cid = company.cid
-        WHERE job_offers.sid='$uid'
+        WHERE job_offers.sid='$sid'
         ORDER BY job_offers.oid DESC";
-
 }
 
 else{
@@ -227,7 +230,7 @@ Offer: <?php echo ucfirst($row['offer_status']); ?>
 </div>
 
 <!-- Description -->
-<p class="text-gray-400 text-sm mb-6">
+<p class="text-gray-400 text-sm mb-6 overflow-hidden">
 <?php echo substr($row['description'],0,100); ?>...
 </p>
 

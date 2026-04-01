@@ -2,6 +2,7 @@
 session_start();
 require "../config/db.php";
 require "../authc/csrf.php";
+require "../auth/session_check.php";
 
 /* CSRF Validation */
 if(!validateCSRFToken($_POST['csrf_token'])){

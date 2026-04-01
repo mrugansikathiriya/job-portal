@@ -2,10 +2,25 @@
 session_start();
 require "../config/db.php";
 require "../authc/csrf.php";
+require "../auth/session_check.php";
 
 date_default_timezone_set('Asia/Kolkata');
 
 $uid = $_SESSION['uid'] ?? 0;
+/* ================= AUTO CLOSE EXPIRED JOBS ================= */
+mysqli_query($conn, "
+    UPDATE job 
+    SET status='closed' 
+    WHERE deadline < NOW() 
+    AND status != 'closed'
+");
+
+mysqli_query($conn, "
+DELETE saved_job 
+FROM saved_job
+JOIN job ON saved_job.jid = job.jid
+WHERE job.status = 'closed'
+");
 
 /* ================= FILTER VALUES ================= */
 $filter = $_GET['filter'] ?? '';
@@ -15,6 +30,16 @@ $experience = $_GET['experience'] ?? '';
 $company_filter = $_GET['company'] ?? '';
 $salary = isset($_GET['salary']) ? (int)$_GET['salary'] : 100;
 
+if(!empty($_GET['search'])){
+    $search = mysqli_real_escape_string($conn, $_GET['search']);
+
+    $where .= " AND (
+        job.title LIKE '%$search%' 
+        OR job.description LIKE '%$search%' 
+        OR job.location LIKE '%$search%' 
+        OR company.cname LIKE '%$search%'
+    )";
+}
 /* ================= BASE QUERY ================= */
 $where = "WHERE job.deadline >= NOW()";
 
@@ -80,8 +105,11 @@ if(!$result){
 
 <body class="bg-black text-white min-h-screen overflow-x-hidden">
 <?php include("../include/navbar.php"); ?>
-
-<div class="max-w-7xl mx-auto px-6 mt-20 mb-10">
+<a href="sdashboard.php"
+class="inline-block mt-20 text-yellow-400 text-sm hover:underline ml-10">
+← Back
+</a>
+<div class="max-w-7xl mx-auto px-6 mt-5 mb-10">
 
 <h2 class="text-3xl text-center font-semibold mb-12">Recommended Jobs</h2>
 
@@ -216,7 +244,7 @@ if(!$result){
     </div>
 
     <!-- Description -->
-    <p class="text-gray-400 text-sm mb-6"><?php echo substr($row['description'],0,100); ?>...</p>
+    <p class="text-gray-400 text-sm mb-6 overflow-hidden"><?php echo substr($row['description'],0,100); ?>...</p>
 
     <!-- Salary + Posted -->
     <div class="flex justify-between items-center text-sm mb-3">

@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("../config/db.php");
+require "../auth/session_check.php";
 
 if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'company'){
     header("Location: ../auth/login.php");
@@ -129,11 +130,18 @@ $jdata = mysqli_fetch_assoc($job_count);
                 <?= $cdata['website']; ?>
             </p>
         </div>
-<div class="mt-4 sm:mt-0 sm:ml-auto">
+<div class="mt-4 sm:mt-0 sm:ml-auto flex flex-col gap-3">
+
     <a href="cedit_profile.php"
-       class="bg-[#D7AE27] text-black px-6 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition duration-300">
+       class="bg-[#D7AE27] text-black px-6 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition duration-300 text-center">
        ✏ Edit Profile
     </a>
+
+    <a href="view_profile.php"
+       class="bg-[#D7AE27] text-black px-6 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition duration-300 text-center">
+       View Profile
+    </a>
+
 </div>
     </div>
 

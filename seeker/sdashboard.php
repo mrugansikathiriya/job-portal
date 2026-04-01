@@ -2,6 +2,8 @@
 session_start();
 include("../config/db.php");
 require "../authc/csrf.php";
+require "../auth/session_check.php";
+
 $csrf_token = generateCSRFToken();
 
 if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'seeker'){
@@ -139,19 +141,26 @@ $sdata_count = mysqli_fetch_assoc($saved_count);
             <p class="text-[#D7AE27] mt-1">⚡ Skills: <?= $sdata['skillname']; ?></p>
         </div>
 
-        <div class="mt-4 sm:mt-0 sm:ml-auto">
-            <a href="sedit_profile.php"
-               class="bg-[#D7AE27] text-black px-6 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition duration-300">
-               ✏ Edit Profile
-            </a>
-        </div>
+      <div class="mt-4 sm:mt-0 sm:ml-auto flex flex-col gap-3">
+
+    <a href="sedit_profile.php"
+       class="bg-[#D7AE27] text-black px-6 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition duration-300 text-center">
+       ✏ Edit Profile
+    </a>
+
+    <a href="sview_profile.php"
+       class="bg-[#D7AE27] text-black px-6 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition duration-300 text-center">
+       View Profile
+    </a>
+
+</div>
     </div>
 
     <!-- Stats Section -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
         <!-- Total Applications -->
-         <a href="find_job.php?applied=1" class="block">
+         <a href="job_history.php?applied=1" class="block">
         <div class="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition duration-300">
             <h3 class="text-5xl font-bold text-[#D7AE27]"><?= $adata['total']; ?></h3>
             <p class="text-white/70 mt-3">Total Jobs Applied</p>

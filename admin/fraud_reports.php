@@ -20,11 +20,12 @@ $result = $conn->query($query);
 <!DOCTYPE html>
 <html>
 <head>
-<title>Fraud Reports</title>
+<title>Career Craft | Fraud Reports</title>
 
 <link href="../dist/styles.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" href="../image/logo3.jpg" type="image/png"></head></head>
 
 </head>
 
@@ -103,6 +104,13 @@ Blocked
 
 </div>
 
+
+<div class="mt-8">
+    <a href="admin_dashboard.php"
+       class="bg-[#D7AE27] text-black px-6 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition">
+       Back to Dashboard
+    </a>
+</div>
 </div>
 
 </body>
