@@ -1,6 +1,11 @@
 <?php
 require "../config/db.php";
-
+if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'admin'){
+    session_unset();
+    session_destroy();
+    header("Location: ../auth/login.php");
+    exit();
+}
 $email = $_POST['email'] ?? '';
 
 if($email != ""){

@@ -39,11 +39,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
    $cname = mysqli_real_escape_string($conn, trim($_POST["cname"] ?? ""));
-$website = mysqli_real_escape_string($conn, trim($_POST["website"] ?? ""));
-$location = mysqli_real_escape_string($conn, trim($_POST["location"] ?? ""));
-$description = mysqli_real_escape_string($conn, trim($_POST["description"] ?? ""));
-$established_at = mysqli_real_escape_string($conn, $_POST["established_at"] ?? "");
-$is_verified = mysqli_real_escape_string($conn, $_POST["is_verified"] ?? "");
+    $website = mysqli_real_escape_string($conn, trim($_POST["website"] ?? ""));
+    $location = mysqli_real_escape_string($conn, trim($_POST["location"] ?? ""));
+    $description = mysqli_real_escape_string($conn, trim($_POST["description"] ?? ""));
+    $established_at = mysqli_real_escape_string($conn, $_POST["established_at"] ?? "");
+    $is_verified = mysqli_real_escape_string($conn, $_POST["is_verified"] ?? "");
 
     if ($cname === "") $cnameErr = "Company name is required";
     if ($location === "") $locationErr = "Location is required";

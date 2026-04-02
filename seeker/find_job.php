@@ -2,7 +2,7 @@
 session_start();
 require "../config/db.php";
 require "../authc/csrf.php";
-require "../auth/session_check.php";
+// require "../auth/session_check.php";
 
 date_default_timezone_set('Asia/Kolkata');
 
@@ -42,7 +42,7 @@ if(!empty($_GET['search'])){
 }
 /* ================= BASE QUERY ================= */
 $where = "WHERE job.deadline >= NOW()";
-
+$where .= " AND job.is_approve='approved'";
 // Title filter
 if(!empty($title)){
     $title = mysqli_real_escape_string($conn, $title);
@@ -77,7 +77,7 @@ $where .= " AND job.salary <= $salary";
 $sql = "SELECT job.*, company.cname, company.logo,
         EXISTS(
             SELECT 1 FROM saved_job 
-            WHERE saved_job.jid = job.jid AND saved_job.uid = '$uid'
+            WHERE job.is_approve = 'approved' AND saved_job.jid = job.jid AND saved_job.uid = '$uid'
         ) AS saved,
         TIMESTAMPDIFF(SECOND, job.posted_at, NOW()) as seconds_old
         FROM job
@@ -142,15 +142,31 @@ class="inline-block mt-20 text-yellow-400 text-sm hover:underline ml-10">
 
     <!-- Experience -->
     <div class="flex items-center gap-2 bg-[#0f0f0f] border border-gray-700 px-3 h-10 rounded-lg flex-1 min-w-[140px]">
-        <i class="fa-solid fa-briefcase text-yellow-400 text-sm"></i>
-        <select name="experience" onchange="this.form.submit()" class="bg-[#0f0f0f] text-white outline-none w-full text-sm appearance-none">
-            <option value="">Experience</option>
-            <option value="Fresher" <?php if($experience=='Fresher') echo 'selected'; ?>>Fresher</option>
-            <option value="Intermediate" <?php if($experience=='Intermediate') echo 'selected'; ?>>Intermediate</option>
-            <option value="Expert" <?php if($experience=='Expert') echo 'selected'; ?>>Expert</option>
-        </select>
-    </div>
+    <i class="fa-solid fa-briefcase text-yellow-400 text-sm"></i>
 
+    <select name="experience" onchange="this.form.submit()" 
+    class="bg-[#0f0f0f] text-white outline-none w-full text-sm appearance-none">
+
+        <option value="">Experience</option>
+
+        <option value="Fresher" <?php if($experience=='Fresher') echo 'selected'; ?>>
+            Fresher
+        </option>
+
+        <option value="1" <?php if($experience=='1') echo 'selected'; ?>>
+            1 Year
+        </option>
+
+        <option value="2" <?php if($experience=='2') echo 'selected'; ?>>
+            2 Year
+        </option>
+
+        <option value="3" <?php if($experience=='3') echo 'selected'; ?>>
+            3+ Year
+        </option>
+
+    </select>
+</div>
     <!-- Job Type -->
     <div class="flex items-center gap-2 bg-[#0f0f0f] border border-gray-700 px-3 h-10 rounded-lg flex-1 min-w-[140px]">
         <i class="fa-solid fa-file-lines text-yellow-400 text-sm"></i>

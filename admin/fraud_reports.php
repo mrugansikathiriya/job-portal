@@ -1,7 +1,12 @@
 <?php
 session_start();
 require "../config/db.php";
-
+if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'admin'){
+    session_unset();
+    session_destroy();
+    header("Location: ../auth/login.php");
+    exit();
+}
 // fetch fraud reports with company status
 $query = "
 SELECT fr.company_email,

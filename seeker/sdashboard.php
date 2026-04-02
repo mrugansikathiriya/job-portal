@@ -173,13 +173,18 @@ $sdata_count = mysqli_fetch_assoc($saved_count);
             <p class="text-white/70 mt-3">Saved Jobs</p>
         </div>
 
-        <!-- Browse Jobs -->
-        <div class="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-xl p-8 flex items-center justify-center hover:shadow-2xl transition duration-300">
-            <a href="http://localhost/php_program/project/seeker/find_job.php"
-               class="bg-[#D7AE27] text-black px-8 py-3 rounded-xl font-bold hover:scale-105 transition duration-300">
-               🔍 Browse Jobs
-            </a>
-        </div>
+    <!-- My Applications -->
+<div class="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-xl p-8 flex items-center justify-center hover:shadow-2xl transition duration-300">
+    
+   <a href="all_application.php"
+   class="bg-[#D7AE27] text-black px-6 py-2 rounded-lg font-semibold flex items-center gap-2">
+   
+   <i class="fa-solid fa-file-lines"></i>
+   My Applications
+
+</a>
+
+</div>
 
     </div>
 

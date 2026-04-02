@@ -2,6 +2,12 @@
 require "../config/db.php";
 require "admin_auth.php";
 require "../authc/csrf.php";
+if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'admin'){
+    session_unset();
+    session_destroy();
+    header("Location: ../auth/login.php");
+    exit();
+}
 // Get seekers whose users are active
 $result = mysqli_query($conn, "
     SELECT job_seeker.*, users.uname, users.email, users.status 
@@ -69,13 +75,32 @@ $result = mysqli_query($conn, "
     <td class="p-3"><?php echo $row['education']; ?></td>
     <td class="p-3"><?php echo $row['experience']; ?></td>
     <td class="p-3"><?php echo $row['skillname']; ?></td>
-    <td class="p-3"><?php echo $row['bio']; ?></td>
+    <td class="p-3">
+    <?php 
+    $bio = $row['bio'];
+    $short = substr($bio, 0, 50); // first 50 characters
+    ?>
+
+    <span class="short-text">
+        <?php echo $short; ?><?php echo (strlen($bio) > 50) ? '...' : ''; ?>
+    </span>
+
+    <span class="full-text hidden">
+        <?php echo $bio; ?>
+    </span>
+
+    <?php if(strlen($bio) > 50) { ?>
+        <button class="text-blue-400 ml-2 read-more-btn">
+            Read More
+        </button>
+    <?php } ?>
+    </td>    
     <td class="p-3"><?php echo $row['birthdate']; ?></td>
 
 
-</tr>
+    </tr>
 
-<?php } ?>
+    <?php } ?>
 
 </tbody>
 </table>
@@ -89,6 +114,24 @@ $result = mysqli_query($conn, "
 </div>
 
 </div>
+<script>
+document.querySelectorAll('.read-more-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const parent = this.parentElement;
+        const shortText = parent.querySelector('.short-text');
+        const fullText = parent.querySelector('.full-text');
 
+        if(fullText.classList.contains('hidden')){
+            fullText.classList.remove('hidden');
+            shortText.classList.add('hidden');
+            this.innerText = "Read Less";
+        } else {
+            fullText.classList.add('hidden');
+            shortText.classList.remove('hidden');
+            this.innerText = "Read More";
+        }
+    });
+});
+</script>
 </body>
 </html>

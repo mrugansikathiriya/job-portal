@@ -2,6 +2,12 @@
 require "../config/db.php";
 require "admin_auth.php";
 require "../authc/csrf.php";
+if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'admin'){
+    session_unset();
+    session_destroy();
+    header("Location: ../auth/login.php");
+    exit();
+}
 $status = $_GET['status'] ?? '';
 
 $query = "

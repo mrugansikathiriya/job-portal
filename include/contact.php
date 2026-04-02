@@ -128,8 +128,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])){
     <div class="mb-5">
         <h4 class="text-yellow-400 font-semibold">Address:</h4>
         <p class="text-gray-300 mt-1">
-            CareerCraft Office <br>
-            Surat, Gujarat, India
+            123 Innovation Street,<br>
+             Surat, Gujarat, India
         </p>
     </div>
 
@@ -137,7 +137,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])){
     <div class="mb-5">
         <h4 class="text-yellow-400 font-semibold">Phone:</h4>
         <p class="text-gray-300 mt-1">
-            +91 98765 43210
+            +91 98765 67890
         </p>
     </div>
 

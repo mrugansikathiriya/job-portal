@@ -1,7 +1,12 @@
 <?php
 require "../config/db.php";
 require "admin_auth.php";
-
+if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'admin'){
+    session_unset();
+    session_destroy();
+    header("Location: ../auth/login.php");
+    exit();
+}
 // FETCH APPLICATIONS
 $result = mysqli_query($conn, "
     SELECT 
@@ -9,8 +14,8 @@ $result = mysqli_query($conn, "
         u.uname, u.email,
         j.title, j.location
     FROM application a
-    JOIN users u ON a.sid = u.uid
-    JOIN job j ON a.jid = j.jid
+    LEFT JOIN users u ON a.uid = u.uid
+    LEFT JOIN job j ON a.jid = j.jid
     ORDER BY a.aid DESC
 ");
 ?>
@@ -80,7 +85,7 @@ $result = mysqli_query($conn, "
     <!-- RESUME -->
     <td class="p-3">
         <?php if($row['resume']) { ?>
-            <a href="../uploads/resumes/<?php echo $row['resume']; ?>" 
+            <a href="../seeker/uploads/<?php echo $row['resume']; ?>" 
                target="_blank"
                class="text-blue-400 hover:underline">
                View

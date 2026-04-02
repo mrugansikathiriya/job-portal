@@ -149,7 +149,7 @@ class="flex-1 text-center bg-yellow-400 text-black py-2 rounded-lg hover:bg-yell
 Edit Profile
 </a>
 
-<a href="delete_account.php" 
+<a href="cdelete_account.php" 
 onclick="return confirm('Are you sure you want to delete your account?');"
 class="flex-1 text-center bg-red-600 py-2 rounded-lg hover:bg-red-700 transition">
 Delete Account

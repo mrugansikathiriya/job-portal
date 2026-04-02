@@ -4,7 +4,6 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 require "../config/db.php";
 require "../authc/csrf.php";
-require "../auth/session_check.php";
 /* =========================
    REMEMBER ME AUTO LOGIN
 ========================= */

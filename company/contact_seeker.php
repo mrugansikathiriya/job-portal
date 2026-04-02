@@ -70,9 +70,10 @@ $cid = $res3->fetch_assoc()['cid'];
 
 // ================= JOBS =================
 $jobs = mysqli_query($conn, "
-    SELECT jid, title, status 
+    SELECT jid, title, status, is_approve 
     FROM job 
-    WHERE cid='$cid'
+    WHERE cid='$cid' 
+      AND is_approve='approved'
     ORDER BY posted_at DESC
 ");
 // ================= CSRF =================

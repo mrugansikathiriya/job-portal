@@ -9,15 +9,20 @@ header("Pragma: no-cache");
 /* Session timeout limit */
 $timeout = 600; // 10 minutes
 
-/* Check session timeout */
+/* Check login */
+if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'admin'){
+    session_unset();
+    session_destroy();
+    header("Location: ../auth/login.php");
+    exit();
+}
+
+/* Session timeout check */
 if(isset($_SESSION['last_activity'])){
-
-    $inactive_time = time() - $_SESSION['last_activity'];
-
-    if($inactive_time > $timeout){
+    $inactive = time() - $_SESSION['last_activity'];
+    if($inactive > $timeout){
         session_unset();
         session_destroy();
-
         header("Location: ../auth/login.php?msg=timeout");
         exit();
     }
@@ -25,10 +30,4 @@ if(isset($_SESSION['last_activity'])){
 
 /* Update last activity */
 $_SESSION['last_activity'] = time();
-
-/* Check admin login */
-if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'admin'){
-    header("Location: ../auth/login.php");
-    exit();
-}
 ?>

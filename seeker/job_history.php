@@ -28,11 +28,11 @@ $sql = "SELECT job.*, company.cname, company.logo,
         FROM saved_job
         JOIN job ON saved_job.jid = job.jid
         JOIN company ON job.cid = company.cid
-        WHERE saved_job.uid='$uid'";
+        WHERE saved_job.uid='$uid'
+        AND job.is_approve='approved'";
 
 }
 elseif($filter == 'applied'){
-
 $sql = "SELECT job.*, company.cname, company.logo,
         1 AS applied,
         TIMESTAMPDIFF(SECOND, job.posted_at, NOW()) as seconds_old
@@ -40,6 +40,7 @@ $sql = "SELECT job.*, company.cname, company.logo,
         JOIN job ON application.jid = job.jid
         JOIN company ON job.cid = company.cid
         WHERE application.uid='$uid'
+        AND job.is_approve='approved'
         ORDER BY application.aid DESC";
 
 }
@@ -55,6 +56,7 @@ $sql = "SELECT job.*, company.cname, company.logo,
         JOIN company ON job.cid = company.cid
         WHERE application.uid='$uid'
         AND application.status='interview_scheduled'
+        AND job.is_approve='approved'
         ORDER BY application.aid DESC";
 
 }
@@ -72,7 +74,6 @@ $sql = "SELECT job.*, company.cname, company.logo,
 }
 
 else{
-
 $sql = "SELECT job.*, company.cname, company.logo,
         EXISTS(
             SELECT 1 FROM saved_job 
@@ -82,6 +83,7 @@ $sql = "SELECT job.*, company.cname, company.logo,
         TIMESTAMPDIFF(SECOND, job.posted_at, NOW()) as seconds_old
         FROM job
         JOIN company ON job.cid = company.cid
+        WHERE job.is_approve='approved'
         ORDER BY job.posted_at DESC";
 }
 

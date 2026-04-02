@@ -170,9 +170,12 @@ Saved Candidates
 <?php } ?>
 </div>
 <?php else: ?>
-<p class="text-gray-400 text-center mt-10 text-lg">
-<?= ($filter == 'saved') ? "No saved candidates found." : "No candidates found." ?>
-</p>
+<div class="flex flex-col items-center justify-center py-20 w-full">
+    <div class="text-6xl mb-4">&#x1F614;</div>
+    <p class="text-2xl text-[#D7AE27] font-semibold text-center">
+        <?= ($filter == 'saved') ? "No Saved Candidates Found" : "No Candidates Found"; ?>
+    </p>
+</div>
 <?php endif; ?>
 
 </div>

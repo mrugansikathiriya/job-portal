@@ -1,7 +1,12 @@
 <?php
 require "../config/db.php";
 require "admin_auth.php";
-
+if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'admin'){
+    session_unset();
+    session_destroy();
+    header("Location: ../auth/login.php");
+    exit();
+}
 // Get companies whose users are active
 $result = mysqli_query($conn, "
     SELECT company.*, users.uname, users.email, users.status 

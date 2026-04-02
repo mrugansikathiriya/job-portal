@@ -294,7 +294,8 @@
                     <h3 class="text-xl font-semibold text-white mb-2">Email</h3>
                     <p>
                         <a href="mailto:CareerCraft12@gmail.com" class="hover:text-white transition">
-                            CareerCraft12@gmail.com
+                        careercraft535@gmail.com
+
                         </a>
                     </p>
                 </div>
@@ -305,9 +306,9 @@
                     <span class="text-3xl mb-4 block"><i class="fa-solid fa-phone"></i></span>
                     <h3 class="text-xl font-semibold text-white mb-2">Phone</h3>
                     <p>
-                        <a href="tel:+919876543210" class="hover:text-white transition">
-                            +91 98765 43210
-                        </a>
+                        <a href="tel:+919876567890" class="hover:text-white transition">
+                            +91 98765 67890
+                            </a>
                     </p>
                 </div>
 

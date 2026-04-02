@@ -320,13 +320,14 @@ include("include/navbar.php");?>
         date_default_timezone_set('Asia/Kolkata');
 
         // Fetch ONLY 3 latest jobs
-        $sql = "SELECT job.*, company.cname, company.logo,
-                TIMESTAMPDIFF(SECOND, job.posted_at, NOW()) as seconds_old
-                FROM job
-                JOIN company ON job.cid = company.cid
-                WHERE job.deadline >= NOW()
-                ORDER BY job.posted_at DESC
-                LIMIT 3";
+       $sql = "SELECT job.*, company.cname, company.logo,
+        TIMESTAMPDIFF(SECOND, job.posted_at, NOW()) as seconds_old
+        FROM job
+        JOIN company ON job.cid = company.cid
+        WHERE job.deadline >= NOW()
+        AND job.is_approve='approved'
+        ORDER BY job.posted_at DESC
+        LIMIT 3";
 
         $result = mysqli_query($conn, $sql);
         ?>
