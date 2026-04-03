@@ -44,24 +44,32 @@ $user = mysqli_fetch_assoc($result);
 /* ===============================
    PREVENT DUPLICATE APPLICATION
 =================================*/
-
 $check = mysqli_query($conn,
-"SELECT aid, score FROM application 
+"SELECT aid, score, status FROM application 
  WHERE jid=$jid AND sid=".$user['sid']." 
+ ORDER BY aid DESC
  LIMIT 1");
-
 if(mysqli_num_rows($check) > 0){
 
     $appData = mysqli_fetch_assoc($check);
 
-    // Test not completed
-    if($appData['score'] == 0){
-        header("Location: test.php?aid=".$appData['aid']);
-        exit();
-    }
+    $status = $appData['status'];
 
-    // Test completed OR failed
-    die("You have already applied for this job.");
+    // 🚀 If withdrawn → allow reapply
+    if($status == 'withdrawn'){
+        // do nothing → allow form
+    }
+    else {
+
+        // Test not completed
+        if($appData['score'] == 0){
+            header("Location: test.php?aid=".$appData['aid']);
+            exit();
+        }
+
+        // Already applied
+        die("You have already applied for this job.");
+    }
 }
 
 /* ===============================
@@ -75,7 +83,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $resumeErr = "Resume is required.";
     } else {
 
-        $fileName = $_FILES['resume']['name'];
+        $fileName = basename($_FILES['resume']['name']);
+        $newName = time() . "_" . preg_replace("/[^a-zA-Z0-9.]/", "_", $fileName);
+
         $fileTmp  = $_FILES['resume']['tmp_name'];
         $fileSize = $_FILES['resume']['size'];
         $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
@@ -92,27 +102,93 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     if(empty($resumeErr)){
 
-        $newName = time()."_".$fileName;
         move_uploaded_file($fileTmp,"uploads/".$newName);
-
+    }
         /* INSERT STRUCTURE SAME STYLE AS YOUR JOB INSERT */
-    $sql = "INSERT INTO application
-        (uid,jid,sid,resume,status,score)
-        VALUES
-        ('$uid','$jid','".$user['sid']."','$newName','pending',0)";
+    // check if withdrawn exists
+            $old = mysqli_query($conn,"
+            SELECT aid FROM application 
+            WHERE jid=$jid AND sid=".$user['sid']." 
+            AND status='withdrawn'
+            LIMIT 1
+            ");
 
-        if(mysqli_query($conn,$sql)){
+        if(mysqli_num_rows($old) > 0){
+
+            $oldData = mysqli_fetch_assoc($old);
+            $aid = $oldData['aid'];
+
+            $update = mysqli_query($conn,"
+            UPDATE application SET 
+                resume='$newName',
+                status='pending',
+                score=0
+            WHERE aid=$aid
+            ");
+/* ===============================
+   INSERT NOTIFICATION (FOR COMPANY)
+=================================*/
+
+/* Get company uid from job */
+$jobRes = mysqli_query($conn, "SELECT uid, title FROM job WHERE jid=$jid");
+$jobData = mysqli_fetch_assoc($jobRes);
+
+$company_uid = $jobData['uid']; // company user id
+
+/* Create message */
+$message = "New application from " . $user['sname'] . " for job: " . $jobData['title'];
+
+/* Insert notification for company */
+mysqli_query($conn, "
+    INSERT INTO notifications (uid, message, is_read)
+    VALUES ('$company_uid', '$message', 0)
+");
+        if($update){
+            regenerateCSRFToken();
+            header("Location: test.php?aid=".$aid);
+            exit();
+        } else {
+            $formError = "Database error.";
+        }
+
+        } else {
+
+            $insert = mysqli_query($conn,"
+            INSERT INTO application
+            (uid,jid,sid,resume,status,score)
+            VALUES
+            ('$uid','$jid','".$user['sid']."','$newName','pending',0)
+            ");
+
+        if($insert){
 
             $aid = mysqli_insert_id($conn);
 
             mysqli_query($conn,
             "UPDATE job SET applicant = applicant + 1 WHERE jid=$jid");
-            regenerateCSRFToken();
+        /* ===============================
+        INSERT NOTIFICATION (FOR COMPANY)
+        =================================*/
 
+            /* Get company uid from job */
+            $jobRes = mysqli_query($conn, "SELECT uid, title FROM job WHERE jid=$jid");
+            $jobData = mysqli_fetch_assoc($jobRes);
+
+            $company_uid = $jobData['uid']; // company user id
+
+            /* Create message */
+            $message = "New application from " . $user['sname'] . " for job: " . $jobData['title'];
+
+            /* Insert notification for company */
+            mysqli_query($conn, "
+                INSERT INTO notifications (uid, message, is_read)
+                VALUES ('$company_uid', '$message', 0)
+            ");
+            regenerateCSRFToken();
             header("Location: test.php?aid=".$aid);
             exit();
-        }
-        else{
+
+        } else {
             $formError = "Database error.";
         }
     }

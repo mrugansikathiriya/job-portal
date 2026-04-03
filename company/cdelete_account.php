@@ -93,8 +93,28 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
         }
 
         // ================= DELETE COMPANY =================
-        mysqli_query($conn, "DELETE FROM company WHERE uid='$uid'");
+// ================= DELETE COMPANY =================
+$res = mysqli_query($conn, "SELECT cname FROM company WHERE uid='$uid'");
+$cname = '';
+if($row = mysqli_fetch_assoc($res)){
+    $cname = $row['cname']; // store name before deletion
+}
 
+mysqli_query($conn, "DELETE FROM company WHERE uid='$uid'");
+
+// ================= INSERT NOTIFICATION FOR ALL SEEKERS =================
+if(!empty($cname)){
+    $seekers = mysqli_query($conn, "SELECT uid FROM users WHERE role='seeker'");
+    $message = $cname." is not available !! Company profile Deleted... ";
+
+    while($row = mysqli_fetch_assoc($seekers)){
+        $seeker_uid = $row['uid'];
+        mysqli_query($conn, "
+            INSERT INTO notifications (uid, message, is_read)
+            VALUES ('$seeker_uid', '$message', 0)
+        ");
+    }
+}
         // ================= FINAL DELETE USER =================
         mysqli_query($conn, "DELETE FROM users WHERE uid='$uid'");
 

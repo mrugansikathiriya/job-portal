@@ -44,7 +44,7 @@ if($stmt->execute()){
     $total = $row['total'];
 
     // 🚫 BLOCK company if >= 3 reports
-    if($total >= 3){
+    if($total >= 10){
         $block = $conn->prepare("UPDATE users SET status='blocked' WHERE email=?");
         $block->bind_param("s", $email);
         $block->execute();

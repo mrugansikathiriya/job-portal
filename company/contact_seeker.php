@@ -169,7 +169,29 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send'])){
 
             $mail->Subject = $subject;
             $mail->send();
+/* ===============================
+   INSERT NOTIFICATION FOR SEEKER
+=================================*/
 
+/* Get seeker uid safely */
+$uid_q = mysqli_query($conn, "SELECT uid FROM job_seeker WHERE sid='$sid'");
+$uid_data = mysqli_fetch_assoc($uid_q);
+$seeker_uid = $uid_data['uid'] ?? 0;
+
+/* Create message */
+if($jid > 0){
+    $notify_msg = "Job Offer from".$company_name . " for ".$seeker_name." for " . $job_title;
+} else {
+    $notify_msg = $company_name . "has contacted ".$seeker_name."regarding an opportunity.";
+}
+
+/* Insert only if valid uid */
+if($seeker_uid > 0){
+    mysqli_query($conn, "
+        INSERT INTO notifications (uid, message, is_read)
+        VALUES ('$seeker_uid', '$notify_msg', 0)
+    ");
+}
             $msg = $is_offer ? "✅ Job Offer sent successfully!" : "✅ Message sent successfully!";
             regenerateCSRFToken();
 

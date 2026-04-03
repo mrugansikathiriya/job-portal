@@ -15,7 +15,10 @@ $user_id = $_SESSION['uid'] ?? 0;
     <link rel="icon" href="../image/logo3.jpg" type="image/png"></head></head>
 
 <body class="bg-black text-white">
-
+<a href="http://localhost/php_program/project/home.php"
+class="inline-block mb-5 mt-2 ml-5 text-yellow-400 text-sm hover:underline ">
+← Back
+</a>
 <div class="max-w-5xl mx-auto p-6">
 
 <!-- 🔴 Header -->

@@ -137,7 +137,27 @@ if($logoName != ""){
 
 $_SESSION['is_completed'] = 1;
 $_SESSION['profile_success'] = "Company profile completed successfully!";
+/* ===============================
+   INSERT NOTIFICATION FOR ALL SEEKERS
+=================================*/
 
+/* Get all seekers */
+$seekers = mysqli_query($conn, "
+    SELECT uid FROM users WHERE role = 'seeker'
+");
+
+/* Create message (NOW cname is correct) */
+$message = "New company Added,Check Now! : " . $cname;
+
+/* Insert notification */
+while($row = mysqli_fetch_assoc($seekers)){
+    $seeker_uid = $row['uid'];
+
+    mysqli_query($conn, "
+        INSERT INTO notifications (uid, message, is_read)
+        VALUES ('$seeker_uid', '$message', 0)
+    ");
+}
     // Clear form values
     $cname = $website = $location = $description = $established_at = "";
     $is_verified = "";

@@ -49,23 +49,31 @@ if(mysqli_num_rows($check) > 0){
 }
 
 /* ================= APPLY ================= */
-$applied = false;
-$pendingTest = false;
-$aid = 0;
 
 $applyCheck = mysqli_query($conn,
-"SELECT aid, score FROM application 
+"SELECT aid, score, status FROM application 
  WHERE uid='$uid' AND jid='$jid' 
+ ORDER BY aid DESC 
  LIMIT 1");
+$applied = false;
+$pendingTest = false;
+$canReapply = false;
+$aid = 0;
 
 if(mysqli_num_rows($applyCheck) > 0){
     $appData = mysqli_fetch_assoc($applyCheck);
 
-    $applied = true;
+    $status = $appData['status'];
     $aid = $appData['aid'];
 
-    if($appData['score'] == 0){
-        $pendingTest = true;
+    if($status == 'withdrawn'){
+        $canReapply = true;   // ✅ allow reapply
+    } else {
+        $applied = true;
+
+        if($appData['score'] == 0){
+            $pendingTest = true;
+        }
     }
 }
 
@@ -215,12 +223,18 @@ View Company Details
 <div class="bg-[#1a1a1a] p-6 rounded-2xl border border-gray-800 sticky top-24">
 
 <h3 class="text-lg font-semibold mb-4">Apply for this job</h3>
-
 <?php if($pendingTest){ ?>
 
 <a href="test.php?aid=<?=$aid?>" 
 class="block w-full bg-yellow-400 text-black text-center py-3 rounded-lg font-semibold hover:bg-yellow-500">
 Continue Test
+</a>
+
+<?php } elseif($canReapply){ ?>
+
+<a href="apply_job.php?jid=<?=$jid?>" 
+class="block w-full bg-green-500 text-black text-center py-3 rounded-lg font-semibold hover:bg-green-600">
+Apply Again
 </a>
 
 <?php } elseif(!$applied){ ?>

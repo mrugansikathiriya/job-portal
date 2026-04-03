@@ -19,12 +19,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
  if (!validateCSRFToken($_POST['csrf_token'])) {
         die("Invalid CSRF token");
     }
-    $uname = trim($_POST["uname"]);
-    $email = trim($_POST["email"]);
-    $password = $_POST["password"];
-    $contact = trim($_POST["contact"]);
-    $role= $_POST["role"] ?? "";
-
+$uname = mysqli_real_escape_string($conn, trim($_POST["uname"]));
+$email = mysqli_real_escape_string($conn, trim($_POST["email"]));
+$password = $_POST["password"];
+$contact = mysqli_real_escape_string($conn, trim($_POST["contact"]));
+$role = mysqli_real_escape_string($conn, $_POST["role"] ?? "");
+$terms = $_POST["terms"] ?? "";
+if (!$terms) {
+    $termsErr = "You must accept terms";
+}
     if ($uname == "") $unameErr = "Username required";
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $emailErr = "Invalid email";
     if (strlen($password) < 6) $passwordErr = "Minimum 6 characters";
@@ -49,15 +52,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $uid = mysqli_insert_id($conn);
 
             // insert role specific data
-           
-            if ($role == "company") {
-                mysqli_query($conn, "INSERT INTO company (uid,cname) VALUES ($uid,'$uname')");
-            }
-            else {
-                mysqli_query($conn,
-                    "INSERT INTO job_seeker (uid,sname) VALUES ($uid,'$uname')"
-                );
-                    }
+           if ($role == "company") {
+    mysqli_query($conn, "INSERT INTO company (uid,cname) VALUES ($uid,'$uname')");
+}
+elseif ($role == "seeker") {
+    mysqli_query($conn,
+        "INSERT INTO job_seeker (uid,sname) VALUES ($uid,'$uname')"
+    );
+}
              
 try {
 
@@ -253,8 +255,7 @@ class="w-full bg-black border border-white/20 rounded px-4 py-2">
 <div>
 <label>Role <span id="s-role" class="req">*</span></label>
 <div class="flex gap-6 mt-2 mb-2">
-<?php foreach (["company","jobseeker"] as $r): ?>
-<label>
+<?php foreach (["company","seeker"] as $r): ?><label>
 <input type="radio" name="role" value="<?= $r ?>" <?= $role===$r?"checked":"" ?>
 class="accent-[#D7AE27]">
 <?= ucfirst($r) ?>

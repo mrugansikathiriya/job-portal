@@ -79,6 +79,35 @@ VALUES (
 )";
         if(mysqli_query($conn,$sql)){
             $_SESSION['post_success'] = "Job posted successfully!";
+            /* ===============================
+            INSERT NOTIFICATION FOR ALL SEEKERS
+            =================================*/
+
+            /* Get all seekers */
+            $seekers = mysqli_query($conn, "
+                SELECT uid FROM users WHERE role = 'seeker'
+            ");
+
+            /* Get company name */
+            $compRes = mysqli_query($conn, "
+                SELECT cname FROM company WHERE uid = $uid
+            ");
+            $compData = mysqli_fetch_assoc($compRes);
+
+            $company_name = $compData['cname'];
+
+            /* Create message */
+            $message = $company_name . " posted a new job: " . $title;
+
+            /* Insert notification for each seeker */
+            while($row = mysqli_fetch_assoc($seekers)){
+                $seeker_uid = $row['uid'];
+
+                mysqli_query($conn, "
+                    INSERT INTO notifications (uid, message, is_read)
+                    VALUES ('$seeker_uid', '$message', 0)
+                ");
+            }
             $title = $description = $location = $salary = "";
             $experience_required = $job_type = $work_mode = $deadline = "";
             $skillname = $vacancy = "";
@@ -86,10 +115,10 @@ VALUES (
 
             header("Location: cdashboard.php");
             exit;
-    }
+            
         }
        
-
+    }
 }
 ?>
 

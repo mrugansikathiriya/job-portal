@@ -124,6 +124,7 @@ class="inline-block mt-20 text-yellow-400 text-sm hover:underline ml-10">
 
                         if($status == "pending") $color = "text-yellow-400";
                         if($status == "selected") $color = "text-green-400";
+                         if($status == "shortlisted") $color = "text-grey-400";
                         if($status == "rejected") $color = "text-red-400";
                         if($status == "withdrawn") $color = "text-red-500";
 

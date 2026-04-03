@@ -19,7 +19,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $jid = intval($_POST['jid']);
 
-    // Delete job
+    
+        // Delete job
+
     $delete = mysqli_query($conn, "DELETE FROM job WHERE jid = $jid");
 
     if($delete){

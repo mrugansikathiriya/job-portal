@@ -2,20 +2,54 @@
 require "../config/db.php";
 require "admin_auth.php";
 
-if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'admin'){
-    session_unset();
-    session_destroy();
-    header("Location: ../auth/login.php");
-    exit();
-}
+        // 🔐 Admin session check
+        if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'admin'){
+            session_unset();
+            session_destroy();
+            header("Location: ../auth/login.php");
+            exit();
+        }
 
+        // 🔔 Notification count (unread)
+        $admin_uid = $_SESSION['uid'];
 
-// Fetch counts
-$users = $conn->query("SELECT COUNT(*) as total FROM users")->fetch_assoc()['total'];
-$jobseekers = $conn->query("SELECT COUNT(*) as total FROM job_seeker")->fetch_assoc()['total'];
-$companies = $conn->query("SELECT COUNT(*) as total FROM company")->fetch_assoc()['total'];
-$jobs = $conn->query("SELECT COUNT(*) as total FROM job")->fetch_assoc()['total'];
-$applications = $conn->query("SELECT COUNT(*) as total FROM application")->fetch_assoc()['total'];
+        // 🔔 Fetch all notifications for admin view
+        if ($_SESSION['role'] === 'admin') {
+            // Admin sees all notifications
+          $result = mysqli_query($conn, "
+    SELECT n.*, u.role AS sender_role, 
+        CASE WHEN u.role='seeker' THEN js.sname
+             WHEN u.role='company' THEN c.cname
+             ELSE u.uname END AS sender_name
+    FROM notifications n
+    LEFT JOIN users u ON n.uid = u.uid
+    LEFT JOIN job_seeker js ON u.uid = js.uid
+    LEFT JOIN company c ON u.uid = c.uid
+    GROUP BY n.message
+    ORDER BY n.created_at DESC
+") or die(mysqli_error($conn));
+        
+} else {
+            // Normal users see only their own notifications
+            $uid = (int)$_SESSION['uid'];
+            $result = mysqli_query($conn, "
+                SELECT * FROM notifications WHERE uid='$uid' ORDER BY created_at DESC
+            ") or die(mysqli_error($conn));
+        }
+
+        $unread_count_query = mysqli_query($conn, "
+            SELECT COUNT(*) AS total 
+            FROM notifications 
+            WHERE is_read = 0
+        ");
+        $notification_count = mysqli_fetch_assoc($unread_count_query)['total'] ?? 0;
+
+        // ✅ Fetch counts
+        $users = $conn->query("SELECT COUNT(*) as total FROM users")->fetch_assoc()['total'];
+        $jobseekers = $conn->query("SELECT COUNT(*) as total FROM job_seeker")->fetch_assoc()['total'];
+        $companies = $conn->query("SELECT COUNT(*) as total FROM company")->fetch_assoc()['total'];
+        $jobs = $conn->query("SELECT COUNT(*) as total FROM job")->fetch_assoc()['total'];
+        $applications = $conn->query("SELECT COUNT(*) as total FROM application")->fetch_assoc()['total'];
 ?>
 
 <!DOCTYPE html>
@@ -33,11 +67,20 @@ $applications = $conn->query("SELECT COUNT(*) as total FROM application")->fetch
 <body class="bg-black text-white min-h-screen">
 
 <!-- Mobile Hamburger  -->
-<button onclick="openSidebar()" 
-        class="fixed top-5 right-5 lg:hidden text-2xl text-[#D7AE27]" 
-        aria-label="Open Menu">
-    <i class="fas fa-bars"></i>
-</button>
+<div class="fixed top-5 right-5 flex items-center gap-4 lg:hidden z-50">
+    <!-- 🔔 Notification Bell -->
+<a href="http://localhost/php_program/project/include/notifications.php" class="relative inline-block">
+        <i class="fa-solid fa-bell text-2xl text-white hover:text-[#D7AE27] transition"></i>
+        <?php if($notification_count > 0): ?>
+            <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-black z-10"></span>
+        <?php endif; ?>
+    </a>
+
+    <!-- Hamburger Button -->
+    <button onclick="openSidebar()" class="text-2xl text-[#D7AE27]" aria-label="Open Menu">
+        <i class="fas fa-bars"></i>
+    </button>
+</div>
 
 <div class="flex">
 
@@ -117,10 +160,20 @@ $applications = $conn->query("SELECT COUNT(*) as total FROM application")->fetch
     <!-- Main Content -->
     <div class="flex-1 p-6 md:ml-64">
 
-        <h1 class="text-2xl md:text-3xl font-bold mb-8 text-[#D7AE27]">
-            Admin Dashboard
-        </h1>
+       <div class="flex justify-between items-center mb-8">
+    <h1 class="text-2xl md:text-3xl font-bold text-[#D7AE27]">
+        Admin Dashboard
+    </h1>
 
+<div class="hidden lg:flex items-center gap-4">
+<a href="http://localhost/php_program/project/include/notifications.php" class="relative inline-block">
+        <i class="fa-solid fa-bell text-2xl text-white hover:text-[#D7AE27] transition"></i>
+        <?php if($notification_count > 0): ?>
+            <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-black z-10"></span>
+        <?php endif; ?>
+    </a>
+</div>
+    </div>
         <!-- Clickable Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 

@@ -101,14 +101,48 @@ if(isset($_POST['action'])){
         mysqli_query($conn,"UPDATE application SET status='$status' WHERE aid='$aid'");
         regenerateCSRFToken();
 
-        if($status == 'selected'){
+     if($status == 'selected'){
             $subject = "Congratulations! You are selected for {$data['job_title']}";
             $message_body = "You have been <b>selected</b> for the position <b>{$data['job_title']}</b>. Our HR will contact you for interview scheduling.";
-            $msg = sendSeekerEmail($data['seeker_email'], $data['sname'], $subject, $message_body, $data['cname'], $data['company_email']);
-        } elseif($status == 'rejected'){
+
+            // ✅ EMAIL SEND
+            $msg = sendSeekerEmail(
+                $data['seeker_email'],
+                $data['sname'],
+                $subject,
+                $message_body,
+                $data['cname'],
+                $data['company_email']
+            );
+
+            // ✅ NOTIFICATION (ADD THIS)
+            $notify_msg = $data['cname'] . " accepted " . $data['sname'] . "'s application for " . $data['job_title'];
+            mysqli_query($conn, "
+                INSERT INTO notifications (uid, message, is_read)
+                VALUES ('{$data['uid']}', '$notify_msg', 0)
+            ");
+        }
+
+        elseif($status == 'rejected'){
             $subject = "Application Update for {$data['job_title']}";
-            $message_body = "We regret to inform you that your application for the position <b>{$data['job_title']}</b> was not successful.";
-            $msg = sendSeekerEmail($data['seeker_email'], $data['sname'], $subject, $message_body, $data['cname'], $data['company_email']);
+            $message_body = "We regret to inform you that your application for the position <b>{$data['job_title']}</b> was rejected .";
+
+            // ✅ EMAIL SEND
+            $msg = sendSeekerEmail(
+                $data['seeker_email'],
+                $data['sname'],
+                $subject,
+                $message_body,
+                $data['cname'],
+                $data['company_email']
+            );
+
+            // ✅ NOTIFICATION (ADD THIS)
+  $notify_msg = $data['cname'] . " rejected " . $data['sname'] . "'s application for " . $data['job_title'];
+            mysqli_query($conn, "
+                INSERT INTO notifications (uid, message, is_read)
+                VALUES ('{$data['uid']}', '$notify_msg', 0)
+            ");
         }
 
         header("Location: applicant_detail.php?aid=".$aid);
@@ -176,8 +210,19 @@ if($isReschedule){
                 $data['cname'],
                 $data['company_email']
             );
+    if($isReschedule){
+                        $notify_msg = $data['cname'] . " rescheduled interview for " . $data['sname'] . 
+                                " for " . $data['job_title'] . " on " . $date . " at " . $time;
+                    } else {
+                       $notify_msg = $data['cname'] . " scheduled interview for " . $data['sname'] . 
+                               " for " . $data['job_title'] . " on " . $date . " at " . $time;
+                    }
 
-            header("Location: applicant_detail.php?aid=".$aid);
+                    // Insert notification
+                    mysqli_query($conn, "
+                        INSERT INTO notifications (uid, message, is_read)
+                        VALUES ('{$data['uid']}', '$notify_msg', 0)
+                    ");            header("Location: applicant_detail.php?aid=".$aid);
             exit();
         }
     }

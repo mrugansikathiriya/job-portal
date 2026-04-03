@@ -100,10 +100,8 @@ $result = mysqli_query($conn, "
         <?php if($row['is_verified'] == 1) { ?>
             <span class="bg-green-500 px-3 py-1 rounded text-sm">Verified</span>
         <?php } else { ?>
-            <a href="verify_company.php?cid=<?php echo $row['cid']; ?>"
-               class="bg-yellow-500 px-3 py-1 rounded text-sm hover:bg-yellow-600 text-black">
-               Verify
-            </a>
+                        <span class="bg-red-500 px-3 py-1 rounded text-sm">Not Verified</span>
+
         <?php } ?>
     </td>
 

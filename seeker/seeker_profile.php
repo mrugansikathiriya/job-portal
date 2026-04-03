@@ -108,17 +108,33 @@ if($imageQuery != "") $sql .= ", $imageQuery";
 
 $sql .= " WHERE uid='$uid'";
 
-        if(mysqli_query($conn,$sql)){
+    if(mysqli_query($conn,$sql)){
 
-            mysqli_query($conn,"UPDATE users SET is_completed=1 WHERE uid='$uid'");
-            $_SESSION['is_completed'] = 1;
-            $_SESSION['profile_success'] = "Profile completed successfully!";
-            if($imageName != "") $_SESSION['profile_image'] = $imageName;
+    // ✅ STEP 1: Send notification to all companies
+    $message = mysqli_real_escape_string($conn, "New seeker profile added. Check it now!");
 
-            regenerateCSRFToken();
-            header("Location: sdashboard.php");
-            exit();
-        }
+    $companies = mysqli_query($conn, "SELECT uid FROM users WHERE role='company'");
+
+    while ($row = mysqli_fetch_assoc($companies)) {
+        $company_id = (int)$row['uid'];
+
+        mysqli_query($conn, "
+            INSERT INTO notifications (uid, message, is_read, created_at)
+            VALUES ($company_id, '$message', 0, NOW())
+        ");
+    }
+
+    // ✅ STEP 2: Your existing code
+    mysqli_query($conn,"UPDATE users SET is_completed=1 WHERE uid='$uid'");
+    $_SESSION['is_completed'] = 1;
+    $_SESSION['profile_success'] = "Profile completed successfully!";
+    
+    if($imageName != "") $_SESSION['profile_image'] = $imageName;
+
+    regenerateCSRFToken();
+    header("Location: sdashboard.php");
+    exit();
+}
     }
 }
 ?>

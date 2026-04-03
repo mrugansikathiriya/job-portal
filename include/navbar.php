@@ -3,6 +3,22 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+$notification_count = 0;
+
+if(isset($_SESSION['uid'])){
+    $uid = (int)$_SESSION['uid'];
+
+    require __DIR__ . "/../config/db.php";
+
+    $nq = mysqli_query($conn, "
+        SELECT COUNT(*) AS total 
+        FROM notifications 
+        WHERE uid = $uid AND is_read = 0
+    ") or die(mysqli_error($conn));
+
+    $nr = mysqli_fetch_assoc($nq);
+    $notification_count = $nr['total'] ?? 0;
+}
 ?>
 
 <!DOCTYPE html>
@@ -74,10 +90,21 @@ if (session_status() == PHP_SESSION_NONE) {
     <?php endif; ?>
 
 </div>
+<div class="hidden lg:flex justify-end gap-3 items-center relative">
 
-            <!-- Buttons / Profile Image -->
-            <div class="hidden lg:flex justify-end gap-3 items-center relative">
-            <?php if(isset($_SESSION['uid'])): ?>
+<?php if(isset($_SESSION['uid'])): ?>
+
+    <!-- 🔔 Notification Bell -->
+<a href="http://localhost/php_program/project/include/notifications.php" class="relative inline-block">
+
+    <i class="fa-solid fa-bell text-xl text-white hover:text-[#D7AE27] transition"></i>
+
+    <?php if($notification_count > 0): ?>
+        <!-- RED DOT -->
+<span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-black z-10"></span>    <?php endif; ?>
+
+</a>
+
 
                 <div class="relative group">
             <?php if(!empty($_SESSION['p_image'])): ?>
@@ -122,7 +149,6 @@ if (session_status() == PHP_SESSION_NONE) {
     <a href="http://localhost/php_program/project/auth/logout.php"
                class="block px-4 py-2 text-red-400 hover:bg-gray-800">Logout</a>
         </div>
-
      </div>
 
         <?php else: ?>
@@ -140,6 +166,22 @@ if (session_status() == PHP_SESSION_NONE) {
 
         <?php endif; ?>
         </div>
+        </div>
+        <div class="flex items-center gap-4 lg:hidden">
+
+            <?php if(isset($_SESSION['uid'])): ?>
+        <!-- 🔔 Mobile Bell -->
+        <a href="http://localhost/php_program/project/include/notifications.php" class="relative">
+
+            <i class="fa-solid fa-bell text-xl text-white"></i>
+
+            <?php if($notification_count > 0): ?>
+                <!-- RED DOT -->
+                <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-black"></span>
+            <?php endif; ?>
+
+        </a>
+    <?php endif; ?>
 
             <!-- Hamburger (Mobile Only) -->
             <button id="menu-btn" class="lg:hidden text-2xl text-[#D7AE27]" aria-label="Open Menu">
@@ -169,114 +211,114 @@ if (session_status() == PHP_SESSION_NONE) {
                 </div>
 
                 <!-- Links -->
-<a href="http://localhost/php_program/project/home.php" 
-class="block py-2 text-gray-200 hover:text-[#D7AE27]">Home</a>
+            <a href="http://localhost/php_program/project/home.php" 
+            class="block py-2 text-gray-200 hover:text-[#D7AE27]">Home</a>
 
-<?php if(!isset($_SESSION['uid'])): ?>
-    <!-- Guest: show all links -->
-    <a href="http://localhost/php_program/project/seeker/find_job.php"
-       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Jobs</a>
+            <?php if(!isset($_SESSION['uid'])): ?>
+            <!-- Guest: show all links -->
+            <a href="http://localhost/php_program/project/seeker/find_job.php"
+            class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Jobs</a>
 
-    <a href="http://localhost/php_program/project/company/find_talent.php"
-       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Talent</a>
+            <a href="http://localhost/php_program/project/company/find_talent.php"
+            class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Talent</a>
 
-    <a href="http://localhost/php_program/project/company/post_job.php"
-       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Post Job</a>
+            <a href="http://localhost/php_program/project/company/post_job.php"
+            class="block py-2 text-gray-200 hover:text-[#D7AE27]">Post Job</a>
 
-    <a href="http://localhost/php_program/project/company/candidate_history.php"
-       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Candidate History</a>
+            <a href="http://localhost/php_program/project/company/candidate_history.php"
+            class="block py-2 text-gray-200 hover:text-[#D7AE27]">Candidate History</a>
 
-<?php elseif($_SESSION['role'] == 'seeker'): ?>
-    <!-- Seeker -->
-    <a href="http://localhost/php_program/project/seeker/find_job.php"
-       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Jobs</a>
+            <?php elseif($_SESSION['role'] == 'seeker'): ?>
+            <!-- Seeker -->
+            <a href="http://localhost/php_program/project/seeker/find_job.php"
+            class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Jobs</a>
 
-   
+        
 
-    <a href="http://localhost/php_program/project/seeker/job_history.php"
-       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Job History</a>
+            <a href="http://localhost/php_program/project/seeker/job_history.php"
+            class="block py-2 text-gray-200 hover:text-[#D7AE27]">Job History</a>
 
-<?php elseif($_SESSION['role'] == 'company'): ?>
-    <!-- Company -->
-    <a href="http://localhost/php_program/project/company/find_talent.php"
-       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Talent</a>
+        <?php elseif($_SESSION['role'] == 'company'): ?>
+            <!-- Company -->
+            <a href="http://localhost/php_program/project/company/find_talent.php"
+            class="block py-2 text-gray-200 hover:text-[#D7AE27]">Find Talent</a>
 
-    <a href="http://localhost/php_program/project/company/post_job.php"
-       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Post Job</a>
+            <a href="http://localhost/php_program/project/company/post_job.php"
+            class="block py-2 text-gray-200 hover:text-[#D7AE27]">Post Job</a>
 
-    <a href="http://localhost/php_program/project/company/job_history.php"
-       class="block py-2 text-gray-200 hover:text-[#D7AE27]">Job History</a>
-<?php endif; ?>
+            <a href="http://localhost/php_program/project/company/job_history.php"
+            class="block py-2 text-gray-200 hover:text-[#D7AE27]">Job History</a>
+            <?php endif; ?>
 
                 <!-- Mobile Login / Profile -->
                <!-- Bottom Section -->
-<div class="mt-6 border-t border-gray-700 pt-4">
+        <div class="mt-6 border-t border-gray-700 pt-4">
 
-<?php if(isset($_SESSION['uid'])): ?>
+        <?php if(isset($_SESSION['uid'])): ?>
 
-    <!-- Profile Section -->
-    <div class="flex items-center gap-3 mb-4">
-        <?php if(!empty($_SESSION['p_image'])): ?>
+            <!-- Profile Section -->
+            <div class="flex items-center gap-3 mb-4">
+                <?php if(!empty($_SESSION['p_image'])): ?>
 
-                <?php
-                    if($_SESSION['role'] == 'company'){
-                        $imagePath = "http://localhost/php_program/project/company/uploads/" . $_SESSION['p_image'];
-                    } else {
-                        $imagePath = "http://localhost/php_program/project/seeker/uploads/" . $_SESSION['p_image'];
-                    }
-                ?>
+                        <?php
+                            if($_SESSION['role'] == 'company'){
+                                $imagePath = "http://localhost/php_program/project/company/uploads/" . $_SESSION['p_image'];
+                            } else {
+                                $imagePath = "http://localhost/php_program/project/seeker/uploads/" . $_SESSION['p_image'];
+                            }
+                        ?>
 
-                <img src="<?= $imagePath ?>" 
-                    class="w-10 h-10 rounded-full object-cover cursor-pointer border-2 border-[#D7AE27]"
-                    alt="Profile">
+                        <img src="<?= $imagePath ?>" 
+                            class="w-10 h-10 rounded-full object-cover cursor-pointer border-2 border-[#D7AE27]"
+                            alt="Profile">
 
+                    <?php else: ?>
+
+                        <img src="https://ui-avatars.com/api/?name=<?= urlencode($_SESSION['uname']) ?>&background=D7AE27&color=000"
+                            class="w-10 h-10 rounded-full cursor-pointer border-2 border-[#D7AE27]"
+                            alt="Profile">
+
+                    <?php endif; ?>
+
+                <div>
+                    <p class="text-white font-semibold"><?= $_SESSION['uname']; ?></p>
+                    <p class="text-sm text-gray-400"><?= ucfirst($_SESSION['role']); ?></p>
+                </div>
+            </div>
+
+            <!-- Dropdown Links (Now Visible in Mobile) -->
+            <?php if($_SESSION['role'] == 'company'): ?>
+                <a href="http://localhost/php_program/project/company/cdashboard.php"
+                class="block py-2 text-gray-200 hover:text-[#D7AE27]">Dashboard</a>
+                <a href="http://localhost/php_program/project/company/cedit_profile.php"
+                class="block py-2 text-gray-200 hover:text-[#D7AE27]">Edit Profile</a>
             <?php else: ?>
-
-                <img src="https://ui-avatars.com/api/?name=<?= urlencode($_SESSION['uname']) ?>&background=D7AE27&color=000"
-                    class="w-10 h-10 rounded-full cursor-pointer border-2 border-[#D7AE27]"
-                    alt="Profile">
-
+                        <a href="http://localhost/php_program/project/seeker/sdashboard.php"
+                class="block py-2 text-gray-200 hover:text-[#D7AE27]">Dashboard</a>
+                        <a href="http://localhost/php_program/project/seeker/sedit_profile.php"
+                class="block py-2 text-gray-200 hover:text-[#D7AE27]">Edit Profile</a>
             <?php endif; ?>
 
-        <div>
-            <p class="text-white font-semibold"><?= $_SESSION['uname']; ?></p>
-            <p class="text-sm text-gray-400"><?= ucfirst($_SESSION['role']); ?></p>
+            <a href="http://localhost/php_program/project/auth/logout.php"
+            class="block py-2 text-red-400 hover:text-red-500">Logout</a>
+
+        <?php else: ?>
+
+            <!-- Not Logged In -->
+            <button class="w-full py-2 mb-2 border border-[#D7AE27] text-[#D7AE27] rounded-lg"
+                onclick="location.href='http://localhost/php_program/project/auth/login.php'">
+                Login
+            </button>
+
+            <button class="w-full py-2 bg-[#D7AE27] text-black rounded-lg"
+                onclick="location.href='http://localhost/php_program/project/auth/signup.php'">
+                Sign Up
+            </button>
+
+        <?php endif; ?>
+
         </div>
     </div>
-
-    <!-- Dropdown Links (Now Visible in Mobile) -->
-    <?php if($_SESSION['role'] == 'company'): ?>
-        <a href="http://localhost/php_program/project/company/cdashboard.php"
-           class="block py-2 text-gray-200 hover:text-[#D7AE27]">Dashboard</a>
-        <a href="http://localhost/php_program/project/company/cedit_profile.php"
-           class="block py-2 text-gray-200 hover:text-[#D7AE27]">Edit Profile</a>
-    <?php else: ?>
-                <a href="http://localhost/php_program/project/seeker/sdashboard.php"
-           class="block py-2 text-gray-200 hover:text-[#D7AE27]">Dashboard</a>
-                <a href="http://localhost/php_program/project/seeker/sedit_profile.php"
-           class="block py-2 text-gray-200 hover:text-[#D7AE27]">Edit Profile</a>
-    <?php endif; ?>
-
-    <a href="http://localhost/php_program/project/auth/logout.php"
-       class="block py-2 text-red-400 hover:text-red-500">Logout</a>
-
-<?php else: ?>
-
-    <!-- Not Logged In -->
-    <button class="w-full py-2 mb-2 border border-[#D7AE27] text-[#D7AE27] rounded-lg"
-        onclick="location.href='http://localhost/php_program/project/auth/login.php'">
-        Login
-    </button>
-
-    <button class="w-full py-2 bg-[#D7AE27] text-black rounded-lg"
-        onclick="location.href='http://localhost/php_program/project/auth/signup.php'">
-        Sign Up
-    </button>
-
-<?php endif; ?>
-
-</div>
-            </div>
         </div>
     </div>
 
