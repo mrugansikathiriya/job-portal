@@ -102,7 +102,7 @@ if(isset($_POST['action'])){
         regenerateCSRFToken();
 
      if($status == 'selected'){
-            $subject = "Congratulations! You are selected for {$data['job_title']}";
+            $subject = "Congratulations! You are selected for ".$data['job_title'];
             $message_body = "You have been <b>selected</b> for the position <b>{$data['job_title']}</b>. Our HR will contact you for interview scheduling.";
 
             // ✅ EMAIL SEND
@@ -116,7 +116,7 @@ if(isset($_POST['action'])){
             );
 
             // ✅ NOTIFICATION (ADD THIS)
-            $notify_msg = $data['cname'] . " accepted " . $data['sname'] . "'s application for " . $data['job_title'];
+            $notify_msg = $data['cname'] . " accepted " . $data['sname'] . " application for " . $data['job_title'];
             mysqli_query($conn, "
                 INSERT INTO notifications (uid, message, is_read)
                 VALUES ('{$data['uid']}', '$notify_msg', 0)
@@ -124,7 +124,7 @@ if(isset($_POST['action'])){
         }
 
         elseif($status == 'rejected'){
-            $subject = "Application Update for {$data['job_title']}";
+            $subject = "Application Update for ".$data['job_title'];
             $message_body = "We regret to inform you that your application for the position <b>{$data['job_title']}</b> was rejected .";
 
             // ✅ EMAIL SEND
@@ -138,7 +138,7 @@ if(isset($_POST['action'])){
             );
 
             // ✅ NOTIFICATION (ADD THIS)
-  $notify_msg = $data['cname'] . " rejected " . $data['sname'] . "'s application for " . $data['job_title'];
+  $notify_msg = $data['cname'] . " rejected " . $data['sname'] . " application for " . $data['job_title'];
             mysqli_query($conn, "
                 INSERT INTO notifications (uid, message, is_read)
                 VALUES ('{$data['uid']}', '$notify_msg', 0)

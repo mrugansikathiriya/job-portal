@@ -107,27 +107,23 @@ if(isset($_SESSION['uid'])){
 
 
                 <div class="relative group">
-            <?php if(!empty($_SESSION['p_image'])): ?>
+<?php
+$defaultAvatar = "https://ui-avatars.com/api/?name=" . urlencode($_SESSION['uname']) . "&background=D7AE27&color=000";
 
-                <?php
-                    if($_SESSION['role'] == 'company'){
-                        $imagePath = "http://localhost/php_program/project/company/uploads/" . $_SESSION['p_image'];
-                    } else {
-                        $imagePath = "http://localhost/php_program/project/seeker/uploads/" . $_SESSION['p_image'];
-                    }
-                ?>
+if($_SESSION['role'] == 'company' && !empty($_SESSION['p_image'])){
+    $imagePath = "http://localhost/php_program/project/company/uploads/" . $_SESSION['p_image'];
+} 
+elseif($_SESSION['role'] == 'seeker' && !empty($_SESSION['profile_image'])){
+    $imagePath = "http://localhost/php_program/project/seeker/uploads/" . $_SESSION['profile_image'];
+} 
+else {
+    $imagePath = $defaultAvatar;
+}
+?>
 
-                <img src="<?= $imagePath ?>" 
-                    class="w-10 h-10 rounded-full object-cover cursor-pointer border-2 border-[#D7AE27]"
-                    alt="Profile">
-
-            <?php else: ?>
-
-                <img src="https://ui-avatars.com/api/?name=<?= urlencode($_SESSION['uname']) ?>&background=D7AE27&color=000"
-                    class="w-10 h-10 rounded-full cursor-pointer border-2 border-[#D7AE27]"
-                    alt="Profile">
-
-            <?php endif; ?>
+<img src="<?= $imagePath ?>" 
+class="w-10 h-10 rounded-full object-cover cursor-pointer border-2 border-[#D7AE27]"
+alt="Profile">
 
         <!-- Dropdown Menu -->
         <div class="absolute right-0 mt-2 w-48 bg-black border border-gray-700 rounded-md shadow-lg 
@@ -246,8 +242,8 @@ if(isset($_SESSION['uid'])){
             <a href="http://localhost/php_program/project/company/post_job.php"
             class="block py-2 text-gray-200 hover:text-[#D7AE27]">Post Job</a>
 
-            <a href="http://localhost/php_program/project/company/job_history.php"
-            class="block py-2 text-gray-200 hover:text-[#D7AE27]">Job History</a>
+            <a href="http://localhost/php_program/project/company/candidate_history.php"
+            class="block py-2 text-gray-200 hover:text-[#D7AE27]">Candidate History</a>
             <?php endif; ?>
 
                 <!-- Mobile Login / Profile -->

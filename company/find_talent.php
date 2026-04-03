@@ -34,24 +34,9 @@ if(!empty($skill_filter)){
 }
 
 // Experience filter
-if($experience_filter !== ""){
-
-    if($experience_filter == "Fresher"){
-        $where .= " AND js.experience = 'Fresher'";
-    }
-    elseif($experience_filter == "1"){
-        $where .= " AND js.experience LIKE '%1%'";
-    }
-    elseif($experience_filter == "2"){
-        $where .= " AND js.experience LIKE '%2%'";
-    }
-    elseif($experience_filter == "3"){
-        $where .= " AND (
-            js.experience LIKE '%3%' 
-            OR js.experience LIKE '%4%' 
-            OR js.experience LIKE '%5%'
-        )";
-    }
+if(!empty($experience_filter)){
+    $exp = mysqli_real_escape_string($conn, $experience_filter);
+    $where .= " AND js.experience = '$exp'";
 }
 
 // fetch seekers + saved status.
@@ -139,28 +124,32 @@ ORDER BY u.created_at DESC";
 <div class="flex items-center gap-2 bg-[#0f0f0f] border border-gray-700 px-3 h-10 rounded-lg flex-1 min-w-[140px]">
     <i class="fa-solid fa-briefcase text-yellow-400 text-sm"></i>
 
-    <select name="experience" onchange="this.form.submit()" 
-    class="bg-[#0f0f0f] text-white outline-none w-full text-sm appearance-none">
+ <select name="experience" onchange="this.form.submit()" 
+class="bg-[#0f0f0f] text-white outline-none w-full text-sm appearance-none">
 
-        <option value="">Experience</option>
+    <option value="">Experience</option>
 
-        <option value="Fresher" <?php if($experience_filter=='Fresher') echo 'selected'; ?>>
-            Fresher
-        </option>
+    <option value="Fresher" <?= ($experience_filter=="Fresher")?"selected":"" ?>>
+        Fresher
+    </option>
 
-        <option value="1" <?php if($experience_filter=='1') echo 'selected'; ?>>
-            1 Year
-        </option>
+    <option value="0-1 Years" <?= ($experience_filter=="0-1 Years")?"selected":"" ?>>
+        0-1 Years
+    </option>
 
-        <option value="2" <?php if($experience_filter=='2') echo 'selected'; ?>>
-            2 Year
-        </option>
+    <option value="1-3 Years" <?= ($experience_filter=="1-3 Years")?"selected":"" ?>>
+        1-3 Years
+    </option>
 
-        <option value="3" <?php if($experience_filter=='3') echo 'selected'; ?>>
-            3+ Year
-        </option>
+    <option value="3-5 Years" <?= ($experience_filter=="3-5 Years")?"selected":"" ?>>
+        3-5 Years
+    </option>
 
-    </select>
+    <option value="5+ Years" <?= ($experience_filter=="5+ Years")?"selected":"" ?>>
+        5+ Years
+    </option>
+
+</select>
 </div>
    
 
@@ -207,6 +196,8 @@ ORDER BY u.created_at DESC";
 
 
     <!-- SAVE ICON (NOW INSIDE CARD ✅) -->
+<?php if($uid > 0) { ?>   <!-- Only show if logged in -->
+
 <form method="POST" action="toggle_save_candidate.php" class="absolute top-4 right-4">
     <input type="hidden" name="sid" value="<?= $row['sid'] ?>">
     <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
@@ -216,7 +207,9 @@ ORDER BY u.created_at DESC";
             : 'fa-regular fa-bookmark text-white hover:text-yellow-400' ?>">
         </i>
     </button>
-</form>  
+</form>
+
+<?php } ?>
 
     <!-- TOP -->
     <div class="flex items-center gap-4">

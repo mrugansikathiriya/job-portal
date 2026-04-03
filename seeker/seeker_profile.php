@@ -205,7 +205,7 @@ Job Seeker Registration
 <label class="block mb-2">Profile Image</label>
 <div class="flex items-center gap-6">
 <img id="imagePreview"
-src="<?= !empty($imageName) ? '../uploads/profile/'.$imageName : 'https://ui-avatars.com/api/?name='.urlencode($sname ?? 'User').'&background=D7AE27&color=000'; ?>"
+src="<?= !empty($imageName) ? 'uploads/'.$imageName : 'https://ui-avatars.com/api/?name='.urlencode($sname ?? 'User').'&background=D7AE27&color=000'; ?>"
 class="w-24 h-24 rounded-full object-cover border-2 border-gray-300 shadow">
 <input type="file" name="profile_image" id="profileInput" accept="image/*" class="text-white">
 </div>

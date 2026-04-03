@@ -412,11 +412,19 @@ include("include/navbar.php");?>
                     </div>
                 </div>
 
-                <!-- View Details -->
-                <a href="http://localhost/php_program/project/seeker/job_details.php?jid=<?php echo $row['jid']; ?>" 
-                class="block text-center bg-yellow-400 text-black py-2 rounded-xl font-semibold hover:bg-yellow-500 transition">
-                    View Details
-                </a>
+             <?php
+if(isset($_SESSION['role']) && $_SESSION['role'] == 'company'){
+    $detailsLink = "http://localhost/php_program/project/company/view_job.php";
+} else {
+    $detailsLink = "http://localhost/php_program/project/seeker/job_details.php?jid=".$row['jid'];
+}
+?>
+
+<!-- View Details -->
+<a href="<?php echo $detailsLink; ?>" 
+class="block text-center bg-yellow-400 text-black py-2 rounded-xl font-semibold hover:bg-yellow-500 transition">
+    View Details
+</a>
 
             </div>
 
@@ -426,11 +434,19 @@ include("include/navbar.php");?>
 
             <!-- View More Button -->
         <div class="text-center mt-10">
-            <a href="http://localhost/php_program/project/seeker/find_job.php"
-            class="inline-block bg-yellow-400 text-black px-6 py-3 rounded-xl font-semibold 
-            hover:bg-yellow-500 transition animate-pulse">
-                View More Jobs →
-            </a>
+            <?php
+                if(isset($_SESSION['role']) && $_SESSION['role'] == 'company'){
+                    $viewMoreLink = "http://localhost/php_program/project/company/view_job.php";
+                } else {
+                    $viewMoreLink = "http://localhost/php_program/project/seeker/find_job.php";
+                }
+                ?>
+
+                <a href="<?php echo $viewMoreLink; ?>"
+                class="inline-block bg-yellow-400 text-black px-6 py-3 rounded-xl font-semibold 
+                hover:bg-yellow-500 transition animate-pulse">
+                    View More Jobs →
+                </a>
         </div>
 
     </div>
