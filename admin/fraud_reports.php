@@ -96,17 +96,17 @@ $result = $conn->query($query);
 <form method="POST">
 <input type="hidden" name="cname" value="<?php echo $row['cname']; ?>">
 
-<button type="submit"
-class="bg-red-600 px-3 py-1 rounded hover:bg-red-700">
+<p
+class="bg-red-600 px-1 py-1 rounded hover:bg-red-700">
 Block
-</button>
+</p>
 </form>
 
 <?php } else { ?>
 
-<button class="bg-gray-600 px-3 py-1 rounded cursor-not-allowed">
+<p class="bg-gray-600 px-1 py-1 rounded cursor-not-allowed">
 Blocked
-</button>
+</p>
 
 <?php } ?>
 
