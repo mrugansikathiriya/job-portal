@@ -1,58 +1,62 @@
 <?php
 require "../config/db.php";
 
-$message = strtolower(trim($_POST['message'] ?? ''));
-$email   = strtolower(trim($_POST['email'] ?? ''));
+$company = $_POST['company'] ?? '';
+$message = strtolower($_POST['message'] ?? '');
 
-// ❌ 1. email format check
-if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
-    echo "INVALID";
-    exit;
+if(empty($company)){
+    echo "UNKNOWN";
+    exit();
 }
 
-// 🔍 2. check company exists in DB (UPDATED VALIDATION)
-$stmt = $conn->prepare("SELECT status FROM users WHERE email=? AND role='company'");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$res = $stmt->get_result();
+// ✅ CHECK COMPANY EXIST
+$res = mysqli_query($conn, "SELECT * FROM company WHERE cname='$company'");
 
-if($res->num_rows == 0){
-    echo "INVALID"; // ❗ changed from UNKNOWN
-    exit;
+if(mysqli_num_rows($res) == 0){
+    echo "UNKNOWN";
+    exit();
 }
 
-$row = $res->fetch_assoc();
+// 🔢 COUNT FRAUD REPORTS
+$countRes = mysqli_query($conn, "SELECT COUNT(*) as total FROM fraud_reports WHERE cname='$company'");
+$countRow = mysqli_fetch_assoc($countRes);
+$totalReports = $countRow['total'];
 
-// 🚫 3. blocked company
-if($row['status'] == 'blocked'){
-    echo "YES";
-    exit;
+// 🚫 AUTO BLOCK IF REPORTS >= 10
+if($totalReports >= 20){
+
+    mysqli_query($conn, "UPDATE users SET status='blocked' WHERE uname='$company'");
+
+    echo "BLOCKED";
+    exit();
 }
 
-// 🔢 4. report count check
-$count = $conn->prepare("SELECT COUNT(*) as total FROM fraud_reports WHERE company_email=?");
-$count->bind_param("s", $email);
-$count->execute();
-$r = $count->get_result()->fetch_assoc();
+// 🤖 FRAUD KEYWORDS
+$fraud_keywords = [
+    "pay", "money", "fee", "registration", "urgent", "bank",
+    "account number", "ifsc", "upi", "otp", "credit card",
+    "debit card", "pin", "cvv",
+    "no interview", "direct job", "guaranteed job", "100% job",
+    "instant joining", "no experience required",
+    "send aadhar", "send pan", "upload documents", "verify kyc",
+    "document verification fee", "hr asking money",
+    "consultancy fee", "placement charges",
+    "fake job offers without interview",
+    "asking money for registration/training",
+    "unrealistic salary offers",
+    "urgent hiring pressure",
+    "request for bank details",
+    "no company website",
+    "suspicious links"
+];
 
-if($r['total'] >= 10){
-    echo "YES";
-    exit;
-}
-
-// 🔍 5. fraud keyword logic
-$fraudWords = ["pay","payment","money","fee","fees","amount","charges","charge","earn 5000 daily","earn money fast","high salary no experience","easy income","no skill required","double income","aadhaar","pan card","document verification fee","deposit","registration fee","processing fee","security deposit","advance","advance payment","initial payment","bank","bank details","account","account number","ifsc","upi","upi id","transfer","online transfer","wallet","paytm","gpay","phonepe","urgent","immediately","asap","limited time","today only","hurry",
-    "last chance","click link","apply now link","download app","fake","install app","click link","apply now link","download app","install app","fast process","quick joining","no interview","direct selection","direct joining","instant job","100% selection","guaranteed job","confirm job","form filling charges",];
-
-$isFraud = false;
-
-foreach($fraudWords as $word){
+// 🔍 CHECK MESSAGE
+foreach($fraud_keywords as $word){
     if(strpos($message, $word) !== false){
-        $isFraud = true;
-        break;
+        echo "YES";
+        exit();
     }
 }
 
-// ✅ final result
-echo $isFraud ? "YES" : "NO";
+echo "NO";
 ?>

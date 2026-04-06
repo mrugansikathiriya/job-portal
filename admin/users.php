@@ -97,13 +97,13 @@ $result = mysqli_query($conn, "SELECT * FROM users ORDER BY uid DESC");
       class="inline"
       onsubmit="return confirm('Are you sure?')">
 
-    <input type="hidden" name="uid" value="<?php echo $row['uid']; ?>">
-    <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
+            <input type="hidden" name="uid" value="<?php echo $row['uid']; ?>">
+            <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
 
-    <button type="submit"
-        class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 text-sm">
-        Delete
-    </button>
+            <button type="submit"
+                class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 text-sm">
+                Delete
+            </button>
 </form>
 
                     </td>

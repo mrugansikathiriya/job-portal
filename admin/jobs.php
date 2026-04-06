@@ -99,8 +99,11 @@ $result = mysqli_query($conn, $query);
     <th class="p-3">Applicants</th>
     <th class="p-3">Status</th>
     <th class="p-3">Posted At</th>
+    <th class="p-3">Description</th>
+
     <th class="p-3">is_approve</th>
     <th class="p-3 text-center">Actions</th>
+
 </tr>
 </thead>
 
@@ -144,6 +147,17 @@ $result = mysqli_query($conn, $query);
 
     <td class="p-3"><?= $row['posted_at']; ?></td>
 
+<td class="p-3">
+<?php if(!empty($row['description'])) { ?>
+    <button
+        class="text-blue-400 hover:underline view-job-desc-btn"
+        data-desc="<?php echo htmlspecialchars($row['description']); ?>">
+        View Description
+    </button>
+<?php } else { ?>
+    <span class="text-gray-400">No Description</span>
+<?php } ?>
+</td>
 <td class="p-3">
 
 <?php if($row['is_approve'] == 'pending') { ?>
@@ -217,6 +231,55 @@ $result = mysqli_query($conn, $query);
 </div>
 
 </div>
+<!-- JOB DESCRIPTION MODAL -->
+<div id="jobDescModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
+    <div class="bg-[#0f0f0f] text-white p-6 rounded-xl max-w-2xl w-full shadow-xl border border-white/20">
+       
+        <h2 class="text-xl font-bold mb-4 text-[#D7AE27]">
+            Job Description
+        </h2>
+       
+        <p id="jobDescContent"
+           class="text-gray-300 max-h-80 overflow-y-auto whitespace-pre-line"></p>
+       
+        <div class="mt-6 text-right">
+            <button id="closeJobDescModal"
+                class="bg-[#D7AE27] text-black px-5 py-2 rounded hover:bg-yellow-500">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
 
+
+<script>
+const jobModal = document.getElementById("jobDescModal");
+const jobContent = document.getElementById("jobDescContent");
+const closeJobModal = document.getElementById("closeJobDescModal");
+
+// Open modal
+document.querySelectorAll(".view-job-desc-btn").forEach(btn => {
+    btn.addEventListener("click", function(){
+        const desc = this.getAttribute("data-desc");
+        jobContent.textContent = desc;
+        jobModal.classList.remove("hidden");
+        jobModal.classList.add("flex");
+    });
+});
+
+// Close button
+closeJobModal.addEventListener("click", () => {
+    jobModal.classList.add("hidden");
+    jobModal.classList.remove("flex");
+});
+
+// Close on outside click
+jobModal.addEventListener("click", (e) => {
+    if(e.target === jobModal){
+        jobModal.classList.add("hidden");
+        jobModal.classList.remove("flex");
+    }
+});
+</script> 
 </body>
 </html>

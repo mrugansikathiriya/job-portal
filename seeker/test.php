@@ -43,7 +43,8 @@ if($app['score'] > 0){
 
 <body class="bg-black text-gray-200 min-h-screen">
 <?php include("../include/navbar.php"); ?>
-<a href="sdashboard.php"
+
+<a href="find_job.php"
    class="inline-block mt-20 text-yellow-400 text-sm hover:underline  ml-10">
    ← Back
 </a>

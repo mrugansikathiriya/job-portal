@@ -23,7 +23,7 @@ WHERE job.status = 'closed'
 ");
 
 /* ================= FILTER VALUES ================= */
-$filter = $_GET['filter'] ?? '';
+$filter = $_GET['job_type'] ?? '';
 $title = $_GET['title'] ?? '';
 $location_filter = $_GET['location'] ?? '';
 $experience = $_GET['experience'] ?? '';
@@ -170,11 +170,13 @@ class="inline-block mt-20 text-yellow-400 text-sm hover:underline ml-10">
     <!-- Job Type -->
     <div class="flex items-center gap-2 bg-[#0f0f0f] border border-gray-700 px-3 h-10 rounded-lg flex-1 min-w-[140px]">
         <i class="fa-solid fa-file-lines text-yellow-400 text-sm"></i>
-        <select name="filter" onchange="this.form.submit()" class="bg-[#0f0f0f] text-white outline-none w-full text-sm appearance-none">
+        <select name="job_type" onchange="this.form.submit()" class="bg-[#0f0f0f] text-white outline-none w-full text-sm appearance-none">
             <option value="">Job Type</option>
-            <option value="Full Time" <?php if($filter=='Full Time') echo 'selected'; ?>>Full Time</option>
-            <option value="Part Time" <?php if($filter=='Part Time') echo 'selected'; ?>>Part Time</option>
-            <option value="Remote" <?php if($filter=='Remote') echo 'selected'; ?>>Remote</option>
+            <option value="full-time" <?php if($filter=='full-time') echo 'selected'; ?>>Full Time</option>
+            <option value="part-time" <?php if($filter=='part-time') echo 'selected'; ?>>Part Time</option>
+            <option value="contract" <?php if($filter=='contract') echo 'selected'; ?>>contract</option>
+            <option value="internship" <?php if($filter=='internship') echo 'selected'; ?>>internship</option>
+
         </select>
     </div>
 
@@ -245,7 +247,7 @@ class="inline-block mt-20 text-yellow-400 text-sm hover:underline ml-10">
     <div class="flex items-center gap-4 mb-5">
         <img src="<?php echo $logo; ?>" class="w-14 h-14 rounded-xl object-cover bg-white p-1">
         <div>
-            <h3 class="text-lg font-semibold"><?php echo $row['title']; ?></h3>
+           <a href="job_details.php?jid=<?php echo $row['jid']; ?>"> <h3 class="text-lg font-semibold"><?php echo $row['title']; ?></h3></a>
             <p class="text-gray-400 text-sm flex items-center gap-2">
                 <?php echo $row['cname']; ?> • <i class="fa-solid fa-users text-gray-500"></i> <?php echo $row['applicant']; ?> Applicants
             </p>

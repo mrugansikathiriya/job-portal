@@ -1,22 +1,35 @@
 <?php
 session_start();
 require "../config/db.php";
+
+// 🔐 ADMIN CHECK
 if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'admin'){
     session_unset();
     session_destroy();
     header("Location: ../auth/login.php");
     exit();
 }
-// fetch fraud reports with company status
+
+// 🚫 BLOCK COMPANY
+if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['cname'])){
+    $cname = $_POST['cname'];
+
+    // update user status
+    $stmt = $conn->prepare("UPDATE users SET status='blocked' WHERE company_name=?");
+    $stmt->bind_param("s", $cname);
+    $stmt->execute();
+}
+
+// 📊 FETCH FRAUD REPORTS
 $query = "
-SELECT fr.company_email,
-       COUNT(fr.fr_id) as total,
-       MAX(fr.details) as details,
-       u.status
-FROM fraud_reports fr
-LEFT JOIN users u ON fr.company_email = u.email
-GROUP BY fr.company_email
-ORDER BY total DESC
+    SELECT fr.cname,
+           COUNT(fr.fr_id) as total,
+           MAX(fr.details) as details,
+           u.status
+    FROM fraud_reports fr
+    LEFT JOIN users u ON fr.cname = u.uname
+    GROUP BY fr.cname
+    ORDER BY total DESC
 ";
 
 $result = $conn->query($query);
@@ -30,8 +43,7 @@ $result = $conn->query($query);
 <link href="../dist/styles.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="icon" href="../image/logo3.jpg" type="image/png"></head></head>
-
+<link rel="icon" href="../image/logo3.jpg" type="image/png">
 </head>
 
 <body class="bg-black text-white">
@@ -46,7 +58,7 @@ $result = $conn->query($query);
 
 <thead class="bg-[#D7AE27] text-black">
 <tr>
-<th class="p-3">Company Email</th>
+<th class="p-3">Company Name</th>
 <th class="p-3">Reports</th>
 <th class="p-3">Latest Detail</th>
 <th class="p-3">Status</th>
@@ -56,17 +68,18 @@ $result = $conn->query($query);
 
 <tbody>
 
+<?php if($result && $result->num_rows > 0){ ?>
 <?php while($row = $result->fetch_assoc()) { ?>
 
 <tr class="border-b border-gray-700 hover:bg-white/5">
 
-<td class="p-3"><?php echo $row['company_email']; ?></td>
+<td class="p-3"><?php echo htmlspecialchars($row['cname']); ?></td>
 
 <td class="p-3 text-yellow-400 font-bold">
 <?php echo $row['total']; ?>
 </td>
 
-<td class="p-3"><?php echo $row['details']; ?></td>
+<td class="p-3"><?php echo htmlspecialchars($row['details']); ?></td>
 
 <td class="p-3">
 <?php if($row['status'] == 'blocked'){ ?>
@@ -80,8 +93,8 @@ $result = $conn->query($query);
 
 <?php if($row['status'] != 'blocked'){ ?>
 
-<form method="POST" action="block_company.php">
-<input type="hidden" name="email" value="<?php echo $row['company_email']; ?>">
+<form method="POST">
+<input type="hidden" name="cname" value="<?php echo $row['cname']; ?>">
 
 <button type="submit"
 class="bg-red-600 px-3 py-1 rounded hover:bg-red-700">
@@ -102,6 +115,15 @@ Blocked
 </tr>
 
 <?php } ?>
+<?php } else { ?>
+
+<tr>
+<td colspan="5" class="p-4 text-center text-gray-400">
+No Fraud Reports Found
+</td>
+</tr>
+
+<?php } ?>
 
 </tbody>
 
@@ -109,13 +131,13 @@ Blocked
 
 </div>
 
-
 <div class="mt-8">
-    <a href="admin_dashboard.php"
-       class="bg-[#D7AE27] text-black px-6 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition">
-       Back to Dashboard
-    </a>
+<a href="admin_dashboard.php"
+class="bg-[#D7AE27] text-black px-6 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition">
+Back to Dashboard
+</a>
 </div>
+
 </div>
 
 </body>

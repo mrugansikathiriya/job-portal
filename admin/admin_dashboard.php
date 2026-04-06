@@ -165,14 +165,14 @@ require "admin_auth.php";
         Admin Dashboard
     </h1>
 
-<div class="hidden lg:flex items-center gap-4">
-<a href="http://localhost/php_program/project/include/notifications.php" class="relative inline-block">
-        <i class="fa-solid fa-bell text-2xl text-white hover:text-[#D7AE27] transition"></i>
-        <?php if($notification_count > 0): ?>
-            <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-black z-10"></span>
-        <?php endif; ?>
-    </a>
-</div>
+        <div class="hidden lg:flex items-center gap-4">
+                <a href="http://localhost/php_program/project/include/notifications.php" class="relative inline-block">
+                <i class="fa-solid fa-bell text-2xl text-white hover:text-[#D7AE27] transition"></i>
+                <?php if($notification_count > 0): ?>
+                    <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-black z-10"></span>
+                <?php endif; ?>
+            </a>
+        </div>
     </div>
         <!-- Clickable Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

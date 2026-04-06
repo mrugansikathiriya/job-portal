@@ -58,6 +58,8 @@ $result = mysqli_query($conn, "
     <th class="p-3">Location</th>
     <th class="p-3">Established</th>
     <th class="p-3">Verified</th>
+        <th class="p-3">Description</th>
+
 </tr>
 </thead>
 
@@ -73,12 +75,11 @@ $result = mysqli_query($conn, "
     <td class="p-3"><?php echo $row['cname']; ?></td>
 
    <td class="p-3">
-    <?php if($row['logo']) { ?>
-  
-            <?php echo $row['logo']; ?>
-    <?php } else { 
-        echo "No Logo"; 
-    } ?>
+ <?php if($row['logo']) { ?>
+    <img src="../company/uploads/<?php echo $row['logo']; ?>" class="h-12 w-12 rounded">
+<?php } else { ?>
+    No Logo
+<?php } ?>
 </td>
 
 <td class="p-3">
@@ -104,7 +105,17 @@ $result = mysqli_query($conn, "
 
         <?php } ?>
     </td>
-
+<td class="p-3">
+<?php if(!empty($row['description'])) { ?>
+    <button
+        class="text-blue-400 hover:underline view-desc-btn"
+        data-desc="<?php echo htmlspecialchars($row['description']); ?>">
+        View 
+    </button>
+<?php } else { ?>
+    <span class="text-gray-400">No Description</span>
+<?php } ?>
+</td>
 
 </tr>
 
@@ -122,6 +133,54 @@ $result = mysqli_query($conn, "
 </div>
 
 </div>
+<!-- DESCRIPTION MODAL -->
+<div id="descModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
+    <div class="bg-[#0f0f0f] text-white p-6 rounded-xl max-w-lg w-full shadow-xl border border-white/20">
+       
+        <h2 class="text-xl font-bold mb-4 text-[#D7AE27]">
+            Company Description
+        </h2>
+       
+        <p id="descContent" class="text-gray-300 max-h-60 overflow-y-auto whitespace-pre-line"></p>
+       
+        <div class="mt-6 text-right">
+            <button id="closeDescModal"
+                class="bg-[#D7AE27] text-black px-5 py-2 rounded hover:bg-yellow-500">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
 
+<script>
+const descModal = document.getElementById("descModal");
+const descContent = document.getElementById("descContent");
+const closeDescModal = document.getElementById("closeDescModal");
+
+// Open modal
+document.querySelectorAll(".view-desc-btn").forEach(btn => {
+    btn.addEventListener("click", function(){
+        const desc = this.getAttribute("data-desc");
+        descContent.textContent = desc;
+        descModal.classList.remove("hidden");
+        descModal.classList.add("flex");
+    });
+});
+
+// Close modal button
+closeDescModal.addEventListener("click", () => {
+    descModal.classList.add("hidden");
+    descModal.classList.remove("flex");
+});
+
+// Close on outside click
+descModal.addEventListener("click", (e) => {
+    if(e.target === descModal){
+        descModal.classList.add("hidden");
+        descModal.classList.remove("flex");
+    }
+});
+</script>
 </body>
+
 </html>

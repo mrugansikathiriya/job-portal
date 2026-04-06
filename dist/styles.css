@@ -41,6 +41,7 @@
     --spacing: 0.25rem;
     --container-sm: 24rem;
     --container-md: 28rem;
+    --container-lg: 32rem;
     --container-2xl: 42rem;
     --container-3xl: 48rem;
     --container-4xl: 56rem;
@@ -608,6 +609,15 @@
   .max-h-40 {
     max-height: calc(var(--spacing) * 40);
   }
+  .max-h-48 {
+    max-height: calc(var(--spacing) * 48);
+  }
+  .max-h-60 {
+    max-height: calc(var(--spacing) * 60);
+  }
+  .max-h-80 {
+    max-height: calc(var(--spacing) * 80);
+  }
   .min-h-screen {
     min-height: 100vh;
   }
@@ -694,6 +704,9 @@
   }
   .max-w-full {
     max-width: 100%;
+  }
+  .max-w-lg {
+    max-width: var(--container-lg);
   }
   .max-w-md {
     max-width: var(--container-md);
@@ -1527,6 +1540,9 @@
   }
   .whitespace-nowrap {
     white-space: nowrap;
+  }
+  .whitespace-pre-line {
+    white-space: pre-line;
   }
   .text-\[\#0a0a0a\] {
     color: #0a0a0a;

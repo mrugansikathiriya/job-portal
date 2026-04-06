@@ -53,7 +53,7 @@ $birthdate = mysqli_real_escape_string($conn, $_POST["birthdate"] ?? "");
     if ($sname === "") $snameErr = "Full name required";
     if ($education === "") $educationErr = "Education required";
     if ($experience === "") $experienceErr = "Experience required";
-    if ($skillname === "") $skillErr = "At least one skill required";
+if (trim($skillname) === "") $skillErr = "At least one skill required";
     if ($birthdate === "") $birthDateErr = "Birthdate required";
 
     /* Image Upload */
@@ -139,7 +139,7 @@ mysqli_query($conn,$sql);
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Career Craft | Edit Company Profile</title>
+<title>Career Craft | Edit Seeket Profile</title>
 
 <link href="../dist/styles.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
@@ -185,7 +185,7 @@ mysqli_query($conn,$sql);
 p-6 sm:p-8 border border-white/10 text-white mb-20">
 
 <h2 class="text-2xl md:text-3xl font-bold text-[#D7AE27] mb-6 text-center">
-Edit Company Profile
+Edit Seeker Profile
 </h2>
 
 
@@ -383,9 +383,13 @@ function checkRequired(input, err, msg){
     if(input.value.trim()===""){ err.textContent = msg; return false; }
     err.textContent = ""; return true;
 }
-function validateSkills(){ 
-    if(skills.length===0){ skillErr.textContent="At least one skill required"; return false;}
-    skillErr.textContent=""; return true;
+function validateSkills(){
+    if(skills.length===0){
+        skillErr.textContent="At least one skill required";
+        return false;
+    }
+    skillErr.textContent="";
+    return true;
 }
 
 // Add listeners
@@ -397,19 +401,31 @@ experience.addEventListener("change", ()=>checkRequired(experience,document.getE
 // Form submission
 document.querySelector("form").addEventListener("submit", function(e){
     let valid = true;
+
     if(!checkRequired(sname,document.getElementById("snameErr"),"Full name required")) valid=false;
     if(!checkRequired(education,document.getElementById("educationErr"),"Education required")) valid=false;
     if(!checkRequired(birthdate,document.getElementById("birthDateErr"),"Birthdate required")) valid=false;
     if(!checkRequired(experience,document.getElementById("experienceErr"),"Experience required")) valid=false;
-    if(!validateSkills()) valid=false;
 
-    const file = imageInput.files[0];
-    if(file && (file.size>2*1024*1024 || !["image/jpeg","image/png","image/webp"].includes(file.type))){
-        valid=false;
-        imageErr.textContent="Invalid image file";
+    // 🔥 IMPORTANT FIX
+    if(skills.length === 0){
+        skillErr.textContent = "At least one skill required";
+        valid = false;
+    } else {
+        skillErr.textContent = "";
     }
 
-    if(!valid) e.preventDefault();
+    const imageInput = document.getElementById("profileInput");
+    const file = imageInput.files[0];
+
+    if(file && (file.size>2*1024*1024 || !["image/jpeg","image/png","image/webp"].includes(file.type))){
+        valid=false;
+        document.getElementById("imageErr").textContent="Invalid image file";
+    }
+
+    if(!valid){
+        e.preventDefault();
+    }
 });
 
 renderSkills();

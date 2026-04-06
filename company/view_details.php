@@ -99,7 +99,7 @@ p-6 sm:p-8 border border-white/10 text-white mb-20 justify-center">
         <p><b>Experience Required:</b> <?= htmlspecialchars($jdata['experience_required']) ?></p>
         <p><b>Job Type:</b> <?= htmlspecialchars($jdata['job_type']) ?></p>
         <p><b>Work Mode:</b> <?= htmlspecialchars($jdata['work_mode']) ?></p>
-        <p><b>Salary:</b> ₹ <?= htmlspecialchars($jdata['salary']) ?></p>
+        <p><b>Salary:</b> ₹ <?= htmlspecialchars($jdata['salary']) ?>LPA</p>
         <p class="text-red-400"><b>Deadline:</b> <?= date("d M Y", strtotime($jdata['deadline'])) ?></p>
         <p><b>Total Applicants:</b> <?= htmlspecialchars($jdata['applicant']) ?></p>
     </div>

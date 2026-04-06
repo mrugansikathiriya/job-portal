@@ -86,10 +86,10 @@ class="inline-block mt-20 text-yellow-400 text-sm hover:underline ml-10">
                          class="w-14 h-14 rounded-lg border border-yellow-400 object-cover">
 
                     <div>
+                        <a href="job_details.php?jid=<?php echo $row['jid']; ?>">
                         <h2 class="text-lg font-semibold text-yellow-300">
                             <?php echo htmlspecialchars($row['title']); ?>
-                        </h2>
-
+                        </h2></a>
                         <p class="text-gray-300">
                             <?php echo htmlspecialchars($row['cname']); ?>
                         </p>

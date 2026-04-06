@@ -54,11 +54,13 @@ $result = mysqli_query($conn, "
     <th class="p-3">User Name</th>
     <th class="p-3">Email</th>
     <th class="p-3">Full Name</th>
+    <th class="p-3">Profile Image</th>
     <th class="p-3">Education</th>
     <th class="p-3">Experience</th>
     <th class="p-3">Skills</th>
-    <th class="p-3">Bio</th>
     <th class="p-3">Birthdate</th>
+        <th class="p-3">Bio</th>
+
 </tr>
 </thead>
 
@@ -72,30 +74,32 @@ $result = mysqli_query($conn, "
     <td class="p-3"><?php echo $row['uname']; ?></td>
     <td class="p-3"><?php echo $row['email']; ?></td>
     <td class="p-3"><?php echo $row['sname']; ?></td>
+    <td class="p-3">
+   <?php if($row['profile_image']) { ?>
+    <img src="../seeker/uploads/<?php echo $row['profile_image']; ?>" class="h-12 w-12 rounded">
+<?php } else { ?>
+    No Logo
+<?php } ?>
+   
+</td>
     <td class="p-3"><?php echo $row['education']; ?></td>
     <td class="p-3"><?php echo $row['experience']; ?></td>
     <td class="p-3"><?php echo $row['skillname']; ?></td>
+ <td class="p-3"><?php echo $row['birthdate']; ?></td>
     <td class="p-3">
-    <?php 
-    $bio = $row['bio'];
-    $short = substr($bio, 0, 50); // first 50 characters
-    ?>
-
-    <span class="short-text">
-        <?php echo $short; ?><?php echo (strlen($bio) > 50) ? '...' : ''; ?>
-    </span>
-
-    <span class="full-text hidden">
-        <?php echo $bio; ?>
-    </span>
-
-    <?php if(strlen($bio) > 50) { ?>
-        <button class="text-blue-400 ml-2 read-more-btn">
-            Read More
-        </button>
-    <?php } ?>
+   <?php if(!empty($row['bio'])) { ?>
+    <button 
+        class="text-blue-400 hover:underline view-bio-btn"
+        data-bio="<?php echo htmlspecialchars($row['bio']); ?>">
+        View 
+    </button>
+<?php } else { ?>
+    <span class="text-gray-400">No Bio</span>
+<?php } ?>
     </td>    
-    <td class="p-3"><?php echo $row['birthdate']; ?></td>
+    
+
+
 
 
     </tr>
@@ -104,6 +108,24 @@ $result = mysqli_query($conn, "
 
 </tbody>
 </table>
+
+
+<!-- BIO MODAL -->
+<div id="bioModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
+    <div class="bg-[#0f0f0f] text-white p-6 rounded-xl max-w-lg w-full shadow-xl border border-white/20">
+        
+        <h2 class="text-xl font-bold mb-4 text-[#D7AE27]">Seeker's Bio</h2>
+        
+        <p id="bioContent" class="text-gray-300 whitespace-pre-line"></p>
+        
+        <div class="mt-6 text-right">
+            <button id="closeModal" 
+                class="bg-[#D7AE27] text-black px-5 py-2 rounded hover:bg-yellow-500">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
 </div>
 
 <div class="mt-8">
@@ -114,23 +136,34 @@ $result = mysqli_query($conn, "
 </div>
 
 </div>
-<script>
-document.querySelectorAll('.read-more-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const parent = this.parentElement;
-        const shortText = parent.querySelector('.short-text');
-        const fullText = parent.querySelector('.full-text');
 
-        if(fullText.classList.contains('hidden')){
-            fullText.classList.remove('hidden');
-            shortText.classList.add('hidden');
-            this.innerText = "Read Less";
-        } else {
-            fullText.classList.add('hidden');
-            shortText.classList.remove('hidden');
-            this.innerText = "Read More";
-        }
+<script>
+const modal = document.getElementById("bioModal");
+const bioContent = document.getElementById("bioContent");
+const closeModal = document.getElementById("closeModal");
+
+// Open modal
+document.querySelectorAll(".view-bio-btn").forEach(btn => {
+    btn.addEventListener("click", function(){
+        const bio = this.getAttribute("data-bio");
+        bioContent.textContent = bio;
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
     });
+});
+
+// Close modal
+closeModal.addEventListener("click", () => {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+});
+
+// Close on outside click
+modal.addEventListener("click", (e) => {
+    if(e.target === modal){
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    }
 });
 </script>
 </body>

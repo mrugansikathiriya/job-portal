@@ -16,7 +16,7 @@ if (isset($_SESSION['uid'])) {
 
         $user = mysqli_fetch_assoc($result);
 
-        // 🚫 IF BLOCKED → FORCE LOGOUT
+        //  IF BLOCKED → FORCE LOGOUT
         if ($user['status'] != 'active') {
 
             session_unset();

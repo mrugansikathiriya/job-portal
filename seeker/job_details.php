@@ -63,12 +63,24 @@ $aid = 0;
 if(mysqli_num_rows($applyCheck) > 0){
     $appData = mysqli_fetch_assoc($applyCheck);
 
-    $status = $appData['status'];
+    $status = strtolower($appData['status']);
     $aid = $appData['aid'];
 
-    if($status == 'withdrawn'){
-        $canReapply = true;   // ✅ allow reapply
-    } else {
+    // ❌ REJECTED → FULLY BLOCK
+    if($status == 'rejected'){
+        $applied = true;      // treat as already applied
+        $pendingTest = false; // no test
+        $canReapply = false;  // no reapply
+    }
+
+    // ✅ WITHDRAWN → allow reapply
+    elseif($status == 'withdrawn'){
+        $canReapply = true;
+        $applied = false;
+    }
+
+    // ✅ NORMAL FLOW
+    else {
         $applied = true;
 
         if($appData['score'] == 0){
@@ -104,7 +116,7 @@ $logo = !empty($row['logo'])
 
 <?php include("../include/navbar.php"); ?>
 
-<a href="sdashboard.php"
+<a href="find_job.php"
 class="inline-block mt-20 text-yellow-400 text-sm hover:underline ml-10">
 ← Back
 </a>
@@ -223,6 +235,11 @@ View Company Details
 <div class="bg-[#1a1a1a] p-6 rounded-2xl border border-gray-800 sticky top-24">
 
 <h3 class="text-lg font-semibold mb-4">Apply for this job</h3>
+<?php if(isset($status) && $status == 'rejected'){ ?>
+<p class="text-red-400 text-sm mb-2">
+Your application was rejected. You cannot apply again for this job.
+</p>
+<?php } ?>
 <?php if($pendingTest){ ?>
 
 <a href="test.php?aid=<?=$aid?>" 
