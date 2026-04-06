@@ -495,9 +495,6 @@
   .mb-\[-15px\] {
     margin-bottom: -15px;
   }
-  .ml-2 {
-    margin-left: calc(var(--spacing) * 2);
-  }
   .ml-5 {
     margin-left: calc(var(--spacing) * 5);
   }

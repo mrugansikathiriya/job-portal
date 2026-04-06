@@ -139,7 +139,7 @@ mysqli_query($conn,$sql);
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Career Craft | Edit Seeket Profile</title>
+<title>Career Craft | Edit Company Profile</title>
 
 <link href="../dist/styles.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
@@ -185,7 +185,7 @@ mysqli_query($conn,$sql);
 p-6 sm:p-8 border border-white/10 text-white mb-20">
 
 <h2 class="text-2xl md:text-3xl font-bold text-[#D7AE27] mb-6 text-center">
-Edit Seeker Profile
+Edit my Profile
 </h2>
 
 
@@ -383,12 +383,12 @@ function checkRequired(input, err, msg){
     if(input.value.trim()===""){ err.textContent = msg; return false; }
     err.textContent = ""; return true;
 }
-function validateSkills(){
-    if(skills.length===0){
-        skillErr.textContent="At least one skill required";
+function validateSkills(){ 
+    if(skills.length===0){ 
+        skillErr.textContent="At least one skill required"; 
         return false;
     }
-    skillErr.textContent="";
+    skillErr.textContent=""; 
     return true;
 }
 

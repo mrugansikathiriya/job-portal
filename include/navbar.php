@@ -113,8 +113,8 @@ $defaultAvatar = "https://ui-avatars.com/api/?name=" . urlencode($_SESSION['unam
 if($_SESSION['role'] == 'company' && !empty($_SESSION['p_image'])){
     $imagePath = "http://localhost/php_program/project/company/uploads/" . $_SESSION['p_image'];
 } 
-elseif($_SESSION['role'] == 'seeker' && !empty($_SESSION['profile_image'])){
-    $imagePath = "http://localhost/php_program/project/seeker/uploads/" . $_SESSION['profile_image'];
+elseif($_SESSION['role'] == 'seeker' && !empty($_SESSION['p_image'])){
+    $imagePath = "http://localhost/php_program/project/seeker/uploads/" . $_SESSION['p_image'];
 } 
 else {
     $imagePath = $defaultAvatar;
