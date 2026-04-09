@@ -122,7 +122,7 @@ $contact_link = isset($_SESSION['uid'])
         <!-- BOTTOM -->
         <div class="relative max-w-7xl mx-auto text-center text-sm text-gray-500 mt-6 leading-relaxed">
             Designed & Developed by <span class="text-[#D7AE27] font-semibold">CareerCraft Team</span><br>
-            © 2025 <span class="text-[#D7AE27] font-semibold">Rabbitcode</span>. All Rights Reserved.
+            © 2026s <span class="text-[#D7AE27] font-semibold">Rabbitcode</span>. All Rights Reserved.
         </div>
     </footer>
 

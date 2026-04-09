@@ -1,8 +1,18 @@
 <?php
 session_start();
 require "../config/db.php";
+// 🔐 LOGIN CHECK
+if(!isset($_SESSION['uid'])){
+    header("Location: ../auth/login.php");
+    exit();
+}
 
-$user_id = $_SESSION['uid'] ?? 0;
+// 🚫 BLOCK COMPANY USERS
+if($_SESSION['role'] == "company"){
+    header("Location: ../home.php?msg=not_allowed");
+    exit();
+}
+$uid = $_SESSION['uid'] ?? 0;
 ?>
 
 <!DOCTYPE html>
@@ -86,8 +96,7 @@ alert("❌ Invalid Request");
 
 <form action="report_action.php" method="POST" class="space-y-4">
 
-<input type="hidden" name="user_id" value="<?= $user_id ?>">
-
+<input type="hidden" name="uid" value="<?= $uid ?>">
 <!-- ✅ COMPANY NAME -->
 <div class="relative">
 

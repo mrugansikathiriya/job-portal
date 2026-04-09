@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerCraft - Project Schedule</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #fff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .chart-container {
+            width: 750px;
+            height: 650px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-container">
+        <canvas id="scheduleChart"></canvas>
+    </div>
+
+    <script>
+        Chart.register(ChartDataLabels);
+
+        const ctx = document.getElementById('scheduleChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: [
+                    'Requirement Gathering and Analysis',
+                    'Planning',
+                    'Designing',
+                    'Risk Analysis',
+                    'Coding and Integrating Modules',
+                    'Finalize the System Developed System',
+                    'Documentation'
+                ],
+                datasets: [{
+                    data: [12, 11, 20, 12, 25, 10, 10],
+                    backgroundColor: [
+                        '#8FBC8F',   /* Sage green */
+                        '#DDA0DD',   /* Plum pink */
+                        '#5F9EA0',   /* Teal */
+                        '#F08080',   /* Light coral */
+                        '#6F8FAF',   /* Steel blue */
+                        '#87CEEB',   /* Sky blue */
+                        '#C9A9E4'    /* Lavender */
+                    ],
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 40,
+                        bottom: 40,
+                        left: 40,
+                        right: 40
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    datalabels: {
+                        color: '#333',
+                        font: {
+                            size: 13,
+                            weight: 'bold'
+                        },
+                        formatter: function(value) {
+                            return value + '.0%';
+                        },
+                        anchor: 'center',
+                        align: 'center'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed + '%';
+                            }
+                        }
+                    }
+                }
+            },
+            plugins: [{
+                id: 'outerLabels',
+                afterDraw: function(chart) {
+                    const ctx = chart.ctx;
+                    const meta = chart.getDatasetMeta(0);
+
+                    meta.data.forEach(function(element, index) {
+                        const label = chart.data.labels[index];
+                        const centerX = element.x;
+                        const centerY = element.y;
+                        const outerRadius = element.outerRadius;
+                        const startAngle = element.startAngle;
+                        const endAngle = element.endAngle;
+                        const midAngle = (startAngle + endAngle) / 2;
+
+                        const labelRadius = outerRadius + 30;
+                        const x = centerX + Math.cos(midAngle) * labelRadius;
+                        const y = centerY + Math.sin(midAngle) * labelRadius;
+
+                        ctx.save();
+                        ctx.font = '13px Segoe UI';
+                        ctx.fillStyle = '#444';
+                        ctx.textAlign = midAngle > Math.PI / 2 && midAngle < Math.PI * 1.5 ? 'right' : 'left';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(label, x, y);
+                        ctx.restore();
+                    });
+                }
+            }]
+        });
+    </script>
+</body>
+</html>

@@ -22,7 +22,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['cname'])){
 
 // 📊 FETCH FRAUD REPORTS
 $query = "
-    SELECT fr.cname,
+    SELECT fr.cname,u.uid,
            COUNT(fr.fr_id) as total,
            MAX(fr.details) as details,
            u.status
@@ -59,6 +59,8 @@ $result = $conn->query($query);
 <thead class="bg-[#D7AE27] text-black">
 <tr>
 <th class="p-3">Company Name</th>
+<th class="p-3">User ID</th>
+
 <th class="p-3">Reports</th>
 <th class="p-3">Latest Detail</th>
 <th class="p-3">Status</th>
@@ -74,7 +76,7 @@ $result = $conn->query($query);
 <tr class="border-b border-gray-700 hover:bg-white/5">
 
 <td class="p-3"><?php echo htmlspecialchars($row['cname']); ?></td>
-
+<td class="p-3"><?php echo $row['uid']; ?></td>
 <td class="p-3 text-yellow-400 font-bold">
 <?php echo $row['total']; ?>
 </td>

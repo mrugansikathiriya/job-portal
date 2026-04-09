@@ -1,6 +1,10 @@
 <?php
 session_start(); 
+if(isset($_GET['msg']) && $_GET['msg'] == "not_allowed"){
+    echo "<script>alert('❌ Companies cannot report fraud');</script>";
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 

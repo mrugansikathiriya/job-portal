@@ -2,12 +2,24 @@
 session_start();
 require "../config/db.php";
 
+// 🔐 LOGIN CHECK
+if(!isset($_SESSION['uid'])){
+    header("Location: ../auth/login.php");
+    exit();
+}
+
+// 🚫 BLOCK COMPANY USERS
+if($_SESSION['role'] == "company"){
+    header("Location: ../home.php?msg=not_allowed");
+    exit();
+}
+
 if($_SERVER['REQUEST_METHOD'] !== "POST"){
     header("Location: fraud_alert.php?msg=invalid");
     exit();
 }
 
-$user_id = $_POST['user_id'] ?? 0;
+$uid = $_POST['uid'] ?? 0;
 $cname = trim($_POST['cname'] ?? '');
 $details = strtolower(trim($_POST['details'] ?? ''));
 
@@ -49,8 +61,8 @@ if(!$isFraud){
 }
 
 // ✅ INSERT REPORT
-mysqli_query($conn, "INSERT INTO fraud_reports (user_id, cname, details)
-VALUES ('$user_id', '$cname', '$details')");
+mysqli_query($conn, "INSERT INTO fraud_reports (uid, cname, details)
+VALUES ('$uid', '$cname', '$details')");
 
 // ✅ COUNT REPORTS
 $countRes = mysqli_query($conn, "SELECT COUNT(*) as total FROM fraud_reports WHERE cname='$cname'");
