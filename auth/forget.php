@@ -128,28 +128,28 @@ if (mysqli_num_rows($check) == 0) {
                 $message = "Minimum 6 characters required";
                 $step = 3;
             } else {
-$hashed = password_hash($newPass, PASSWORD_DEFAULT);
-$email = $_SESSION['email'];
+            $hashed = password_hash($newPass, PASSWORD_DEFAULT);
+            $email = $_SESSION['email'];
 
-/* UPDATE PASSWORD */
-mysqli_query($conn, 
-    "UPDATE users SET password='$hashed' WHERE email='$email'");
+        /* UPDATE PASSWORD */
+        mysqli_query($conn, 
+            "UPDATE users SET password='$hashed' WHERE email='$email'");
 
-/* Remove remember token */
-mysqli_query($conn, 
-    "UPDATE users SET remember_token=NULL WHERE email='$email'");
+        /* Remove remember token */
+        mysqli_query($conn, 
+            "UPDATE users SET remember_token=NULL WHERE email='$email'");
 
-/* Delete remember cookie */
-setcookie("remember_token", "", time() - 3600, "/");
+        /* Delete remember cookie */
+        setcookie("remember_token", "", time() - 3600, "/");
 
-/* Cleanup session */
-unset($_SESSION['otp_verified']);
-unset($_SESSION['email']);
+        /* Cleanup session */
+        unset($_SESSION['otp_verified']);
+        unset($_SESSION['email']);
 
-session_destroy();
+        session_destroy();
 
-header("Location: login.php");
-exit;
+        header("Location: login.php");
+        exit;
             }
         }
     }

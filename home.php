@@ -37,8 +37,6 @@ if(isset($_GET['msg']) && $_GET['msg'] == "not_allowed"){
         }
 
 
-
-
         /* Pulsing glow effect for the button */
         @keyframes glowPulse {
             0% {
@@ -70,21 +68,6 @@ if(isset($_GET['msg']) && $_GET['msg'] == "not_allowed"){
             }
         }
 
-        .animate-fadeIn {
-            animation: fadeIn 1s ease forwards;
-        }
-
-        .animate-fadeIn.delay-100 {
-            animation-delay: 0.1s;
-        }
-
-        .animate-fadeIn.delay-200 {
-            animation-delay: 0.2s;
-        }
-
-        .animate-fadeIn.delay-300 {
-            animation-delay: 0.3s;
-        }
 
         /* Fade-in on scroll */
         .fade-in-on-scroll {
@@ -153,19 +136,7 @@ if(isset($_GET['msg']) && $_GET['msg'] == "not_allowed"){
             transition-delay: 0.3s;
         }
 
-        /* Pop / Pulse animation */
-        @keyframes popPulse {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.12);
-            }
-        }
-
+      
         /* Company recruiter */
         @keyframes scroll {
             0% {
@@ -208,91 +179,89 @@ include("include/navbar.php");?>
         </div>
     </div>
  
-   
+   <div id="main-content" class="opacity-0 transition-opacity duration-1000">
+ 
 
     <!-- Image cursoel -->
      <div id="carousel" class="relative h-[460px] overflow-hidden rounded-2xl shadow-2xl mt-10">
 
-    <!-- SLIDES -->
-    <div class="absolute inset-0 slide opacity-100 transition-opacity duration-1000"
-         data-img="image/img2.jpg"
-         data-title="Build Your <span class='text-[#D7AE27]'>Career</span> With Confidence">
-    </div>
-
-    <div class="absolute inset-0 slide opacity-0 transition-opacity duration-1000"
-         data-img="image/img11.jpg"
-         data-title="Your Dream Job <span class='text-[#D7AE27]'>Starts Here</span>">
-    </div>
-
-    <div class="absolute inset-0 slide opacity-0 transition-opacity duration-1000"
-         data-img="image/img3.jpg"
-         data-title="Find Work That <span class='text-[#D7AE27]'>Matters</span>">
-    </div>
-
-    <!-- IMAGE -->
-    <img id="carouselImage" src="image/img2.jpg"
-         class="w-full h-full object-cover">
-
-    <!-- OVERLAY (ONLY ONE TIME) -->
-    <div class="absolute inset-0 pointer-events-none
-        bg-[radial-gradient(ellipse_85%_65%_at_center,rgba(2,6,23,0.92)_0%,rgba(2,6,23,0.75)_40%,rgba(2,6,23,0.45)_70%,transparent_100%)]
-        flex flex-col justify-center px-6 md:px-12">
-
-        <div class="max-w-3xl mx-auto text-center space-y-6">
-            <h1 id="carouselTitle" class="text-3xl md:text-4xl font-bold text-white">
-                Build Your <span class="text-[#D7AE27]">Career</span> With Confidence
-            </h1>
-            <p class="text-gray-300">Find jobs that match your skills</p>
+        <!-- SLIDES -->
+        <div class="absolute inset-0 slide opacity-100 transition-opacity duration-1000"
+            data-img="image/img2.jpg"
+            data-title="Build Your <span class='text-[#D7AE27]'>Career</span> With Confidence">
         </div>
 
-             <!-- Search Bar -->
-            <div class="hidden md:flex relative max-w-3xl mx-auto mt-6 gap-2 pointer-events-auto z-20">
-                                        <!-- <i
-                                                class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i> -->
-                    <form onsubmit="return handleSearch()"
-                            class="hidden md:flex items-center max-w-3xl mx-auto mt-6">
+        <div class="absolute inset-0 slide opacity-0 transition-opacity duration-1000"
+            data-img="image/img11.jpg"
+            data-title="Your Dream Job <span class='text-[#D7AE27]'>Starts Here</span>">
+        </div>
 
-                        <div class="relative flex-1">
-                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        <div class="absolute inset-0 slide opacity-0 transition-opacity duration-1000"
+            data-img="image/img3.jpg"
+            data-title="Find Work That <span class='text-[#D7AE27]'>Matters</span>">
+        </div>
 
-                        <input type="text" id="searchInput"
-                        class="w-full pl-12 pr-4 py-3 rounded-xl border border-white bg-transparent text-white 
-                        placeholder-gray-300 focus:border-[#D7AE27] focus:ring-2 focus:ring-[#D7AE27] outline-none"
-                        placeholder="Search jobs....">
-                        </div>
+        <!-- IMAGE -->
+        <img id="carouselImage" src="image/img2.jpg"
+            class="w-full h-full object-cover">
 
-                    <button type="submit"
-                    class="ml-5 px-6 py-3 bg-[#D7AE27] text-black rounded-xl font-semibold 
-                    hover:bg-yellow-500 transition">
-                        Search
-                    </button>
+        <!-- OVERLAY (ONLY ONE TIME) -->
+        <div class="absolute inset-0 pointer-events-none
+            bg-[radial-gradient(ellipse_85%_65%_at_center,rgba(2,6,23,0.92)_0%,rgba(2,6,23,0.75)_40%,rgba(2,6,23,0.45)_70%,transparent_100%)]
+            flex flex-col justify-center px-6 md:px-12">
 
-                </form>
+            <div class="max-w-3xl mx-auto text-center space-y-6">
+                <h1 id="carouselTitle" class="text-3xl md:text-4xl font-bold text-white">
+                    Build Your <span class="text-[#D7AE27]">Career</span> With Confidence
+                </h1>
+                <p class="text-gray-300">Find jobs that match your skills</p>
             </div>
 
-                        <!-- Mobile Buttons -->
-                        <div class="md:hidden px-4 py-6 flex flex-col items-center space-y-4 pointer-events-auto z-20">
+                <!-- Search Bar -->
+                <div class="hidden md:flex relative max-w-3xl mx-auto mt-6 gap-2 pointer-events-auto z-20">
+                                            <!-- <i
+                                                    class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i> -->
+                        <form onsubmit="return handleSearch()"
+                                class="hidden md:flex items-center max-w-3xl mx-auto mt-6">
 
-                    
+                            <div class="relative flex-1">
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
 
-                            <!-- Get Started -->
-                            <div class="flex justify-center">
-                                <button onclick="location.href='#hire'" class="w-64 bg-[#FBBF24] text-black py-3 rounded-lg font-semibold
-                transform transition-all duration-300 hover:bg-[#D7AE27] hover:text-white hover:scale-105 hover:shadow-xl
-                active:scale-95 active:shadow-inner">Get Started</button>
+                            <input type="text" id="searchInput"
+                            class="w-full pl-12 pr-4 py-3 rounded-xl border border-white bg-transparent text-white 
+                            placeholder-gray-300 focus:border-[#D7AE27] focus:ring-2 focus:ring-[#D7AE27] outline-none"
+                            placeholder="Search jobs....">
                             </div>
 
-                        </div>
+                        <button type="submit"
+                        class="ml-5 px-6 py-3 bg-[#D7AE27] text-black rounded-xl font-semibold 
+                        hover:bg-yellow-500 transition">
+                            Search
+                        </button>
+
+                    </form>
+                </div>
+
+                            <!-- Mobile Buttons -->
+                            <div class="md:hidden px-4 py-6 flex flex-col items-center space-y-4 pointer-events-auto z-20">
+                                <!-- Get Started -->
+                                <div class="flex justify-center">
+                                    <button onclick="location.href='#hire'" class="w-64 bg-[#FBBF24] text-black py-3 rounded-lg font-semibold
+                    transform transition-all duration-300 hover:bg-[#D7AE27] hover:text-white hover:scale-105 hover:shadow-xl
+                    active:scale-95 active:shadow-inner">Get Started</button>
+                            </div>
+
+        </div>
+        </div>
+
+        <!-- CONTROLS -->
+        <button id="prev"
+            class="absolute left-4 top-1/2 -translate-y-1/2 text-3xl text-white/70 hover:text-white transition">&#10096;</button>
+
+        <button id="next"
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-3xl text-white/70 hover:text-white transition">&#10097;</button>
+
     </div>
-
-    <!-- CONTROLS -->
-    <button id="prev"
-        class="absolute left-4 top-1/2 -translate-y-1/2 text-3xl text-white/70 hover:text-white transition">&#10096;</button>
-
-    <button id="next"
-        class="absolute right-4 top-1/2 -translate-y-1/2 text-3xl text-white/70 hover:text-white transition">&#10097;</button>
-
-</div>
  
 
     <!-- Trusted Companies -->
@@ -317,6 +286,7 @@ include("include/navbar.php");?>
 
         </div>
     </section>
+
     <!-- jobs -->
     <?php
         require "config/db.php";
@@ -334,7 +304,7 @@ include("include/navbar.php");?>
         LIMIT 3";
 
         $result = mysqli_query($conn, $sql);
-        ?>
+    ?>
 
     <div class="max-w-7xl mx-auto px-6 mt-16">
 
@@ -410,29 +380,28 @@ include("include/navbar.php");?>
                     </div>
 
                     <div class="text-gray-400">
-                                        <i class="fa-regular fa-clock text-yellow-400"></i>
-
+                      <i class="fa-regular fa-clock text-yellow-400"></i>
                         <?php echo $posted; ?>
                     </div>
                 </div>
 
              <?php
-if(isset($_SESSION['role']) && $_SESSION['role'] == 'company'){
-    $detailsLink = "http://localhost/php_program/project/company/view_job.php";
-} else {
-    $detailsLink = "http://localhost/php_program/project/seeker/job_details.php?jid=".$row['jid'];
-}
-?>
+                if(isset($_SESSION['role']) && $_SESSION['role'] == 'company'){
+                    $detailsLink = "http://localhost/php_program/project/company/view_job.php";
+                } else {
+                    $detailsLink = "http://localhost/php_program/project/seeker/job_details.php?jid=".$row['jid'];
+                }
+             ?>
 
-<!-- View Details -->
-<a href="<?php echo $detailsLink; ?>" 
-class="block text-center bg-yellow-400 text-black py-2 rounded-xl font-semibold hover:bg-yellow-500 transition">
-    View Details
-</a>
+                <!-- View Details -->
+                <a href="<?php echo $detailsLink; ?>" 
+                class="block text-center bg-yellow-400 text-black py-2 rounded-xl font-semibold hover:bg-yellow-500 transition">
+                    View Details
+                </a>
 
-            </div>
+                </div>
 
-        <?php } ?>
+             <?php } ?>
 
             </div>
 
@@ -454,6 +423,7 @@ class="block text-center bg-yellow-400 text-black py-2 rounded-xl font-semibold 
         </div>
 
     </div>
+
     <!-- hire process -->
     <section id="hire" class="bg-black py-20 px-6 md:px-20">
         <div class="max-w-7xl mx-auto">
@@ -541,7 +511,7 @@ class="block text-center bg-yellow-400 text-black py-2 rounded-xl font-semibold 
 
             <!-- Heading -->
             <div class="text-center mb-8">
-                <h2 id="about" class="text-4xl md:text-4xl font-bold text-center text-white mb-10 relative">
+                <h2 id="about-h2" class="text-4xl md:text-4xl font-bold text-center text-white mb-10 relative">
                     <span class="text-[#D7AE27] relative z-10">About</span> Us
                     <!-- Decorative underline -->
                     <span
@@ -667,7 +637,7 @@ class="block text-center bg-yellow-400 text-black py-2 rounded-xl font-semibold 
                             <div class="w-20 h-[2px] bg-[#D7AE27] mb-8"></div>
 
                             <!-- SMALLER EXPLORE JOBS BUTTON -->
-                            <a href="http://localhost/php_program/project/seeker/find_job.php" class="relative inline-flex items-center justify-center px-6 py-3 rounded-lg
+                             <a href="<?php echo $viewMoreLink; ?>" class="relative inline-flex items-center justify-center px-6 py-3 rounded-lg
                   bg-gradient-to-r from-[#D7AE27] to-[#FFD700] text-black font-semibold text-base
                   tracking-wide shadow-[0_2px_10px_rgba(215,174,23,0.4)]
                   hover:scale-105 hover:shadow-[0_4px_20px_rgba(215,174,23,0.6)]
@@ -822,48 +792,48 @@ class="block text-center bg-yellow-400 text-black py-2 rounded-xl font-semibold 
                 </h2>
             </div>
 
-            <!-- GRID -->
-            <div class="grid md:grid-cols-3 gap-6">
+                <!-- GRID -->
+                <div class="grid md:grid-cols-3 gap-6">
 
-            <?php while($row = $result->fetch_assoc()) { 
+                    <?php while($row = $result->fetch_assoc()) { 
 
-                // limit to 4 if not expanded
-                if(!$show_all && $count >= 4) break;
-                $count++;
-            ?>
+                        // limit to 4 if not expanded
+                        if(!$show_all && $count >= 4) break;
+                        $count++;
+                    ?>
 
-            <div class="bg-gradient-to-b from-[#0a0a0a] to-[#0a0a0a] p-6 rounded-xl shadow-lg hover:scale-105 transition">
+                <div class="bg-gradient-to-b from-[#0a0a0a] to-[#0a0a0a] p-6 rounded-xl shadow-lg hover:scale-105 transition">
 
-                <?php
-                if(!empty($row['p_image'])){
-                    if($row['role'] == 'company'){
-                        $imagePath = "http://localhost/php_program/project/company/uploads/" . $row['p_image'];
-                    } else {
-                        $imagePath = "http://localhost/php_program/project/seeker/uploads/" . $row['p_image'];
-                    }
-                ?>
-                    <img src="<?= $imagePath ?>" 
-                        class="w-12 h-12 rounded-full mb-3 object-cover border-2 border-[#D7AE27]">
-                <?php } else { ?>
-                    <img src="https://ui-avatars.com/api/?name=<?= urlencode($row['name']) ?>&background=D7AE27&color=000"
-                        class="w-12 h-12 rounded-full mb-3 border-2 border-[#D7AE27]">
+                    <?php
+                    if(!empty($row['p_image'])){
+                        if($row['role'] == 'company'){
+                            $imagePath = "http://localhost/php_program/project/company/uploads/" . $row['p_image'];
+                        } else {
+                            $imagePath = "http://localhost/php_program/project/seeker/uploads/" . $row['p_image'];
+                        }
+                    ?>
+                        <img src="<?= $imagePath ?>" 
+                            class="w-12 h-12 rounded-full mb-3 object-cover border-2 border-[#D7AE27]">
+                    <?php } else { ?>
+                        <img src="https://ui-avatars.com/api/?name=<?= urlencode($row['name']) ?>&background=D7AE27&color=000"
+                            class="w-12 h-12 rounded-full mb-3 border-2 border-[#D7AE27]">
+                    <?php } ?>
+
+                    <h3 class="text-lg font-semibold"><?= $row['name']; ?></h3>
+
+                    <p class="text-yellow-400 mb-2">
+                        <?= str_repeat("⭐️", $row['rating']); ?>
+                    </p>
+
+                    <p class="text-gray-400 text-sm">
+                        <?= $row['message']; ?>
+                    </p>
+
+                </div>
+
                 <?php } ?>
 
-                <h3 class="text-lg font-semibold"><?= $row['name']; ?></h3>
-
-                <p class="text-yellow-400 mb-2">
-                    <?= str_repeat("⭐️", $row['rating']); ?>
-                </p>
-
-                <p class="text-gray-400 text-sm">
-                    <?= $row['message']; ?>
-                </p>
-
-            </div>
-
-            <?php } ?>
-
-            </div>
+        </div>
 
             <!-- VIEW MORE / LESS -->
             <?php if($total > 4): ?>
@@ -894,12 +864,10 @@ class="block text-center bg-yellow-400 text-black py-2 rounded-xl font-semibold 
 
     </section>
               
-  
-
-<?php
- include("include/footer.php");
-?>
-
+    <?php
+    include("include/footer.php");
+    ?>
+   </div>
 
     <!-- SCRIPT -->
     <script>
@@ -907,48 +875,46 @@ class="block text-center bg-yellow-400 text-black py-2 rounded-xl font-semibold 
         window.addEventListener("load", () => {
             const loader = document.getElementById("loader");
             const mainContent = document.getElementById("main-content");
-            loader.classList.add("animate-fadeZoom");
             setTimeout(() => {
                 mainContent.classList.add("opacity-100");
                 loader.style.display = "none";
-            }, 2000);
+            }, 500);
         });
 
-      
+        // ================= Image curosel =================
+    const slides = document.querySelectorAll(".slide");
+    const img = document.getElementById("carouselImage");
+    const title = document.getElementById("carouselTitle");
 
+    let current = 0;
 
-const slides = document.querySelectorAll(".slide");
-const img = document.getElementById("carouselImage");
-const title = document.getElementById("carouselTitle");
+    function showSlide(index) {
+        const slide = slides[index];
 
-let current = 0;
+        img.src = slide.dataset.img;
+        title.innerHTML = slide.dataset.title;
 
-function showSlide(index) {
-    const slide = slides[index];
+        slides.forEach(s => s.style.opacity = "0");
+        slide.style.opacity = "1";
+    }
 
-    img.src = slide.dataset.img;
-    title.innerHTML = slide.dataset.title;
+    document.getElementById("next").onclick = () => {
+        current = (current + 1) % slides.length;
+        showSlide(current);
+    };
 
-    slides.forEach(s => s.style.opacity = "0");
-    slide.style.opacity = "1";
-}
+    document.getElementById("prev").onclick = () => {
+        current = (current - 1 + slides.length) % slides.length;
+        showSlide(current);
+    };
 
-document.getElementById("next").onclick = () => {
-    current = (current + 1) % slides.length;
-    showSlide(current);
-};
+    // Auto slide
+    setInterval(() => {
+        current = (current + 1) % slides.length;
+        showSlide(current);
+    }, 5000);
 
-document.getElementById("prev").onclick = () => {
-    current = (current - 1 + slides.length) % slides.length;
-    showSlide(current);
-};
-
-// Auto slide
-setInterval(() => {
-    current = (current + 1) % slides.length;
-    showSlide(current);
-}, 5000);
-        //  company logo
+            // ================= Compnay logo =================
         // List of company logos (can be PNG or JPG)
         const logos = [
             "logo/google.jpg",
@@ -1024,46 +990,26 @@ setInterval(() => {
             }, { threshold: 0.6 });
 
             counters.forEach(counter => counterObserver.observe(counter));
+           
+        
+            // Fade-in on scroll-animation
+            const faders = document.querySelectorAll('.fade-in-on-scroll');
 
-
-            /* ================= VIDEO AUTOPLAY ON SCROLL ================= */
-            const videos = document.querySelectorAll(".reveal-video video");
-
-            const videoObserver = new IntersectionObserver(entries => {
+            const appearOnScroll = new IntersectionObserver(function (entries, observer) {
                 entries.forEach(entry => {
-                    entry.isIntersecting ? entry.target.play() : entry.target.pause();
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target); // FIXED LINE
+                    }
                 });
-            }, { threshold: 0.4 });
+            }, { threshold: 0.2 });
 
-            videos.forEach(video => videoObserver.observe(video));
-
-        });
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add("show");
-                }
+            faders.forEach(fader => {
+                appearOnScroll.observe(fader);
             });
-        }, { threshold: 0.2 });
+        });   
 
-        document.querySelectorAll(".animate-item").forEach(el => observer.observe(el));
-
-        // Fade-in on scroll
-        const faders = document.querySelectorAll('.fade-in-on-scroll');
-
-        const appearOnScroll = new IntersectionObserver(function (entries, observer) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observer.unobserve(entry.target); // FIXED LINE
-                }
-            });
-        }, { threshold: 0.2 });
-
-        faders.forEach(fader => {
-            appearOnScroll.observe(fader);
-        });
-       const userRole = "<?= $_SESSION['role'] ?>";
+        const userRole = "<?= isset($_SESSION['role']) ? $_SESSION['role'] : '' ?>";
 
         // searching
         function handleSearch() {

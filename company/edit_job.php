@@ -85,7 +85,7 @@ margin-top:4px;
 <?php include("../include/navbar.php"); ?>
 <a href="cdashboard.php"
    class="inline-block mt-20 mb-4 text-yellow-400 text-sm hover:underline">
-   ← Back to Dashboard
+   ← Back
 </a>
 
 <div class="max-w-5xl mx-auto bg-[#0f0f0f] rounded-2xl shadow-2xl 

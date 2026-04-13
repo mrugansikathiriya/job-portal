@@ -13,106 +13,11 @@
     <link rel="icon" href="image/logo3.jpg" type="image/png">
     <style>
         /* Process cards */
-        .process-card {
-            background: #0b1020;
-            border: 1px solid #444;
-            padding: 1.5rem 1rem;
-            border-radius: 14px;
-            font-weight: 600;
-            color: #D7AE27;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            transition: transform 0.5s ease, box-shadow 0.5s ease, background 0.3s ease;
-        }
-
-        .process-card:hover {
-            transform: translateY(-10px) scale(1.05);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8);
-            background: #1f1f2f;
-        }
 
         #scroll-progress-circle {
             transform: rotate(-90deg);
             transform-origin: 50% 50%;
             transition: stroke-dashoffset 0.2s linear;
-        }
-
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes fadeInRight {
-            from {
-                opacity: 0;
-                transform: translateX(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fadeInDown {
-            animation: fadeInDown 1s ease forwards;
-        }
-
-        .animate-fadeInLeft {
-            animation: fadeInLeft 1s ease forwards;
-        }
-
-        .animate-fadeInRight {
-            animation: fadeInRight 1s ease forwards;
-        }
-
-        .animate-fadeInUp {
-            animation: fadeInUp 1s ease forwards;
-        }
-
-        .animate-fadeIn {
-            animation: fadeInDown 1s ease forwards;
-        }
-
-        .delay-150 {
-            animation-delay: 0.15s;
-        }
-
-        .delay-300 {
-            animation-delay: 0.3s;
         }
 
         /* heading image */
@@ -162,7 +67,7 @@
             <div class="relative h-[460px] md:h-[60vh] overflow-hidden rounded-2xl shadow-2xl">
 
                 <!-- Background Image -->
-                <img src="image\about.jpg" alt="About Us Background" class="w-full h-full object-cover brightness-30">
+                <img src="image/about.jpg" alt="About Us Background" class="w-full h-full object-cover brightness-30">
 
                 <!-- Overlay Content -->
                 <div class="absolute inset-0 flex flex-col justify-center items-center text-center px-6">
@@ -185,7 +90,7 @@
             <div class="max-w-3xl text-center text-gray-300 space-y-6">
 
                 <p>
-                    Established in 2024,
+                    Established in 2018,
                     <span class="text-yellow-400 font-semibold">CareerCraft</span> is committed to delivering the best
                     work
                     environment for our employees. Our team thrives on innovation, collaboration, and growth.
@@ -261,6 +166,7 @@
 
         </div>
     </section>
+
     <!-- Contact Details Section -->
     <section id="contact" class="bg-black text-gray-400 py-24 px-6 md:px-20 mb-6">
         <div class="max-w-7xl mx-auto text-center">
@@ -316,27 +222,13 @@
         </div>
     </section>
 
-<?php
-  include("include/footer.php");
-?>
-
-
-
-
-
+    <?php
+    include("include/footer.php");
+    ?>
 
 
     <!-- Scroll Animations -->
     <script>
-
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('show');
-                }
-            });
-        }, { threshold: 0.2 });
-        document.querySelectorAll('.fade-left, .fade-right, .fade-up, .zoom-in, .rotate-in').forEach(el => observer.observe(el));
 
         //================ progress==================
         const progressContainer = document.getElementById('scroll-progress-container');

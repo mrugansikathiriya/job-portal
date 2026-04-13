@@ -10,7 +10,7 @@ header("Pragma: no-cache");
 $timeout = 600; // 10 minutes
 
 /* Check login */
-if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'admin'){
+if(!isset($_SESSION['uid']) || $_SESSION['role'] !== 'admin'){
     session_unset();
     session_destroy();
     header("Location: ../auth/login.php");

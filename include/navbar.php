@@ -199,12 +199,7 @@ alt="Profile">
                     <button id="close-menu" class="text-2xl text-gray-200" aria-label="Close Menu">&#10005;</button>
                 </div>
 
-                <!-- Search Bar -->
-                <div class="relative mb-6">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="Search jobs, skills..."
-                           class="w-full pl-10 pr-4 py-3 rounded-full border border-gray-700 bg-gray-900 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#D7AE27]">
-                </div>
+              
 
                 <!-- Links -->
             <a href="http://localhost/php_program/project/home.php" 
@@ -221,8 +216,8 @@ alt="Profile">
             <a href="http://localhost/php_program/project/company/post_job.php"
             class="block py-2 text-gray-200 hover:text-[#D7AE27]">Post Job</a>
 
-            <a href="http://localhost/php_program/project/company/candidate_history.php"
-            class="block py-2 text-gray-200 hover:text-[#D7AE27]">Candidate History</a>
+            <a href="http://localhost/php_program/project/seeker/job_history.php"
+            class="block py-2 text-gray-200 hover:text-[#D7AE27]">Job History</a>
 
             <?php elseif($_SESSION['role'] == 'seeker'): ?>
             <!-- Seeker -->

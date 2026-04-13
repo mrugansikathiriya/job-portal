@@ -72,11 +72,11 @@ if($app['score'] > 0){
                bg-gray-600 cursor-not-allowed">
         Submit Test
     </button>
- <?php if ($app['score'] > 0): ?>
-<div class="text-center text-green-400 font-bold mt-6">
-    Your Previous Score: <?= $app['score'] ?>
-</div>
-<?php endif; ?>
+        <?php if ($app['score'] > 0): ?>
+        <div class="text-center text-green-400 font-bold mt-6">
+            Your Previous Score: <?= $app['score'] ?>
+        </div>
+        <?php endif; ?>
 
     <div id="result" class="text-center text-xl font-bold text-blue-400 mt-8"></div>
 

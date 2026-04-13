@@ -10,15 +10,6 @@ if(!isset($_SESSION['uid']) || $_SESSION['role'] != 'admin'){
     exit();
 }
 
-// 🚫 BLOCK COMPANY
-if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['cname'])){
-    $cname = $_POST['cname'];
-
-    // update user status
-    $stmt = $conn->prepare("UPDATE users SET status='blocked' WHERE company_name=?");
-    $stmt->bind_param("s", $cname);
-    $stmt->execute();
-}
 
 // 📊 FETCH FRAUD REPORTS
 $query = "
