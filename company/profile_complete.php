@@ -288,15 +288,14 @@ while($row = mysqli_fetch_assoc($seekers)){
     </div>
 
     <!-- Established Date -->
-    <div>
-        <label>Established Date <span class="text-red-500">*</span></label>
-        <input type="date" id="established_at" name="established_at"
+<div>
+    <label>Established Date <span class="text-red-500">*</span></label>
+    <input type="date" id="established_at" name="established_at"
         value="<?= htmlspecialchars($established_at) ?>"
-        placeholder="Select Established Date"
+        max="<?= date('Y-m-d') ?>" 
         class="input-field">
-        <p id="establishedErr" class="error"><?= $establishedErr ?></p>
-    </div>
-
+    <p id="establishedErr" class="error"><?= $establishedErr ?></p>
+</div>
 
 
     <!-- Description -->

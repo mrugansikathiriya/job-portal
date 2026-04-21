@@ -227,12 +227,9 @@ class="w-24 h-24 rounded-full object-cover border-2 border-gray-300 shadow">
 </div>
 
 <!-- Birthdate -->
-<div>
-<label>Birth Date <span class="text-red-500">*</span></label>
-<input type="date" name="birthdate" id="birthdate" value="<?= htmlspecialchars($birthdate) ?>" class="input-field">
-<p id="birthDateErr" class="error"><?= $birthDateErr ?></p>
-</div>
-
+<div> <label>Birth Date <span class="text-red-500">*</span></label>
+ <input type="date" name="birthdate" id="birthdate" max="<?= date('Y-m-d') ?>"value="<?= htmlspecialchars($birthdate) ?>" class="input-field">
+  <p id="birthDateErr" class="error"  ><?= $birthDateErr ?></p> </div>
 <!-- Experience -->
 <div>
 <label>Experience <span class="text-red-500">*</span></label>
@@ -281,24 +278,27 @@ const skillsArray = <?= json_encode($skillsList) ?>;
 const skillInput = document.getElementById("skillInput");
 const skillTags = document.getElementById("skillTags");
 const skillHidden = document.getElementById("skillHidden");
-let skills = <?= json_encode(explode(",",$skillname)) ?> || [];
-
-// Render skills
+let skills = <?= json_encode(array_filter(array_map('trim', explode(",", $skillname)))) ?> || [];// Render skills
 function renderSkills(){
     skillTags.innerHTML = "";
+
+    skills = skills.filter(s => s.trim() !== ""); // ✅ remove empty
+
     skills.forEach(skill=>{
         const div = document.createElement("div");
         div.className = "bg-[#D7AE27] text-black px-3 py-1 rounded-full flex items-center gap-2";
         div.innerHTML = skill+`<button onclick="removeSkill('${skill}')" class="font-bold">×</button>`;
         skillTags.appendChild(div);
     });
+
     skillHidden.value = skills.join(",");
     validateSkills();
 }
-
 // Add/Remove Skills
 function addSkill(skill){
-    if(!skills.includes(skill)){
+    skill = skill.trim(); // ✅ remove spaces
+
+    if(skill !== "" && !skills.includes(skill)){
         skills.push(skill);
         renderSkills();
     }
@@ -395,8 +395,14 @@ function checkRequired(input, err, msg){
     err.textContent = ""; return true;
 }
 function validateSkills(){ 
-    if(skills.length===0){ skillErr.textContent="At least one skill required"; return false;}
-    skillErr.textContent=""; return true;
+    if(skills.length === 0){
+        if(isSubmitted){ // ✅ only show after submit
+            skillErr.textContent = "At least one skill required";
+        }
+        return false;
+    }
+    skillErr.textContent = "";
+    return true;
 }
 
 // Add listeners

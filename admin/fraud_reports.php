@@ -50,7 +50,7 @@ $result = $conn->query($query);
 <thead class="bg-[#D7AE27] text-black">
 <tr>
 <th class="p-3">Company Name</th>
-<th class="p-3">User ID</th>
+<th class="p-3">Company user ID</th>
 
 <th class="p-3">Reports</th>
 <th class="p-3">Latest Detail</th>

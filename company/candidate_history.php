@@ -51,136 +51,136 @@ $num_candidates = mysqli_num_rows($result);
 
 <!DOCTYPE html>
 <html>
-<head>
-<title>Career Craft | Candidate History</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="../dist/styles.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="icon" href="../image/logo3.jpg" type="image/png">
-</head>
+    <head>
+        <title>Career Craft | Candidate History</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="../dist/styles.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        <link rel="icon" href="../image/logo3.jpg" type="image/png">
+    </head>
 
-<body class="bg-black text-white min-h-screen">
+    <body class="bg-black text-white min-h-screen">
 
-<?php include("../include/navbar.php"); ?>
+        <?php include("../include/navbar.php"); ?>
 
-<a href="cdashboard.php"
-class="inline-block mt-20 text-yellow-400 text-sm hover:underline ml-10">
-← Back
-</a>
+        <a href="cdashboard.php"
+        class="inline-block mt-20 text-yellow-400 text-sm hover:underline ml-10">
+        ← Back
+        </a>
 
-<div class="max-w-7xl mx-auto px-6 mt-5 mb-10">
-<form method="POST">
-    <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
-</form>
-<!-- Heading -->
-<h2 class="text-3xl text-center font-semibold mb-8">
-<?= ($filter == 'saved') ? "Saved Candidates" : "All Candidates"; ?>
-</h2>
+        <div class="max-w-7xl mx-auto px-6 mt-5 mb-10">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+        </form>
+        <!-- Heading -->
+        <h2 class="text-3xl text-center font-semibold mb-8">
+        <?= ($filter == 'saved') ? "Saved Candidates" : "All Candidates"; ?>
+        </h2>
 
-<!-- FILTER BUTTONS -->
-<div class="flex justify-center gap-4 mb-10 flex-wrap">
+        <!-- FILTER BUTTONS -->
+        <div class="flex justify-center gap-4 mb-10 flex-wrap">
 
-<a href="?filter=all"
-class="px-5 py-2 rounded-full border <?= ($filter=='all') ? 'bg-yellow-400 text-black' : 'border-gray-600'; ?>">
-All Candidates
-</a>
+        <a href="?filter=all"
+        class="px-5 py-2 rounded-full border <?= ($filter=='all') ? 'bg-yellow-400 text-black' : 'border-gray-600'; ?>">
+        All Candidates
+        </a>
 
-<a href="?filter=saved"
-class="px-5 py-2 rounded-full border <?= ($filter=='saved') ? 'bg-yellow-400 text-black' : 'border-gray-600'; ?>">
-Saved Candidates
-</a>
+        <a href="?filter=saved"
+        class="px-5 py-2 rounded-full border <?= ($filter=='saved') ? 'bg-yellow-400 text-black' : 'border-gray-600'; ?>">
+        Saved Candidates
+        </a>
 
-</div>
-
-<!-- GRID -->
-<?php if($num_candidates > 0): ?>
-<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
-
-<?php while($row = mysqli_fetch_assoc($result)) { 
-
-    // IMAGE
-    $img = !empty($row['profile_image']) 
-        ? "../seeker/uploads/".$row['profile_image'] 
-        : "https://via.placeholder.com/70";
-
-    $date = date("d M Y", strtotime($row['created_at']));
-
-?>
-
-<!-- CARD -->
-<div class="bg-[#161616] p-6 rounded-2xl border border-gray-800 hover:border-yellow-400 transition-all duration-300 relative">
-
-    <!-- TOP -->
-    <div class="flex items-center gap-4">
-
-        <img src="<?= $img ?>" 
-            class="w-16 h-16 rounded-xl object-cover bg-white p-1">
-
-        <div>
-            <h3 class="text-lg font-semibold"><?= $row['sname'] ?></h3>
-            <p class="text-gray-400 text-sm"><?= $row['education'] ?></p>
-            <p class="text-gray-500 text-xs mt-1">
-                <?= isset($date) ? "Joined: ".$date : "" ?>
-            </p>
         </div>
 
-    </div>
+        <!-- GRID -->
+        <?php if($num_candidates > 0): ?>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
 
-    <!-- TAGS -->
-    <div class="flex flex-wrap gap-2 mt-4 text-xs">
+        <?php while($row = mysqli_fetch_assoc($result)) { 
 
-        <span class="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full">
-            <?= $row['experience'] ?>
-        </span>
+            // IMAGE
+            $img = !empty($row['profile_image']) 
+                ? "../seeker/uploads/".$row['profile_image'] 
+                : "https://via.placeholder.com/70";
 
-        <span class="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full">
-            <?= $row['skillname'] ?>
-        </span>
+            $date = date("d M Y", strtotime($row['created_at']));
 
-    </div>
+        ?>
 
-    <!-- BIO -->
-    <p class="text-gray-400 text-sm mt-4 leading-relaxed">
-        <?= !empty($row['bio']) ? substr($row['bio'], 0, 80)."..." : "No description available" ?>
-    </p>
+        <!-- CARD -->
+        <div class="bg-[#161616] p-6 rounded-2xl border border-gray-800 hover:border-yellow-400 transition-all duration-300 relative">
 
-    <!-- STATUS -->
-    <div class="flex justify-between items-center mt-5">
+            <!-- TOP -->
+            <div class="flex items-center gap-4">
 
-        <span class="text-green-400 text-sm font-medium">
-            ● Available for Hiring
-        </span>
+                <img src="<?= $img ?>" 
+                    class="w-16 h-16 rounded-xl object-cover bg-white p-1">
 
-        <span class="text-gray-500 text-xs">
-            Active
-        </span>
+                <div>
+                    <h3 class="text-lg font-semibold"><?= $row['sname'] ?></h3>
+                    <p class="text-gray-400 text-sm"><?= $row['education'] ?></p>
+                    <p class="text-gray-500 text-xs mt-1">
+                        <?= isset($date) ? "Joined: ".$date : "" ?>
+                    </p>
+                </div>
 
-    </div>
+            </div>
 
-    <!-- BUTTON -->
-    <a href="seeker_details.php?sid=<?= $row['sid'] ?>" 
-    class="block mt-5 bg-[#D7AE27] text-black text-center py-2 rounded-xl 
-            font-semibold hover:bg-yellow-500 transition">
-        View Profile
-    </a>
+            <!-- TAGS -->
+            <div class="flex flex-wrap gap-2 mt-4 text-xs">
 
-</div>
+                <span class="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full">
+                    <?= $row['experience'] ?>
+                </span>
 
-<?php } ?>
-</div>
-<?php else: ?>
-<div class="flex flex-col items-center justify-center py-20 w-full">
-    <div class="text-6xl mb-4">&#x1F614;</div>
-    <p class="text-2xl text-[#D7AE27] font-semibold text-center">
-        <?= ($filter == 'saved') ? "No Saved Candidates Found" : "No Candidates Found"; ?>
-    </p>
-</div>
-<?php endif; ?>
+                <span class="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full">
+                    <?= $row['skillname'] ?>
+                </span>
 
-</div>
+            </div>
 
-<?php include("../include/footer.php"); ?>
+            <!-- BIO -->
+            <p class="text-gray-400 text-sm mt-4 leading-relaxed">
+                <?= !empty($row['bio']) ? substr($row['bio'], 0, 80)."..." : "No description available" ?>
+            </p>
 
-</body>
+            <!-- STATUS -->
+            <div class="flex justify-between items-center mt-5">
+
+                <span class="text-green-400 text-sm font-medium">
+                    ● Available for Hiring
+                </span>
+
+                <span class="text-gray-500 text-xs">
+                    Active
+                </span>
+
+            </div>
+
+            <!-- BUTTON -->
+            <a href="seeker_details.php?sid=<?= $row['sid'] ?>" 
+            class="block mt-5 bg-[#D7AE27] text-black text-center py-2 rounded-xl 
+                    font-semibold hover:bg-yellow-500 transition">
+                View Profile
+            </a>
+
+        </div>
+
+        <?php } ?>
+        </div>
+        <?php else: ?>
+        <div class="flex flex-col items-center justify-center py-20 w-full">
+            <div class="text-6xl mb-4">&#x1F614;</div>
+            <p class="text-2xl text-[#D7AE27] font-semibold text-center">
+                <?= ($filter == 'saved') ? "No Saved Candidates Found" : "No Candidates Found"; ?>
+            </p>
+        </div>
+        <?php endif; ?>
+
+        </div>
+
+        <?php include("../include/footer.php"); ?>
+
+    </body>
 </html>

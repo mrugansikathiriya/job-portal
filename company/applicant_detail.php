@@ -34,60 +34,60 @@ $sql = "SELECT a.*, js.*, u.email AS seeker_email, u.contact AS contact, j.title
         JOIN company c ON c.cid = j.cid
         JOIN users cu ON cu.uid = c.uid
         WHERE a.aid='$aid' AND c.uid='$company_uid'";
-$result = mysqli_query($conn, $sql);
-if(mysqli_num_rows($result) == 0){
-    die("Unauthorized access or applicant not found");
-}
-$data = mysqli_fetch_assoc($result);
-// ---------------- STATUS DISPLAY ----------------
-$display_status = $data['status'];
+        $result = mysqli_query($conn, $sql);
+        if(mysqli_num_rows($result) == 0){
+            die("Unauthorized access or applicant not found");
+        }
+        $data = mysqli_fetch_assoc($result);
+        // ---------------- STATUS DISPLAY ----------------
+        $display_status = $data['status'];
 
-if($data['status'] == 'selected' && empty($data['interview_date'])){
-    $display_status = "Shortlisted";
-}
-elseif(!empty($data['interview_date'])){
-    $display_status = "Interview Scheduled";
-}
+        if($data['status'] == 'selected' && empty($data['interview_date'])){
+            $display_status = "Shortlisted";
+        }
+        elseif(!empty($data['interview_date'])){
+            $display_status = "Interview Scheduled";
+        }
 
-// ---------------- PHPMailer Function ----------------
-function sendSeekerEmail($seeker_email, $seeker_name, $subject, $message, $company_name, $company_email){
-    $mail = new PHPMailer(true);
-    try {
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'careercraft535@gmail.com';
-        $mail->Password = 'twhx zekb bklj ceow'; // App password
-        $mail->SMTPSecure = 'tls';
-        $mail->Port = 587;
+        // ---------------- PHPMailer Function ----------------
+        function sendSeekerEmail($seeker_email, $seeker_name, $subject, $message, $company_name, $company_email){
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'careercraft535@gmail.com';
+                $mail->Password = 'twhx zekb bklj ceow'; // App password
+                $mail->SMTPSecure = 'tls';
+                $mail->Port = 587;
 
-        $mail->setFrom('careercraft535@gmail.com', $company_name.' HR');
-        $mail->addAddress($seeker_email, $seeker_name);
-        $mail->addReplyTo($company_email, $company_name.' HR');
+                $mail->setFrom('careercraft535@gmail.com', $company_name.' HR');
+                $mail->addAddress($seeker_email, $seeker_name);
+                $mail->addReplyTo($company_email, $company_name.' HR');
 
-        $mail->isHTML(true);
-        $mail->Subject = $subject;
-        $mail->Body = "
-        <div style='font-family:Segoe UI;background:#f4f6f9;padding:30px'>
-            <div style='max-width:600px;margin:auto;background:#fff;border-radius:12px'>
-                <div style='background:#D7AE27;padding:15px;text-align:center;font-weight:bold'>{$company_name}</div>
-                <div style='padding:25px'>
-                    <p>Hello <b>{$seeker_name}</b>,</p>
-                    <p style='margin-top:10px'>{$message}</p>
-                    <br>
-                    <p>Regards,<br><b>{$company_name}</b> Team<br><small>{$company_email}</small></p>
-                    <hr class='my-3' style='border-color:#ccc'>
-                    <p style='color:#555'>If you have any queries, contact us at 
-                        <a href='mailto:{$company_email}' style='color:#D7AE27'>{$company_email}</a>.
-                    </p>
-                </div>
-            </div>
-        </div>";
-        $mail->send();
-        return "✅ Email sent successfully!";
-    } catch (Exception $e){
-        return "❌ Mail Error: " . $mail->ErrorInfo;
-    }
+                $mail->isHTML(true);
+                $mail->Subject = $subject;
+                $mail->Body = "
+                <div style='font-family:Segoe UI;background:#f4f6f9;padding:30px'>
+                    <div style='max-width:600px;margin:auto;background:#fff;border-radius:12px'>
+                        <div style='background:#D7AE27;padding:15px;text-align:center;font-weight:bold'>{$company_name}</div>
+                        <div style='padding:25px'>
+                            <p>Hello <b>{$seeker_name}</b>,</p>
+                            <p style='margin-top:10px'>{$message}</p>
+                            <br>
+                            <p>Regards,<br><b>{$company_name}</b> Team<br><small>{$company_email}</small></p>
+                            <hr class='my-3' style='border-color:#ccc'>
+                            <p style='color:#555'>If you have any queries, contact us at 
+                                <a href='mailto:{$company_email}' style='color:#D7AE27'>{$company_email}</a>.
+                            </p>
+                        </div>
+                    </div>
+                </div>";
+                $mail->send();
+                return "✅ Email sent successfully!";
+            } catch (Exception $e){
+                return "❌ Mail Error: " . $mail->ErrorInfo;
+            }
 }
 
 // ---------------- Handle Accept / Reject ----------------
@@ -184,23 +184,23 @@ if(isset($_POST['schedule'])){
 
     $isReschedule = !empty($data['interview_date']);
 
-mysqli_query($conn,"UPDATE application 
-SET interview_date='$date', 
-    interview_time='$time',
-    status='interview_scheduled'
-WHERE aid='$aid'");
+    mysqli_query($conn,"UPDATE application 
+    SET interview_date='$date', 
+        interview_time='$time',
+        status='interview_scheduled'
+    WHERE aid='$aid'");
 
-            regenerateCSRFToken();
+     regenerateCSRFToken();
 
-if($isReschedule){
-    $subject = "Interview Rescheduled for {$data['job_title']}";
-    $message_body = "Your interview has been <b>rescheduled</b>.<br><br>
-                     New Date: <b>$date</b><br>
-                     Time: <b>$time</b>";
-} else {
-    $subject = "Interview Scheduled for {$data['job_title']}";
-    $message_body = "Your interview for <b>{$data['job_title']}</b> is scheduled on <b>$date</b> at <b>$time</b>.";
-}
+            if($isReschedule){
+                $subject = "Interview Rescheduled for {$data['job_title']}";
+                $message_body = "Your interview has been <b>rescheduled</b>.<br><br>
+                                New Date: <b>$date</b><br>
+                                Time: <b>$time</b>";
+            } else {
+                $subject = "Interview Scheduled for {$data['job_title']}";
+                $message_body = "Your interview for <b>{$data['job_title']}</b> is scheduled on <b>$date</b> at <b>$time</b>.";
+            }
 
             $msg = sendSeekerEmail(
                 $data['seeker_email'],
@@ -210,7 +210,7 @@ if($isReschedule){
                 $data['cname'],
                 $data['company_email']
             );
-    if($isReschedule){
+             if($isReschedule){
                         $notify_msg = $data['cname'] . " rescheduled interview for " . $data['sname'] . 
                                 " for " . $data['job_title'] . " on " . $date . " at " . $time;
                     } else {
