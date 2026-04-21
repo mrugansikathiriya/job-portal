@@ -196,243 +196,243 @@ while($row = mysqli_fetch_assoc($seekers)){
     <body class="bg-black px-4 py-6 overflow-x-hidden overflow-y-auto">
 
 
-    <?php include("../include/navbar.php");?>
-   
-    <a href="http://localhost/php_program/project/auth/login.php" class="absolute left-4 top-4  mt-20 text-yellow-400 text-sm hover:underline">← Back</a>
+            <?php include("../include/navbar.php");?>
+        
+            <a href="http://localhost/php_program/project/auth/login.php" class="absolute left-4 top-4  mt-20 text-yellow-400 text-sm hover:underline">← Back</a>
 
-   <?php if(isset($_SESSION['login_success'])): ?>
-<div id="flashMessage"
-     class="fixed top-15 right-5 bg-green-600 text-white px-6 py-4 rounded-lg shadow-lg z-50 
-            flex items-center justify-between gap-4 min-w-[280px] 
-            transition-opacity duration-500">
+        <?php if(isset($_SESSION['login_success'])): ?>
+        <div id="flashMessage"
+            class="fixed top-15 right-5 bg-green-600 text-white px-6 py-4 rounded-lg shadow-lg z-50 
+                    flex items-center justify-between gap-4 min-w-[280px] 
+                    transition-opacity duration-500">
 
-    <span><?= $_SESSION['login_success']; ?></span>
+            <span><?= $_SESSION['login_success']; ?></span>
 
-    <!-- Close Button -->
-    <button onclick="closeFlash()"
-            class="text-white text-xl font-bold hover:text-gray-200 leading-none">
-        &times;
-    </button>
-</div>
-<?php unset($_SESSION['login_success']); ?>
-<?php endif; ?>
-
-    <div class="max-w-5xl mx-auto bg-[#0f0f0f] rounded-2xl shadow-2xl 
-    p-6 sm:p-8 border border-white/10 text-white mt-20 mb-10">
-
-    <h2 class="text-2xl md:text-3xl font-bold text-[#D7AE27] mb-6 text-center">
-    Company Registration
-    </h2>
-
-    <form method="POST" enctype="multipart/form-data"
-    class="grid grid-cols-1 md:grid-cols-2 gap-5" novalidate>
-    <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
-
-<!-- Company Logo -->
-<div class="md:col-span-2 mb-4">
-    <label class="block text-white mb-2">
-        Company Logo <span class="text-red-500">*</span>
-    </label>
-
-    <div class="flex items-center gap-6">
-
-        <!-- Preview -->
-        <img id="logoPreview"
-     src="<?= !empty($_SESSION['p_image']) 
-            ? 'uploads/'.$_SESSION['p_image'] 
-            : 'https://ui-avatars.com/api/?name='.urlencode($cname ?? 'Company').'&background=D7AE27&color=000'; ?>"
-     class="w-24 h-24 rounded-full object-cover border-2 border-gray-300 shadow">
-
-        <!-- File Input -->
-        <input type="file"
-               name="logo"
-               id="logoInput"
-               accept="image/*"
-               class="text-white">
-    </div>
-
-    <p id="logoErr" class="text-red-400 text-sm mt-2">
-        <?= $logoErr ?? "" ?>
-    </p>
-</div>
-    <!-- Company Name -->
-    <div>
-        <label>Company Name </label>
-        <input id="cname" name="cname"
-        value="<?= htmlspecialchars($cname) ?>"
-        class="input-field">
-        <p id="cnameErr" class="error"><?= $cnameErr ?></p>
-    </div>
-
-    <!-- Website -->
-    <div>
-        <label>Website</label>
-        <input id="website" name="website"
-        value="<?= htmlspecialchars($website) ?>"
-        class="input-field">
-        <p id="websiteErr" class="error"><?= $websiteErr ?></p>
-    </div>
-
-    <!-- ✅ UPDATED LOCATION DROPDOWN -->
-    <div>
-    <label>Location <span class="text-red-500">*</span></label>
-        <select id="locationField" name="location" class="input-field">
-        <option value="">Select Location</option>
-        <?php foreach($locationList as $loc): ?>
-        <option value="<?= $loc ?>" <?= ($location==$loc)?"selected":"" ?>>
-        <?= $loc ?>
-        </option>
-        <?php endforeach; ?>
-        </select>
-        <p id="locationErr" class="error"><?= $locationErr ?></p>
-    </div>
-
-    <!-- Established Date -->
-<div>
-    <label>Established Date <span class="text-red-500">*</span></label>
-    <input type="date" id="established_at" name="established_at"
-        value="<?= htmlspecialchars($established_at) ?>"
-        max="<?= date('Y-m-d') ?>" 
-        class="input-field">
-    <p id="establishedErr" class="error"><?= $establishedErr ?></p>
-</div>
-
-
-    <!-- Description -->
-    <div class="md:col-span-2">
-        <label>Description</label>
-        <textarea name="description" rows="4"
-        class="input-field resize-none"><?= htmlspecialchars($description) ?></textarea>
-    </div>
-
-    <!-- Verified -->
-    <div class="md:col-span-2">
-        <label>Please select Verified or Not? <span class="text-red-500">*</span></label>
-        <div class="flex gap-6 mt-2">
-        <label><input type="radio" name="is_verified" value="1" <?= $is_verified==="1"?"checked":"" ?>> Yes</label>
-        <label><input type="radio" name="is_verified" value="0" <?= $is_verified==="0"?"checked":"" ?>> No</label>
+            <!-- Close Button -->
+            <button onclick="closeFlash()"
+                    class="text-white text-xl font-bold hover:text-gray-200 leading-none">
+                &times;
+            </button>
         </div>
-        <p id="verifiedErr" class="error"><?= $verifiedErr ?></p>
-    </div>
+        <?php unset($_SESSION['login_success']); ?>
+        <?php endif; ?>
 
-    <div class="md:col-span-2 mt-6 flex justify-center">
-        <button class="bg-[#D7AE27] text-black px-8 py-2 rounded-md font-semibold hover:bg-yellow-400 transition">
-        Register
-        </button>
-    </div>
+            <div class="max-w-5xl mx-auto bg-[#0f0f0f] rounded-2xl shadow-2xl 
+            p-6 sm:p-8 border border-white/10 text-white mt-20 mb-10">
 
-    </form>
-</div>
+            <h2 class="text-2xl md:text-3xl font-bold text-[#D7AE27] mb-6 text-center">
+            Company Registration
+            </h2>
 
-<style>
-    .input-field{
-    width:100%;
-    background:black;
-    border:1px solid rgba(255,255,255,0.2);
-    border-radius:6px;
-    padding:10px;
-    margin-top:5px;
-    color:white;
-    }
-    .error{
-    color:#f87171;
-    font-size:14px;
-    margin-top:4px;
-    }
-</style>
+            <form method="POST" enctype="multipart/form-data"
+            class="grid grid-cols-1 md:grid-cols-2 gap-5" novalidate>
+            <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
+
+        <!-- Company Logo -->
+        <div class="md:col-span-2 mb-4">
+            <label class="block text-white mb-2">
+                Company Logo <span class="text-red-500">*</span>
+            </label>
+
+            <div class="flex items-center gap-6">
+
+                <!-- Preview -->
+                <img id="logoPreview"
+            src="<?= !empty($_SESSION['p_image']) 
+                    ? 'uploads/'.$_SESSION['p_image'] 
+                    : 'https://ui-avatars.com/api/?name='.urlencode($cname ?? 'Company').'&background=D7AE27&color=000'; ?>"
+            class="w-24 h-24 rounded-full object-cover border-2 border-gray-300 shadow">
+
+                <!-- File Input -->
+                <input type="file"
+                    name="logo"
+                    id="logoInput"
+                    accept="image/*"
+                    class="text-white">
+            </div>
+
+            <p id="logoErr" class="text-red-400 text-sm mt-2">
+                <?= $logoErr ?? "" ?>
+            </p>
+        </div>
+            <!-- Company Name -->
+            <div>
+                <label>Company Name </label>
+                <input id="cname" name="cname"
+                value="<?= htmlspecialchars($cname) ?>"
+                class="input-field">
+                <p id="cnameErr" class="error"><?= $cnameErr ?></p>
+            </div>
+
+            <!-- Website -->
+            <div>
+                <label>Website</label>
+                <input id="website" name="website"
+                value="<?= htmlspecialchars($website) ?>"
+                class="input-field">
+                <p id="websiteErr" class="error"><?= $websiteErr ?></p>
+            </div>
+
+            <!-- ✅ UPDATED LOCATION DROPDOWN -->
+            <div>
+            <label>Location <span class="text-red-500">*</span></label>
+                <select id="locationField" name="location" class="input-field">
+                <option value="">Select Location</option>
+                <?php foreach($locationList as $loc): ?>
+                <option value="<?= $loc ?>" <?= ($location==$loc)?"selected":"" ?>>
+                <?= $loc ?>
+                </option>
+                <?php endforeach; ?>
+                </select>
+                <p id="locationErr" class="error"><?= $locationErr ?></p>
+            </div>
+
+            <!-- Established Date -->
+        <div>
+            <label>Established Date <span class="text-red-500">*</span></label>
+            <input type="date" id="established_at" name="established_at"
+                value="<?= htmlspecialchars($established_at) ?>"
+                max="<?= date('Y-m-d') ?>" 
+                class="input-field">
+            <p id="establishedErr" class="error"><?= $establishedErr ?></p>
+        </div>
+
+
+            <!-- Description -->
+            <div class="md:col-span-2">
+                <label>Description</label>
+                <textarea name="description" rows="4"
+                class="input-field resize-none"><?= htmlspecialchars($description) ?></textarea>
+            </div>
+
+            <!-- Verified -->
+            <div class="md:col-span-2">
+                <label>Please select Verified or Not? <span class="text-red-500">*</span></label>
+                <div class="flex gap-6 mt-2">
+                <label><input type="radio" name="is_verified" value="1" <?= $is_verified==="1"?"checked":"" ?>> Yes</label>
+                <label><input type="radio" name="is_verified" value="0" <?= $is_verified==="0"?"checked":"" ?>> No</label>
+                </div>
+                <p id="verifiedErr" class="error"><?= $verifiedErr ?></p>
+            </div>
+
+            <div class="md:col-span-2 mt-6 flex justify-center">
+                <button class="bg-[#D7AE27] text-black px-8 py-2 rounded-md font-semibold hover:bg-yellow-400 transition">
+                Register
+                </button>
+            </div>
+
+            </form>
+        </div>
+
+    <style>
+        .input-field{
+        width:100%;
+        background:black;
+        border:1px solid rgba(255,255,255,0.2);
+        border-radius:6px;
+        padding:10px;
+        margin-top:5px;
+        color:white;
+        }
+        .error{
+        color:#f87171;
+        font-size:14px;
+        margin-top:4px;
+        }
+    </style>
 
 
     <script>
 
-    // LIVE VALIDATION
-    const cnameField = document.getElementById("cname");
-const cnameErr = document.getElementById("cnameErr");
+            // LIVE VALIDATION
+            const cnameField = document.getElementById("cname");
+        const cnameErr = document.getElementById("cnameErr");
 
-const locationField = document.getElementById("locationField");
-const locationErr = document.getElementById("locationErr");
+        const locationField = document.getElementById("locationField");
+        const locationErr = document.getElementById("locationErr");
 
-const establishedField = document.getElementById("established_at");
-const establishedErr = document.getElementById("establishedErr");
+        const establishedField = document.getElementById("established_at");
+        const establishedErr = document.getElementById("establishedErr");
 
-const websiteField = document.getElementById("website");
-const websiteErr = document.getElementById("websiteErr");
+        const websiteField = document.getElementById("website");
+        const websiteErr = document.getElementById("websiteErr");
 
-const logoInput = document.getElementById("logoInput");
-const preview = document.getElementById("logoPreview");
-const logoErr = document.getElementById("logoErr");
+        const logoInput = document.getElementById("logoInput");
+        const preview = document.getElementById("logoPreview");
+        const logoErr = document.getElementById("logoErr");
 
-const verifiedErr = document.getElementById("verifiedErr");
+        const verifiedErr = document.getElementById("verifiedErr");
 
-// Company Name
-cnameField.addEventListener("input", function(){
-    cnameErr.textContent =
-        cnameField.value.trim() !== "" ? "" : "Company name is required";
-});
+        // Company Name
+        cnameField.addEventListener("input", function(){
+            cnameErr.textContent =
+                cnameField.value.trim() !== "" ? "" : "Company name is required";
+        });
 
-// Location
-locationField.addEventListener("change", function(){
-    locationErr.textContent =
-        locationField.value !== "" ? "" : "Location is required";
-});
+        // Location
+        locationField.addEventListener("change", function(){
+            locationErr.textContent =
+                locationField.value !== "" ? "" : "Location is required";
+        });
 
-// Date
-establishedField.addEventListener("change", function(){
-    establishedErr.textContent =
-        establishedField.value !== "" ? "" : "Established date is required";
-});
+        // Date
+        establishedField.addEventListener("change", function(){
+            establishedErr.textContent =
+                establishedField.value !== "" ? "" : "Established date is required";
+        });
 
-// Website
-websiteField.addEventListener("input", function(){
-    const pattern = /^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-]*)*$/;
-    websiteErr.textContent =
-        websiteField.value.trim() === "" || pattern.test(websiteField.value)
-        ? "" : "Invalid website URL";
-});
+        // Website
+        websiteField.addEventListener("input", function(){
+            const pattern = /^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-]*)*$/;
+            websiteErr.textContent =
+                websiteField.value.trim() === "" || pattern.test(websiteField.value)
+                ? "" : "Invalid website URL";
+        });
 
-// Verified radio
-document.querySelectorAll('input[name="is_verified"]').forEach(radio => {
-    radio.addEventListener("change", function(){
-        verifiedErr.textContent = "";
-    });
-});
+        // Verified radio
+        document.querySelectorAll('input[name="is_verified"]').forEach(radio => {
+            radio.addEventListener("change", function(){
+                verifiedErr.textContent = "";
+            });
+        });
 
-// Logo Preview + Validation
-logoInput.addEventListener("change", function () {
-    const file = this.files[0];
+        // Logo Preview + Validation
+        logoInput.addEventListener("change", function () {
+            const file = this.files[0];
 
-    if (!file) {
-        logoErr.textContent = "";
-        return;
-    }
+            if (!file) {
+                logoErr.textContent = "";
+                return;
+            }
 
-    if (file.size > 2 * 1024 * 1024) {
-        logoErr.textContent = "Image must be less than 2MB";
-        return;
-    }
+            if (file.size > 2 * 1024 * 1024) {
+                logoErr.textContent = "Image must be less than 2MB";
+                return;
+            }
 
-    logoErr.textContent = "";
+            logoErr.textContent = "";
 
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        preview.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-});
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
 
-function closeFlash() {
-    const flash = document.getElementById("flashMessage");
-    if (flash) {
-        flash.style.opacity = "0";
-        setTimeout(() => flash.remove(), 500);
-    }
-}
+        function closeFlash() {
+            const flash = document.getElementById("flashMessage");
+            if (flash) {
+                flash.style.opacity = "0";
+                setTimeout(() => flash.remove(), 500);
+            }
+        }
 
-// Auto hide after 1 minute (60000 milliseconds)
-setTimeout(function(){
-    closeFlash();
-}, 60000);
+        // Auto hide after 1 minute (60000 milliseconds)
+        setTimeout(function(){
+            closeFlash();
+        }, 60000);
     </script>
-    <?php include("../include/footer.php");?>
+            <?php include("../include/footer.php");?>
 
     </body>
 
