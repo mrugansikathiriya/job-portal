@@ -26,8 +26,9 @@ $csrf_token = generateCSRFToken();
 
 // ================= GET JOB OFFERS =================
 $query = "
-    SELECT jo.oid as offer_id, js.sid, js.sname, u.email as seeker_email, j.title as job_title, jo.message, jo.created_at, jo.status
+    SELECT jo.oid as offer_id, js.sid, js.sname, u.email as seeker_email, j.title as job_title, jo.message, jo.created_at, jo.status,a.sid AS applied
     FROM job_offers jo
+    JOIN application a ON a.jid = jo.jid AND a.sid = jo.sid
     JOIN job j ON jo.jid = j.jid
     JOIN job_seeker js ON jo.sid = js.sid
     JOIN users u ON js.uid = u.uid
@@ -82,16 +83,20 @@ $res2 = $stmt2->get_result();
                             <td class="px-4 py-2"><?= htmlspecialchars($row['seeker_email']) ?></td>
                             <td class="px-4 py-2"><?= htmlspecialchars($row['job_title']) ?></td>
                             <td class="px-4 py-2"><?= htmlspecialchars($row['message']) ?></td>
-                            <td class="px-4 py-2">
-                                <?php 
-                                    switch($row['status']){
-                                        case 'pending': echo "<span class='text-yellow-400'>Pending</span>"; break;
-                                        case 'accepted': echo "<span class='text-green-400'>Accepted</span>"; break;
-                                        case 'rejected': echo "<span class='text-red-400'>Rejected</span>"; break;
-                                        default: echo "<span class='text-gray-400'>Unknown</span>";
-                                    }
-                                ?>
+                          <td class="px-4 py-2">
+                            <?php 
+                            if($row['status'] == 'rejected'){
+                                echo "<span class='text-red-400'>Rejected</span>";
+                            }
+                            elseif(!empty($row['applied'])){
+                                echo "<span class='text-green-400'>Accepted</span>";
+                            }
+                            else{
+                                echo "<span class='text-yellow-400'>Pending</span>";
+                            }
+                            ?>
                             </td>
+
                             <td class="px-4 py-2"><?= htmlspecialchars($row['created_at']) ?></td>
                             <td class="px-4 py-2">
                                 <a href="seeker_details.php?sid=<?= $row['sid'] ?>" class="text-blue-400 hover:underline" target="_blank">View</a>

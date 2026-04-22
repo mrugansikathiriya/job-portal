@@ -160,14 +160,14 @@ $sdata_count = mysqli_fetch_assoc($saved_count);
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
         <!-- Total Applications -->
-         <a href="job_history.php?applied=1" class="block">
+         <a href="http://localhost/php_program/project/seeker/job_history.php?filter=applied" class="block">
         <div class="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition duration-300">
             <h3 class="text-5xl font-bold text-[#D7AE27]"><?= $adata['total']; ?></h3>
             <p class="text-white/70 mt-3">Total Jobs Applied</p>
         </div>
 
         <!-- Total Saved Jobs -->
-<a href="find_job.php?saved=1" class="block">        
+<a href="http://localhost/php_program/project/seeker/job_history.php?filter=saved" class="block">        
     <div class="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition duration-300">
             <h3 class="text-5xl font-bold text-[#D7AE27]"><?= $sdata_count['total']; ?></h3>
             <p class="text-white/70 mt-3">Saved Jobs</p>
