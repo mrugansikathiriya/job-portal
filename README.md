@@ -109,5 +109,5 @@ http://localhost/job-portal
 
 ## 🙌 Acknowledgement
 
-This project was developed as part of an academic internship/project.
-We sincerely thank our mentors and organization for their guidance and support.
+ This project was developed as part of an academic internship/project .
+ We sincerely thank our mentors and organization for their guidance and support.
