@@ -39,22 +39,6 @@ This is a Job Portal Web Application developed using PHP, HTML, CSS, and MySQL. 
 * **Database:** MySQL
 * **Server:** Apache (XAMPP/WAMP)
 
----
-
-## 📂 Project Structure
-
-```
-/job-portal
-│── /admin
-│── /employer
-│── /user
-│── /assets (CSS, JS, Images)
-│── /includes (DB connection, functions)
-│── index.php
-│── login.php
-│── register.php
-│── config.php
-```
 
 ---
 
@@ -63,7 +47,7 @@ This is a Job Portal Web Application developed using PHP, HTML, CSS, and MySQL. 
 1. Clone the repository:
 
 ```
-git clone https://github.com/your-username/job-portal.git
+git clone https://github.com/mrugansikathiriya/job-portal.git
 ```
 
 2. Move the project folder to:
@@ -101,9 +85,9 @@ http://localhost/job-portal
 
 ## 🔐 Authentication
 
-* Secure login system with sessions
+*  Secure login system with sessions
 * "Remember Me" functionality using cookies
-
+*  Basic form validation and authentication checks
 ---
 
 ## 📸 Some Screenshots
@@ -125,4 +109,5 @@ http://localhost/job-portal
 
 ## 🙌 Acknowledgement
 
-Developed as part of academic project/internship.
+ This project was developed as part of an academic internship/project .
+ We sincerely thank our mentors and organization for their guidance and support.
