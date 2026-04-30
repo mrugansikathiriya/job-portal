@@ -26,14 +26,21 @@ $csrf_token = generateCSRFToken();
 
 // ================= GET JOB OFFERS =================
 $query = "
-    SELECT jo.oid as offer_id, js.sid, js.sname, u.email as seeker_email, j.title as job_title, jo.message, jo.created_at, jo.status,a.sid AS applied
-    FROM job_offers jo
-    JOIN application a ON a.jid = jo.jid AND a.sid = jo.sid
-    JOIN job j ON jo.jid = j.jid
-    JOIN job_seeker js ON jo.sid = js.sid
-    JOIN users u ON js.uid = u.uid
-    WHERE jo.cid = ?
-    ORDER BY jo.created_at DESC
+   SELECT 
+    jo.oid as offer_id,
+    js.sid,
+    js.sname,
+    u.email as seeker_email,
+    j.title as job_title,
+    jo.message,
+    jo.created_at,
+    jo.status
+FROM job_offers jo
+JOIN job j ON jo.jid = j.jid
+JOIN job_seeker js ON jo.sid = js.sid
+JOIN users u ON js.uid = u.uid
+WHERE jo.cid = ?
+ORDER BY jo.created_at DESC
 ";
 
 $stmt2 = $conn->prepare($query);
@@ -85,10 +92,10 @@ $res2 = $stmt2->get_result();
                             <td class="px-4 py-2"><?= htmlspecialchars($row['message']) ?></td>
                           <td class="px-4 py-2">
                             <?php 
-                            if($row['status'] == 'rejected'){
+                        if($row['status'] == 'rejected'){
                                 echo "<span class='text-red-400'>Rejected</span>";
                             }
-                            elseif(!empty($row['applied'])){
+                            elseif($row['status'] == 'accepted'){
                                 echo "<span class='text-green-400'>Accepted</span>";
                             }
                             else{
